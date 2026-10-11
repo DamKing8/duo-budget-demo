@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://ksrffninlyioqobvdvhu.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Duo Budget: budgeting for couples, built around both your paydays</title>
+<meta name="description" content="Duo Budget is a budgeting app for couples, built around both your paydays. Join the waitlist for the beta.">
+<meta name="theme-color" content="#0a1328">
+<link rel="icon" href="../icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../icons/favicon-16.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<style>
+:root{--bg:#0a1328;--bg2:#0f1b36;--card:#13213f;--line:#24365e;--text:#eaf2ff;--muted:#a9bad8;--cyan:#22d3ee;--teal:#14b8a6;--err:#ffb4b4;--ok:#7ef0c8;--safe-b:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:radial-gradient(1200px 600px at 50% -200px,#13306b 0,var(--bg) 60%) fixed,var(--bg);color:var(--text);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;padding-bottom:var(--safe-b)}
+a{color:var(--cyan)}
+.wrap{max-width:1040px;margin:0 auto;padding:20px 20px 40px}
+header{display:flex;align-items:center;gap:12px;padding:6px 0 18px}
+/* logo: img/logo.webp + logo.png (transparent, 2x of 74x64), built by tools/make-brand-assets.py */
+.logo{width:74px;height:64px;display:block;flex:none}
+.brand{font-weight:800;font-size:19px;letter-spacing:.2px}
+.tag{margin-left:auto;font-size:12px;font-weight:700;color:var(--cyan);border:1px solid #1f5566;border-radius:999px;padding:4px 10px;background:rgba(34,211,238,.08)}
+h1{font-size:clamp(30px,8vw,52px);line-height:1.08;margin:14px 0 14px;letter-spacing:-.5px}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--cyan),var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:18px;color:var(--muted);margin:0 0 22px;max-width:36em}
+.cta{display:inline-block;background:linear-gradient(135deg,var(--cyan),var(--teal));color:#04242c;font-weight:800;text-decoration:none;border-radius:14px;padding:14px 22px;min-height:50px}
+section{margin-top:44px}
+h2{font-size:24px;margin:0 0 16px}
+.feats{list-style:none;padding:0;margin:0;display:grid;gap:14px}
+.feats li{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px 18px 18px 64px;position:relative}
+.feats li svg{position:absolute;left:18px;top:18px;width:30px;height:30px;color:var(--cyan)}
+.feats b{display:block;font-size:17px;margin-bottom:4px}.feats span{color:var(--muted)}
+.soon{margin-top:14px;color:var(--muted);font-size:15px}.soon b{color:var(--text)}
+.shots{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.shots figure{margin:0;flex:0 0 72%;max-width:300px;scroll-snap-align:start}
+.shots img{width:100%;height:auto;aspect-ratio:390/844;border-radius:22px;border:1px solid var(--line);display:block;background:var(--bg2)}
+.shots figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+.note{font-size:13px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px}
+label{display:block;font-weight:700;font-size:15px;margin:16px 0 6px}
+label .opt{font-weight:400;color:var(--muted)}
+input[type=email],select{width:100%;min-height:50px;font:inherit;font-size:16px;color:#eaf2ff;-webkit-text-fill-color:#eaf2ff;background:#0b1630;border:1px solid #3a5285;border-radius:14px;padding:12px 14px;caret-color:var(--cyan);color-scheme:dark;-webkit-appearance:none;appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,#a9bad8 50%),linear-gradient(135deg,#a9bad8 50%,transparent 50%);background-position:calc(100% - 20px) 22px,calc(100% - 14px) 22px;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+input::placeholder{color:#9db0d3;-webkit-text-fill-color:#9db0d3;opacity:1}
+input:-webkit-autofill{-webkit-box-shadow:0 0 0 1000px #0b1630 inset;-webkit-text-fill-color:#eaf2ff}
+input:focus,select:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(34,211,238,.25)}
+input[aria-invalid=true]{border-color:#ff8a8a}
+.row{display:grid;gap:0 14px}
+.check{display:flex;gap:12px;align-items:flex-start;margin-top:20px;font-weight:400;font-size:15px}
+.check input{width:24px;height:24px;margin:1px 0 0;flex:none;accent-color:var(--cyan)}
+.privacy{font-size:13px;color:var(--muted);margin:12px 0 0}
+.err{color:var(--err);font-size:14px;margin:6px 0 0;min-height:0}
+.btn{width:100%;margin-top:20px;border:0;border-radius:14px;min-height:52px;font:inherit;font-weight:800;font-size:17px;color:#04242c;background:linear-gradient(135deg,var(--cyan),var(--teal));cursor:pointer}
+.btn[disabled]{opacity:.6;cursor:progress}
+.hp{position:absolute!important;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
+.status{margin-top:14px;border-radius:14px;padding:12px 14px;font-size:15px}
+.status.bad{background:rgba(255,120,120,.12);border:1px solid #7a3340;color:var(--err)}
+.done{text-align:center;padding:10px 0}.done svg{width:48px;height:48px;color:var(--ok)}
+.done h3{font-size:22px;margin:8px 0 6px}.done p{color:var(--muted);margin:0}
+footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}
+[hidden]{display:none!important}
+@media (min-width:720px){.row{grid-template-columns:1fr 1fr}.feats{grid-template-columns:repeat(3,1fr)}.shots{overflow:visible}.shots figure{flex:1 1 0}
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:36px;align-items:start}.hero .card{margin-top:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <picture><source srcset="img/logo.webp" type="image/webp"><img class="logo" src="img/logo.png" width="74" height="64" alt="Duo Budget"></picture><span class="tag">Coming soon</span>
+</header>
+<main>
+<div class="hero">
+  <div>
+    <h1>Budgeting for couples, built around <em>both your paydays</em></h1>
+    <p class="lead">Duo Budget plans around when each of you actually gets paid, so you can both see what's left this pay cycle and what's coming next.</p>
+    <a class="cta" href="#join">Join the waitlist</a>
+  </div>
+  <div class="card" id="join">
+    <form id="wl" novalidate>
+      <h2 style="margin-bottom:4px">Join the waitlist</h2>
+      <p class="note" style="margin:0">Be first to try the beta.</p>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="254" required placeholder="name@example.com" aria-describedby="email-err">
+      <p class="err" id="email-err" role="alert" hidden></p>
+      <div class="row">
+        <div><label for="pc">Your pay cycle <span class="opt">(optional)</span></label>
+        <select id="pc" name="pay_cycle"><option value="">Choose…</option><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="twice_monthly">Twice a month</option><option value="monthly">Monthly</option><option value="other">Other</option></select></div>
+        <div><label for="ppc">Partner's pay cycle <span class="opt">(optional)</span></label>
+        <select id="ppc" name="partner_pay_cycle"><option value="">Choose…</option><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="twice_monthly">Twice a month</option><option value="monthly">Monthly</option><option value="other">Other</option></select></div>
+      </div>
+      <div class="hp" aria-hidden="true"><label for="website">Website (leave empty)</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+      <label class="check" for="consent"><input id="consent" name="consent" type="checkbox" required aria-describedby="consent-err"><span id="consent-text">Yes, email me Duo Budget launch and beta updates. Unsubscribe any time.</span></label>
+      <p class="err" id="consent-err" role="alert" hidden></p>
+      <p class="privacy">We'll only use your email for Duo Budget launch and beta news. We won't sell it or give it to anyone else for marketing. Your pay cycle answers are optional and help us plan the beta. <a href="./privacy.html">Privacy policy</a></p>
+      <button class="btn" id="submit" type="submit">Join the waitlist</button>
+      <div class="status bad" id="status" role="alert" hidden></div>
+    </form>
+    <div class="done" id="done" role="status" aria-live="polite" tabindex="-1" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
+      <h3>You're on the list</h3>
+      <p>Thanks for joining. We'll email you when the beta opens.</p>
+    </div>
+  </div>
+</div>
+
+<section aria-labelledby="why">
+  <h2 id="why">Why Duo Budget</h2>
+  <ul class="feats">
+    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><b>Both paydays, one plan</b><span>Set each partner's pay cycle. Duo Budget plans in fortnights and converts weekly, twice-a-month and monthly pay to match, so the numbers line up with your real paydays.</span></li>
+    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg><b>Shared and personal, side by side</b><span>Budget the joint bills and your own spending in one place, and save toward goals together, with each person's share shown.</span></li>
+    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5M11 20c0-3 2.5-5 5-5s5 2 5 5"/></svg><b>Equal partners, with room for you</b><span>No admin and no "main" account, so you're both equals. Keep your own spending in your own lines while you plan the shared stuff together.</span></li>
+  </ul>
+  <p class="soon"><b>Bank sync is coming.</b> We're working on optional bank connections. No dates yet, and the app works fully without it. When it arrives, you choose what to share, account by account.</p>
+</section>
+
+<section aria-labelledby="look">
+  <h2 id="look">A look inside</h2>
+  <div class="shots">
+    <figure><img src="img/home.webp" width="390" height="844" loading="lazy" decoding="async" alt="Home screen showing what's left over this fortnight, where the money goes, and the next payday"><figcaption>Home: what's left this fortnight</figcaption></figure>
+    <figure><img src="img/budget.webp" width="390" height="844" loading="lazy" decoding="async" alt="Budget screen with income and savings split into ours, yours and mine"><figcaption>Budget: ours, yours and mine</figcaption></figure>
+    <figure><img src="img/goals.webp" width="390" height="844" loading="lazy" decoding="async" alt="Goals screen showing shared savings goals and each partner's contribution"><figcaption>Goals: saving together</figcaption></figure>
+  </div>
+  <p class="note">Screens show sample data for a fictional couple, Chloe and Jack.</p>
+</section>
+</main>
+<footer>
+  <p>Duo Budget is in pre-launch. <a href="../">Try the demo</a> · <a href="./privacy.html">Privacy policy</a></p>
+  <p>© 2026 Duo Budget</p>
+</footer>
+</div>
+<script>
+(function(){
+  var CFG={"url":"https://ksrffninlyioqobvdvhu.supabase.co","key":"sb_publishable_kYFCNsoHhW537_RtxtOxKg_4agyXKDI"};
+  var CONSENT_VERSION='waitlist-v2-2026-10';
+  var RE=/^[a-z0-9._%+'-]+@[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/;
+  var f=document.getElementById('wl'),em=document.getElementById('email'),cb=document.getElementById('consent'),btn=document.getElementById('submit'),st=document.getElementById('status'),done=document.getElementById('done');
+  function err(id,msg,input){var e=document.getElementById(id);e.textContent=msg||'';e.hidden=!msg;if(input)input.setAttribute('aria-invalid',msg?'true':'false');}
+  function showDone(){f.hidden=true;done.hidden=false;try{done.focus();}catch(e){}}
+  // source = page path + ?src tag, e.g. /duo-budget-demo/waitlist/?src=insta (max 60 chars, safe characters only)
+  function src(){var p='/waitlist/',t='';try{p=(location.pathname||p).replace(/[^A-Za-z0-9\/._-]/g,'').slice(0,40);t=(new URLSearchParams(location.search).get('src')||'').replace(/[^a-z0-9_-]/gi,'').slice(0,15);}catch(e){}return (p+(t?'?src='+t:'')).slice(0,60);}
+  em.addEventListener('input',function(){if(em.getAttribute('aria-invalid')==='true'&&RE.test(em.value.trim().toLowerCase()))err('email-err','',em);});
+  cb.addEventListener('change',function(){if(cb.checked)err('consent-err','',cb);});
+  var busy=false;
+  f.addEventListener('submit',function(ev){
+    ev.preventDefault();if(busy)return;st.hidden=true;
+    var email=em.value.trim().toLowerCase(),ok=true;
+    if(!email||email.length>254||!RE.test(email)){err('email-err','Enter a valid email address, like name@example.com.',em);ok=false;}else err('email-err','',em);
+    if(!cb.checked){err('consent-err','Tick the box so we can email you about the launch.',cb);ok=false;}else err('consent-err','',cb);
+    if(!ok){(em.getAttribute('aria-invalid')==='true'?em:cb).focus();return;}
+    if(document.getElementById('website').value){showDone();return;} // honeypot: pretend success, send nothing
+    busy=true;btn.disabled=true;btn.textContent='Joining…';
+    var body={p_email:email,p_consent:true,p_consent_version:CONSENT_VERSION,p_pay_cycle:document.getElementById('pc').value||null,
+      p_partner_pay_cycle:document.getElementById('ppc').value||null,p_source:src(),p_user_agent:(navigator.userAgent||'').slice(0,300),p_website:null};
+    fetch(CFG.url+'/rest/v1/rpc/join_waitlist',{method:'POST',mode:'cors',credentials:'omit',referrerPolicy:'no-referrer',
+      headers:{'apikey':CFG.key,'Authorization':'Bearer '+CFG.key,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(body)})
+    .then(function(r){
+      if(r.ok){showDone();return;}
+      return r.json().catch(function(){return {};}).then(function(j){var m=(j&&j.message)||'';
+        if(r.status===429||/rate_limited/.test(m))fail('Too many tries in a short time. Please wait a minute and try again.');
+        else if(/invalid_email/.test(m)){err('email-err','Enter a valid email address, like name@example.com.',em);fail('');em.focus();}
+        else if(/consent_required/.test(m)){err('consent-err','Tick the box so we can email you about the launch.',cb);fail('');}
+        else fail('Something went wrong on our side. Please try again.');});
+    })
+    .catch(function(){fail('Couldn\'t reach the server. Check your connection and try again.');});
+  });
+  function fail(msg){busy=false;btn.disabled=false;btn.textContent='Join the waitlist';if(msg){st.textContent=msg;st.hidden=false;}}
+})();
+</script>
+</body>
+</html>
