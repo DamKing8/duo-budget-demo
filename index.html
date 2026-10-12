@@ -377,6 +377,18 @@ ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
   /* home: hero + donut | stats + payday, owners card full width */
   #v-dash.on{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);column-gap:var(--gap);align-items:start}
   #v-dash>.c-split{grid-column:1/-1}
+  /* even home grid: hero|stats, donut spans payday+trends, columns end level */
+  #v-dash.on{grid-template-rows:auto auto auto 1fr auto;row-gap:14px;align-items:stretch}
+  #v-dash .dcol{display:contents}
+  #v-dash .dash-title{grid-row:1;margin-bottom:-14px}
+  #v-dash .hero,#v-dash .d-donut,#v-dash #stats,#v-dash .d-pay,#v-dash .tr-entry,#v-dash>.c-split{margin:0!important}
+  #v-dash .hero{grid-column:1;grid-row:2;display:flex;flex-direction:column;justify-content:center}
+  #v-dash #stats{grid-column:2;grid-row:2;align-content:stretch;grid-auto-rows:1fr}
+  #v-dash .d-donut{grid-column:1;grid-row:3/5;display:flex;flex-direction:column}
+  #v-dash .d-donut .donutwrap{flex:1;align-items:center}
+  #v-dash .d-pay{grid-column:2;grid-row:3}
+  #v-dash .tr-entry{grid-column:2;grid-row:4;display:flex;flex-direction:column;justify-content:center}
+  #v-dash>.c-split{grid-row:5}
   .hero{padding:24px}.hero .big{font-size:48px}.hero .big.long{font-size:32px}
   .stats{gap:12px}.stat{padding:16px}.stat .v{font-size:22px}
   /* budget */
@@ -452,7 +464,7 @@ ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
       <div class="big" id="heroBig" data-test="remainder">$0.00</div>
       <div class="note" id="heroNote"></div>
     </div>
-    <div class="card">
+    <div class="card d-donut">
       <h3><span>Where the money goes</span><span class="pill" id="cycPill">Fortnight</span></h3>
       <div class="donutwrap">
         <svg id="donut" width="150" height="150" viewBox="0 0 150 150"></svg>
@@ -462,7 +474,7 @@ ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
     </div>
     <div class="dcol">
     <div class="stats" id="stats" style="margin-bottom:14px"></div>
-    <div class="card">
+    <div class="card d-pay">
       <h3><span>Next payday</span></h3>
       <div class="countdown">
         <div class="cd-num"><b id="cdDays">0</b><small id="cdUnit">days</small></div>
