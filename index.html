@@ -33,6 +33,8 @@ header.top{display:flex;align-items:center;justify-content:space-between;margin:
 .logo svg{width:22px;height:22px}
 .logo.mark{width:40px;height:40px;border-radius:0;background:none;box-shadow:none}
 .logo.mark img{width:100%;height:100%;display:block}
+/* offline fallback: icons/ only exists in the deploy build; if the mark can't load, show the old gradient SVG logo */
+.logo.mark>svg,.logo:not(.mark)>img{display:none}
 .brand h1{font-size:19px;margin:0;letter-spacing:-.2px}
 .brand small{display:block;color:var(--muted);font-size:12px;font-weight:500}
 .avatars{display:flex}
@@ -303,10 +305,57 @@ input.code-in{text-align:center;font-size:26px;font-weight:800;letter-spacing:10
 .rbtns{display:flex;gap:8px;margin-top:8px}.rbtns .btn{flex:none}
 ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}ol.rorder li{font-size:14px;line-height:1.4}ol.rorder li b{display:block}ol.rorder li span{color:var(--muted)}
 
+/* ---------- Trends ---------- */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.tr-head{display:flex;align-items:center;gap:10px}.tr-head h2{margin:0}
+.tr-back{flex:none}
+.tr-scope[hidden]{display:none}
+.tr-scope{grid-template-columns:repeat(var(--n,4),minmax(0,1fr));margin-bottom:14px}
+.tr-scope button{font-size:14px;padding:11px 4px;min-height:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr-pick{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-2px 0 12px}
+.tr-pick .xbtn{width:44px;height:44px;flex:none}.tr-pick .xbtn[disabled]{opacity:.35;cursor:default}
+.tr-pick b{font-size:14px;text-align:center;color:var(--text)}
+.tr-total{font-size:30px;font-weight:800;letter-spacing:-.5px;color:var(--text)}
+.tr-tsub{color:var(--muted);font-size:13px;margin:2px 0 12px}
+.tr-bar{display:flex;height:14px;border-radius:8px;overflow:hidden;background:#0b1630;margin-bottom:14px}
+.tr-bar i{display:block;height:100%}
+.tr-cats{list-style:none;margin:0;padding:0}
+.tr-cats li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid rgba(36,54,94,.6);font-size:14px}
+.tr-cats li:first-child{border-top:0}
+.tr-cats .dot{width:10px;height:10px;border-radius:50%}
+.tr-cats .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.tr-cats .am{text-align:right;color:var(--text);font-weight:700}.tr-cats .am small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.tr-tog{display:inline-flex;background:#0b1630;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.tr-tog button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:700;border-radius:999px;padding:6px 12px;min-height:36px;cursor:pointer}
+.tr-tog button.on{background:rgba(34,211,238,.16);color:var(--cyan)}
+.tr-chart{display:block;width:100%;height:auto;max-height:280px;overflow:visible}
+.tr-chart text{font:600 10px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;fill:#9fb2d4}
+.tr-key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-top:8px}
+.tr-key span{display:inline-flex;align-items:center;gap:6px}.tr-key i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.tr-ins{list-style:none;margin:0;padding:0}
+.tr-ins li{position:relative;padding:10px 0 10px 18px;border-top:1px solid rgba(36,54,94,.6);font-size:15px;line-height:1.45;color:var(--text)}
+.tr-ins li:first-child{border-top:0;padding-top:2px}.tr-ins li:first-child::before{top:9px}
+.tr-ins li::before{content:"";position:absolute;left:2px;top:17px;width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+.tr-empty{text-align:center;padding:28px 18px}.tr-empty b{display:block;font-size:18px;margin:10px 0 6px;color:var(--text)}
+.tr-entry .row2{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tr-entry .hint{margin-top:0}
+.tr-link{background:none;border:1px solid var(--line);color:var(--cyan);font:inherit;font-size:14px;font-weight:700;border-radius:999px;padding:8px 14px;min-height:44px;cursor:pointer;flex:none}
+.bud-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sb-only{display:none!important}
+@keyframes trGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes trDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes trFade{from{opacity:0}to{opacity:1}}
+.tr-chart .gr{transform-box:fill-box;transform-origin:50% 100%;animation:trGrow .45s ease-out both}
+.tr-chart .ln{stroke-dasharray:1;animation:trDraw .7s ease-out both}
+.tr-chart .ar{animation:trFade .6s ease-out both}
+@media (prefers-reduced-motion:reduce){.tr-chart .gr,.tr-chart .ln,.tr-chart .ar{animation:none}}
 /* ===== tablet / iPad layout (>=768px). Phone (<768px) is untouched: only the hide rules below apply there. ===== */
 .sb-brand,nav.tabs .sb-hh,.dash-title{display:none}
 .dcol{min-width:0}
 @media (min-width:768px){
+  .sb-only{display:flex!important}
+  .tr-back{display:none}
+  #v-trends>.tr-head,#v-trends>.sub,#v-trends>.tr-scope{grid-column:1/-1}
   :root{--side:100px;--safe-l:env(safe-area-inset-left,0px);--safe-r:env(safe-area-inset-right,0px);--gap:18px}
   body{background-attachment:fixed}
   .app{max-width:none;margin:0 0 0 calc(var(--side) + var(--safe-l));padding:calc(26px + var(--safe-t)) calc(28px + var(--safe-r)) calc(40px + var(--safe-b)) 28px}
@@ -362,6 +411,10 @@ ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
 /* landscape / wide: full sidebar, budget in two columns, 3-up goals, goal detail as a right-side panel */
 @media (min-width:1080px){
   :root{--side:236px}
+  #v-trends.on{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);column-gap:var(--gap);align-items:start}
+  #trBody{display:contents}
+  #v-trends .tr-l,#v-trends .tr-r{min-width:0}
+  #v-trends .tr-full{grid-column:1/-1}
   nav.tabs{padding-left:calc(14px + var(--safe-l));padding-right:14px}
   nav.tabs button{flex-direction:row;justify-content:flex-start;gap:12px;font-size:15px;min-height:52px;padding:10px 14px}
   nav.tabs button svg{width:22px;height:22px}
@@ -384,7 +437,7 @@ ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
 <div class="app">
   <header class="top">
     <div class="brand">
-      <div class="logo mark"><img src="icons/logo-mark.webp" width="40" height="40" alt=""></div>
+      <div class="logo mark"><img src="icons/logo-mark.webp" width="40" height="40" alt="" onerror="this.parentNode.classList.remove('mark')"><svg viewBox="0 0 24 24" fill="none" stroke="#04242c" stroke-width="2.4" stroke-linecap="round"><circle cx="9" cy="12" r="5.5"/><circle cx="15" cy="12" r="5.5"/></svg></div>
       <div><h1>Duo Budget</h1><small id="hdrSub">Fortnightly · AUD</small></div>
     </div>
     <button class="avatars" id="avatars" aria-label="Household"><span class="av a" id="avA">D</span><span class="av b" id="avB">P</span></button>
@@ -416,6 +469,7 @@ ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
         <div><div style="font-weight:700;font-size:17px" id="cdDate"></div><div class="muted" style="font-size:14px;margin-top:2px" id="cdNote"></div></div>
       </div>
     </div>
+    <div class="card tr-entry" data-test="trends-card"><h3><span>Trends</span></h3><div class="row2"><div class="hint" id="trEntryLine"></div><button class="tr-link" data-open-trends data-test="see-trends">See trends</button></div></div>
     </div>
     <div class="card c-split">
       <h3><span>Ours · Yours · Mine</span><span class="muted" style="font-size:12px;font-weight:500">whose outgoings</span></h3>
@@ -429,7 +483,7 @@ ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
   <!-- BUDGET -->
   <section class="view" id="v-budget">
     <div class="summary-strip"><div><div class="l" id="stripLbl">Left over this fortnight</div><div class="v" id="stripV">$0</div></div><span class="pill" id="stripPill">Fortnight</span></div>
-    <h2 class="page">Budget</h2>
+    <div class="bud-head"><h2 class="page">Budget</h2><button class="tr-link" data-open-trends data-test="budget-trends">Trends</button></div>
     <p class="sub">Tap a name to edit it. Tap the tag to switch between ours, yours and mine.</p>
     <div id="bkSum"></div>
     <div id="groups"></div>
@@ -464,6 +518,14 @@ ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
     <button class="addbtn" id="addGoal">+ Add a goal</button>
   </section>
 
+  <!-- TRENDS -->
+  <section class="view" id="v-trends" aria-labelledby="trTitle">
+    <div class="tr-head"><button class="xbtn tr-back" id="trBack" aria-label="Back" data-test="tr-back">‹</button><h2 class="page" id="trTitle">Trends</h2></div>
+    <p class="sub" id="trSub"></p>
+    <div class="seg tr-scope" id="trScope" role="group" aria-label="Whose spending"></div>
+    <div id="trBody"></div>
+  </section>
+
   <!-- SETTINGS -->
   <section class="view" id="v-settings">
     <h2 class="page">Partners</h2>
@@ -489,11 +551,12 @@ ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
 </div>
 
 <nav class="tabs" aria-label="Main"><div class="in">
-  <div class="sb-brand"><div class="logo mark"><img src="icons/logo-mark.webp" width="40" height="40" alt=""></div><div class="sb-name"><b>Duo Budget</b><small id="sbSub"></small></div></div>
+  <div class="sb-brand"><div class="logo mark"><img src="icons/logo-mark.webp" width="40" height="40" alt="" onerror="this.parentNode.classList.remove('mark')"><svg viewBox="0 0 24 24" fill="none" stroke="#04242c" stroke-width="2.4" stroke-linecap="round"><circle cx="9" cy="12" r="5.5"/><circle cx="15" cy="12" r="5.5"/></svg></div><div class="sb-name"><b>Duo Budget</b><small id="sbSub"></small></div></div>
   <button data-v="dash" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button>
   <button data-v="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>Budget</button>
   <button data-v="cycle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Pay cycle</button>
   <button data-v="goals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>Goals</button>
+  <button data-v="trends" class="sb-only" data-test="nav-trends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="M8 15l3-4 3 2 5-6"/></svg>Trends</button>
   <button data-v="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M15.5 14.6c2.6-.3 4.9 1.2 5.8 4.4"/></svg>Partner</button>
   <button class="sb-hh" id="sbHH" aria-label="Household" data-test="sidebar-household"><span class="avatars" id="sbAv"></span><span class="sb-hhn" id="sbHHName"></span></button>
 </div></nav>
@@ -1032,7 +1095,167 @@ function renderSettings(){renderHHCard();renderBankCard();
   if(document.activeElement!==$('nameB'))$('nameB').value=S.names.N;
   $('currency').value=S.currency;
 }
-function renderAll(){expireCheck();classifyAll();renderHeader();renderDash();renderBudget();renderCycle();renderGoals();renderSettings();}
+function renderAll(){expireCheck();classifyAll();renderHeader();renderDash();renderBudget();renderCycle();renderGoals();renderSettings();trEntry();if($('v-trends').classList.contains('on'))renderTrends();}
+/* ---------- Trends (read-only, computed locally from recorded history; nothing synced, no schema change) ----------
+   History rows, one per pay window of the household cycle: {start,end,cur,frac,inc:{D,N,J},spend:{itemId:$},unb:{D,N,J},sav:{D,N,J},goals:{both,D,N}}
+   Sources: TRENDS_SYNTH (demo build only: deterministic synthetic history) or the counted bank transactions (simulated bank sync).
+   "Just me" (private) bank accounts never count, exactly like every other household figure. */
+var TRENDS_SYNTH=function(wins){ // DEMO_SYNTHETIC_HISTORY
+  function seed(str){var h=2166136261;for(var i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return function(){h+=0x6D2B79F5;var t=h;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296;};}
+  var VAR={groceries:.14,fuel:.2,energy:.25,pet:.6,card:.25,transport:.18,'':.3};
+  var n=wins.length;
+  return wins.map(function(w,k){
+    var R=seed('duo-trends|'+isoLocal(w.start)),back=n-1-k,f=w.cur?w.frac:1;
+    var row={start:w.start,end:w.end,cur:w.cur,frac:w.frac,inc:{D:0,N:0,J:0},spend:{},unb:{D:0,N:0,J:0},sav:{D:0,N:0,J:0},goals:{both:0,D:0,N:0}};
+    S.items.forEach(function(i){var p=conv(+i.amount||0,i.freq,trCyc()),j=(R()*2-1);
+      if(i.cat==='income'){row.inc[i.owner==='N'||i.owner==='D'?i.owner:'J']+=Math.round(p*(i.owner==='N'?1+j*0.05:1)*100)/100;return;}
+      if(i.cat==='savings'){var o=i.owner==='N'||i.owner==='D'?i.owner:'J';row.sav[o]+=Math.round(p*(w.cur?(f>0?1:0):1)*100)/100;return;}
+      if(i.cat!=='expenses'&&i.cat!=='personal')return;
+      var v=VAR.hasOwnProperty(i.tag)?VAR[i.tag]:(i.cat==='personal'?VAR['']:0),amt=p*(1+j*v-(v?0.035:0));
+      if(i.tag==='rent'||i.tag==='loan'||i.tag==='childcare')amt=p;            // fixed: paid in full at the start of the window
+      else amt=amt*f;                                                          // everything else accrues through the window
+      // a couple of windows running over (synthetic): a car repair, and a vet bill plus a big grocery shop
+      if(back===4&&i.tag==='car-ins')amt+=1360;
+      if(back===9&&i.tag==='pet')amt+=980;
+      if(back===9&&i.tag==='groceries')amt+=310;
+      row.spend[i.id]=Math.round(Math.max(0,amt)*100)/100;});
+    row.unb[k%2?'D':'N']=Math.round(R()*40*f*100)/100;                                    // small one-offs not on any line
+    S.goals.forEach(function(g){var key=g.who==='D'||g.who==='N'?g.who:'both';row.goals[key]+=Math.round(conv(+g.perF||0,'fortnight',trCyc())*(w.cur?0:1)*100)/100;});
+    return row;});
+};
+var TR={scope:'all',off:0,n:6,mode:'left',prev:'dash'},TR_N=12;
+var TR_COL=['#22d3ee','#a78bfa','#5eead4','#60a5fa','#f0abfc','#64748b'];
+function trCyc(){return CYCLES[S.cycle]?S.cycle:'fortnight';}
+function trWord(n){var w=CYCLES[trCyc()].per;return n===1||n==null?w:w+'s';}
+function trWins(){var c=trCyc(),cur=payWindow(c,S.payDate),a=parseISO(S.payDate)||today0(),k=payIdx(a,c,cur.start),out=[],t=today0();
+  for(var j=TR_N;j>=0;j--){var s=payAt(a,c,k-j),e=payAt(a,c,k-j+1);out.push({start:s,end:e,cur:j===0,frac:j===0?Math.min(1,Math.max(0,(t-s+864e5)/(e-s))):1});}
+  return out;}
+function trBankRows(wins){if(!hasBank())return null;var acc=accMap(),items={},first=null;S.items.forEach(function(i){items[i.id]=i;});
+  var rows=wins.map(function(w){return {start:w.start,end:w.end,cur:w.cur,frac:w.frac,inc:{D:0,N:0,J:0},spend:{},unb:{D:0,N:0,J:0},sav:{D:0,N:0,J:0},goals:{both:0,D:0,N:0}};});
+  S.bank.transactions.forEach(function(t){var a=acc[t.account];if(!a||!accCounted(a)||t.review)return;var c=t.budgetCat;if(!c||c==='excluded')return;
+    var d=parseISO(t.transactionDate);if(!first||d<first)first=d;
+    var r=null;for(var k=0;k<rows.length;k++)if(d>=rows[k].start&&d<rows[k].end){r=rows[k];break;}if(!r)return;
+    var it=t.budgetItemId&&items[t.budgetItemId],o=(it&&it.owner)||t.owner||'J';if(!r.inc.hasOwnProperty(o))o='J';
+    if(c==='income')r.inc[o]+=+t.amount;
+    else if(c==='savings'){if(+t.amount>0){r.sav[o]+=+t.amount;r.goals[o==='J'?'both':o]+=+t.amount;}}
+    else if(c==='expenses'||c==='personal'){var v=-(+t.amount);if(it)r.spend[it.id]=(r.spend[it.id]||0)+v;else r.unb[o]+=v;}});
+  if(!first)return null;
+  // only windows the recorded history fully covers (plus the one in progress)
+  rows=rows.filter(function(r){return r.cur||r.start>=first;});
+  return rows.some(function(r){return !r.cur;})?rows:null;}
+function trRows(){var w=trWins();if(typeof TRENDS_SYNTH==='function')return {src:'demo',rows:TRENDS_SYNTH(w)};var b=trBankRows(w);return b?{src:'bank',rows:b}:{src:null,rows:[]};}
+function trHasN(){return !!(S.names&&S.names.N)&&(!!memberBy('partner')||S.items.some(function(i){return i.owner==='N';}));}
+function trScopes(){var s=[['all','All'],['shared','Shared'],['D',S.names.D||'Me']];if(trHasN())s.push(['N',S.names.N]);return s;}
+function trOwn(sc){return sc==='all'?['J','D','N']:sc==='shared'?['J']:[sc];}
+function trPlanOf(i){return conv(+i.amount||0,i.freq,trCyc());}
+function trOut(i){return i.cat==='expenses'||i.cat==='personal';}
+// model for one scope: per-row income / spending / savings / left, plus plan
+function trModel(sc){sc=sc||TR.scope;var H=trRows(),own=trOwn(sc),c=trCyc();
+  var lines=S.items.filter(function(i){return trOut(i)&&own.indexOf(i.owner)>=0;});
+  var plan=lines.reduce(function(a,i){return a+trPlanOf(i);},0);
+  var pinc={D:0,N:0};S.items.forEach(function(i){if(i.cat==='income'&&pinc.hasOwnProperty(i.owner))pinc[i.owner]+=trPlanOf(i);});
+  var shareOut=S.items.filter(function(i){return i.owner==='J'&&(trOut(i)||i.cat==='savings');}).reduce(function(a,i){return a+trPlanOf(i);},0);
+  var wD=(pinc.D+pinc.N)>0?pinc.D/(pinc.D+pinc.N):0.5;
+  var rows=H.rows.map(function(r){var tot=r.inc.D+r.inc.N+r.inc.J,sh=Math.min(tot,shareOut);
+    var inc=sc==='all'?tot:sc==='shared'?sh+r.inc.J:sc==='D'?r.inc.D-sh*wD:r.inc.N-sh*(1-wD);
+    // shared money comes in from both partners' pay: Shared gets the planned joint outgoings, each partner keeps the rest
+    var cats={},spend=0;lines.forEach(function(i){var v=r.spend[i.id]||0;cats[i.id]=v;spend+=v;});
+    var unb=own.reduce(function(a,o){return a+(r.unb[o]||0);},0);spend+=unb;
+    var sav=own.reduce(function(a,o){return a+(r.sav[o]||0);},0);
+    var goals=sc==='all'?r.goals.both+r.goals.D+r.goals.N:sc==='shared'?r.goals.both:r.goals[sc]||0;
+    return {start:r.start,end:r.end,cur:r.cur,frac:r.frac,inc:inc,spend:spend,cats:cats,unb:unb,sav:sav,left:inc-spend-sav,goals:goals};});
+  return {src:H.src,scope:sc,cycle:c,plan:plan,lines:lines,rows:rows};}
+function trWhole(v){return money(Math.round(Math.abs(v)),{whole:true});}
+function trScopeLabel(sc){return sc==='all'?['Household spending',false]:sc==='shared'?['Shared bills',true]:[(sc==='D'?S.names.D:S.names.N)+'\'s spending',false];}
+// 2-3 plain sentences. "This" = the last complete pay cycle (the one in progress isn't finished yet).
+function trInsights(M){var done=M.rows.filter(function(r){return !r.cur;});if(!done.length)return [];
+  var last=done[done.length-1],prev=done[done.length-2],out=[],w=trWord(1),avgN=Math.min(6,done.length);
+  if(prev){var best=null;M.lines.forEach(function(i){var d=(last.cats[i.id]||0)-(prev.cats[i.id]||0);if(!best||Math.abs(d)>Math.abs(best.d))best={i:i,d:d};});
+    if(best&&Math.abs(best.d)>=5)out.push({k:'cat',id:best.i.id,v:Math.round(Math.abs(best.d)),t:'Last '+w+' you spent '+trWhole(best.d)+' '+(best.d<0?'less':'more')+' on '+best.i.name+' than the '+w+' before.'});
+    else out.push({k:'cat',v:0,t:'Spending by category was steady last '+w+'.'});}
+  var avg=done.slice(-avgN).reduce(function(a,r){return a+r.spend;},0)/avgN,dv=last.spend-avg,L=trScopeLabel(M.scope),avgW=avgN+'-'+w+' average';
+  if(Math.abs(dv)<=10)out.push({k:'avg',v:Math.round(Math.abs(dv)),t:L[0]+(L[1]?' are':' is')+' steady: within '+trWhole(Math.max(dv,1))+' of your '+avgW+'.'});
+  else out.push({k:'avg',v:Math.round(Math.abs(dv)),t:L[0]+' came in '+trWhole(dv)+(dv<0?' under':' above')+' your '+avgW+' last '+w+'.'});
+  var streak=0;for(var j=done.length-1;j>=0&&done[j].left>=0;j--)streak++;
+  if(last.left<0)out.push({k:'left',v:Math.round(-last.left),t:'Last '+w+' was running over: '+trWhole(last.left)+' more went out than came in.'});
+  else if(streak>=2)out.push({k:'streak',v:streak,t:'You\'ve had money left at payday '+streak+' '+trWord(streak)+' in a row.'});
+  else out.push({k:'left',v:Math.round(last.left),t:'You had '+trWhole(last.left)+' left at payday last '+w+'.'});
+  return out.slice(0,3);}
+function trBreak(M,row){var list=M.lines.map(function(i){return {id:i.id,name:i.name,v:row.cats[i.id]||0,plan:trPlanOf(i)};}).filter(function(x){return x.v>0.004||x.plan>0.004;});
+  list.sort(function(a,b){return b.v-a.v||b.plan-a.plan;});var top=list.slice(0,5),rest=list.slice(5);
+  var other={id:'other',name:'Everything else',v:rest.reduce(function(a,x){return a+x.v;},0)+row.unb,plan:rest.reduce(function(a,x){return a+x.plan;},0)};
+  if(other.v>0.004||other.plan>0.004)top.push(other);return top;}
+function trDay(d){return fmtDay(d);}
+function trCycleName(r){var w=trWord(1);return r.cur?'This '+w+' (from '+trDay(r.start)+', in progress)':CYCLES[trCyc()].label+' from '+trDay(r.start);}
+// ---- SVG charts (hand-rolled; viewBox scales crisply on retina) ----
+function trAxisMax(v){if(v<=0)return 100;var p=Math.pow(10,Math.floor(Math.log10(v))),m=[1,1.5,2,2.5,3,4,5,6,8,10].map(function(x){return x*p;}).filter(function(x){return x>=v;})[0];return m;}
+function trK(v){var a=Math.abs(v);return (v<0?'-':'')+'$'+(a>=1000?(Math.round(a/100)/10).toString().replace(/\.0$/,'')+'k':Math.round(a));}
+function trBars(M,rows){var W=340,H=190,l=40,r=8,t=14,b=28,n=rows.length,gw=(W-l-r)/n,bw=Math.max(4,Math.min(13,gw*0.3));
+  var mx=trAxisMax(Math.max(M.plan,rows.reduce(function(a,x){return Math.max(a,x.inc,x.spend);},0))*1.05),y=function(v){return t+(H-t-b)*(1-Math.max(0,v)/mx);};
+  var s='<svg class="tr-chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(trBarsLabel(M,rows))+'" data-test="tr-bars">';
+  [0,0.5,1].forEach(function(f){var v=mx*f;s+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="#24365e" stroke-width="1"/><text x="'+(l-6)+'" y="'+(y(v)+3.5)+'" text-anchor="end">'+trK(v)+'</text>';});
+  rows.forEach(function(x,k){var cx=l+gw*k+gw/2,op=x.cur?' opacity=".55"':'';
+    s+='<rect class="gr" style="animation-delay:'+(k*25)+'ms" x="'+(cx-bw-1)+'" y="'+y(x.inc)+'" width="'+bw+'" height="'+Math.max(0,y(0)-y(x.inc))+'" rx="2.5" fill="#22d3ee"'+op+'/>';
+    s+='<rect class="gr" style="animation-delay:'+(k*25+40)+'ms" x="'+(cx+1)+'" y="'+y(x.spend)+'" width="'+bw+'" height="'+Math.max(0,y(0)-y(x.spend))+'" rx="2.5" fill="#a78bfa"'+op+'/>';
+    if(x.cur)s+='<rect x="'+(cx-bw-3)+'" y="'+(Math.min(y(x.inc),y(x.spend))-3)+'" width="'+(bw*2+6)+'" height="'+(y(0)-Math.min(y(x.inc),y(x.spend))+3)+'" rx="4" fill="none" stroke="#9fb2d4" stroke-dasharray="3 3"/><text x="'+cx+'" y="'+(Math.min(y(x.inc),y(x.spend))-7)+'" text-anchor="middle">now</text>';
+    if(n<=6||k%2===(n-1)%2)s+='<text x="'+cx+'" y="'+(H-10)+'" text-anchor="middle">'+esc(trDay(x.start))+'</text>';});
+  s+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+y(M.plan)+'" y2="'+y(M.plan)+'" stroke="#eaf2ff" stroke-width="1.2" stroke-dasharray="5 4" opacity=".8"/>';
+  return s+'</svg>';}
+function trBarsLabel(M,rows){var done=rows.filter(function(r){return !r.cur;}),over=done.filter(function(r){return r.spend>r.inc;}).length;
+  return 'Income and spending for the last '+rows.length+' '+trWord(rows.length)+'. Planned spending '+trWhole(M.plan)+' a '+trWord(1)+'. Spending was higher than income in '+over+' of '+done.length+' finished '+trWord(done.length)+'. The last bar is the '+trWord(1)+' in progress.';}
+function trLine(M,rows,mode){var W=340,H=170,l=40,r=10,t=14,b=28,vals=rows.map(function(x){return x.v;}),n=rows.length;
+  var lo=Math.min(0,Math.min.apply(null,vals)),hi=Math.max(0,Math.max.apply(null,vals));var pad=(hi-lo)*0.12||40;hi=hi+pad;lo=lo<0?lo-pad:0;
+  var x=function(k){return l+(n<2?(W-l-r)/2:(W-l-r)*k/(n-1));},y=function(v){return t+(H-t-b)*(hi-v)/(hi-lo);},z=y(0);
+  var pts=vals.map(function(v,k){return [x(k),y(v)];}),d='M'+pts.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(' L');
+  var area=d+' L'+x(n-1).toFixed(1)+' '+z.toFixed(1)+' L'+x(0).toFixed(1)+' '+z.toFixed(1)+' Z',id='trc'+mode,col=mode==='goals'?'#a78bfa':'#22d3ee',warm='#e0a868';
+  var s='<svg class="tr-chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(trLineLabel(rows,mode))+'" data-test="tr-line">';
+  s+='<defs><clipPath id="'+id+'u"><rect x="0" y="0" width="'+W+'" height="'+z+'"/></clipPath><clipPath id="'+id+'d"><rect x="0" y="'+z+'" width="'+W+'" height="'+(H-z)+'"/></clipPath>'+
+    '<linearGradient id="'+id+'g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity=".35"/><stop offset="1" stop-color="'+col+'" stop-opacity=".04"/></linearGradient></defs>';
+  [hi,lo].forEach(function(v){if(Math.abs(v)<1)return;s+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="#24365e"/><text x="'+(l-6)+'" y="'+(y(v)+3.5)+'" text-anchor="end">'+trK(v)+'</text>';});
+  s+='<path class="ar" d="'+area+'" fill="url(#'+id+'g)" clip-path="url(#'+id+'u)"/><path class="ar" d="'+area+'" fill="'+warm+'" fill-opacity=".22" clip-path="url(#'+id+'d)"/>';
+  s+='<line x1="'+l+'" x2="'+(W-r)+'" y1="'+z+'" y2="'+z+'" stroke="#c9d6ef" stroke-width="1.6"/><text x="'+(l-6)+'" y="'+(z+3.5)+'" text-anchor="end">$0</text>';
+  s+='<path class="ln" pathLength="1" d="'+d+'" fill="none" stroke="'+col+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#'+id+'u)"/>';
+  s+='<path class="ln" pathLength="1" d="'+d+'" fill="none" stroke="'+warm+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#'+id+'d)"/>';
+  pts.forEach(function(p,k){s+='<circle class="ar" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3.2" fill="'+(vals[k]<0?warm:col)+'" stroke="#14223f" stroke-width="1.5"/>';
+    if(n<=6||k%2===(n-1)%2)s+='<text x="'+p[0].toFixed(1)+'" y="'+(H-10)+'" text-anchor="middle">'+esc(trDay(rows[k].start))+'</text>';});
+  return s+'</svg>';}
+function trLineLabel(rows,mode){var v=rows.map(function(r){return r.v;});if(mode==='goals')return 'Goals saved over the last '+rows.length+' finished '+trWord(rows.length)+', reaching '+trWhole(v[v.length-1]||0)+'.';
+  var neg=v.filter(function(x){return x<0;}).length;return 'Money left at payday for the last '+rows.length+' finished '+trWord(rows.length)+'. Lowest '+trK(Math.min.apply(null,v))+', highest '+trK(Math.max.apply(null,v))+'. Running over in '+neg+' of them.';}
+function trTable(cap,head,rows){return '<div class="sr-only"><table><caption>'+esc(cap)+'</caption><thead><tr>'+head.map(function(h){return '<th scope="col">'+esc(h)+'</th>';}).join('')+'</tr></thead><tbody>'+
+  rows.map(function(r){return '<tr>'+r.map(function(c,k){return k?'<td>'+esc(c)+'</td>':'<th scope="row">'+esc(c)+'</th>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
+function renderTrends(){var el=$('trBody');if(!el)return;var sc=trScopes();if(!sc.some(function(x){return x[0]===TR.scope;}))TR.scope='all';
+  $('trScope').style.setProperty('--n',sc.length);
+  $('trScope').innerHTML=sc.map(function(x){return '<button data-sc="'+x[0]+'" class="'+(TR.scope===x[0]?'on':'')+'" aria-pressed="'+(TR.scope===x[0])+'" data-test="tr-scope-'+x[0]+'">'+esc(x[1])+'</button>';}).join('');
+  var M=trModel(),w=trWord(1);
+  $('trSub').textContent=M.src?'Per '+w+', from '+(M.src==='demo'?'sample history':'your synced transactions')+'. Read-only, worked out on this device.':'';
+  if(!M.src||!M.rows.some(function(r){return !r.cur;})){$('trScope').hidden=true;
+    el.innerHTML='<div class="card tr-empty tr-full" data-test="tr-empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/></svg><b>Trends appear after your first full pay cycle</b><div class="muted" style="font-size:14px;line-height:1.45">Once a whole '+w+' of spending is recorded (for example from a connected bank), you\'ll see how each '+w+' compares here.</div></div>';return;}
+  $('trScope').hidden=false;
+  var R=M.rows,maxOff=R.length-1;TR.off=Math.max(0,Math.min(TR.off,maxOff));var row=R[R.length-1-TR.off],br=trBreak(M,row),tot=row.spend,pct=lrPct(br.map(function(x){return x.v;}));
+  var h='<div class="tr-l"><div class="card" data-test="tr-breakdown"><h3><span>Spending by category</span></h3>'+
+    '<div class="tr-pick"><button class="xbtn" id="trPrev" aria-label="Previous '+w+'"'+(TR.off>=maxOff?' disabled':'')+'>‹</button><b data-test="tr-cycle">'+esc(trCycleName(row))+'</b><button class="xbtn" id="trNext" aria-label="Next '+w+'"'+(TR.off<=0?' disabled':'')+'>›</button></div>'+
+    '<div class="tr-total" data-test="tr-total">'+money(tot)+'</div><div class="tr-tsub">'+(row.cur?'spent so far':'spent')+' of '+money(M.plan,{whole:true})+' planned</div>'+
+    '<div class="tr-bar" role="img" aria-label="'+esc(br.map(function(x,k){return x.name+' '+pct[k]+'%';}).join(', '))+'">'+br.map(function(x,k){return x.v>0.004?'<i style="width:'+(tot>0?x.v/tot*100:0)+'%;background:'+TR_COL[Math.min(k,5)]+'"></i>':'';}).join('')+'</div>'+
+    '<ul class="tr-cats">'+br.map(function(x,k){return '<li data-test="tr-cat"><span class="dot" style="background:'+TR_COL[Math.min(k,5)]+'"></span><span class="nm">'+esc(x.name)+'</span><span class="am">'+money(x.v,{whole:x.v>=100})+'<small>'+(x.plan>0.004?Math.round(x.v/x.plan*100)+'% of plan':'not budgeted')+'</small></span></li>';}).join('')+'</ul></div>';
+  var ins=trInsights(M);
+  h+='<div class="card" data-test="tr-insights"><h3><span>What changed</span></h3><ul class="tr-ins">'+ins.map(function(x){return '<li data-test="tr-insight" data-k="'+x.k+'">'+esc(x.t)+'</li>';}).join('')+'</ul></div></div>';
+  var show=R.slice(-Math.min(TR.n+1,R.length));
+  h+='<div class="tr-r"><div class="card" data-test="tr-incspend"><h3><span>Income vs spending</span><span class="tr-tog" role="group" aria-label="How many '+trWord(2)+'"><button data-n="6" class="'+(TR.n===6?'on':'')+'" aria-pressed="'+(TR.n===6)+'">6</button><button data-n="12" class="'+(TR.n===12?'on':'')+'" aria-pressed="'+(TR.n===12)+'">12</button></span></h3>'+
+    trBars(M,show)+'<div class="tr-key"><span><i style="background:#22d3ee"></i>Income</span><span><i style="background:#a78bfa"></i>Spending</span><span><i style="background:none;border-top:2px dashed #eaf2ff;height:0;border-radius:0"></i>Planned spending</span></div>'+
+    trTable('Income and spending per '+w,[CYCLES[trCyc()].label+' from','Income','Spending'],show.map(function(r){return [trDay(r.start)+(r.cur?' (in progress)':''),money(r.inc),money(r.spend)];}))+'</div>';
+  var done=R.filter(function(r){return !r.cur;}).slice(-TR.n),cum=0,lr=TR.mode==='goals'?done.map(function(r){cum+=r.goals;return {start:r.start,v:cum};}):done.map(function(r){return {start:r.start,v:r.left};});
+  h+='<div class="card" data-test="tr-left"><h3><span>'+(TR.mode==='goals'?'Goals saved':'Left at payday')+'</span><span class="tr-tog" role="group" aria-label="Chart"><button data-mode="left" class="'+(TR.mode==='left'?'on':'')+'" aria-pressed="'+(TR.mode==='left')+'">Left</button><button data-mode="goals" class="'+(TR.mode==='goals'?'on':'')+'" aria-pressed="'+(TR.mode==='goals')+'">Goals</button></span></h3>'+
+    trLine(M,lr,TR.mode)+'<div class="hint">'+(TR.mode==='goals'?'Total put toward goals, adding up each '+w+'.':'What was left when the next pay landed. Below the line means that '+w+' was running over.')+' The '+w+' in progress isn\'t included yet.</div>'+
+    trTable(TR.mode==='goals'?'Goals saved, cumulative':'Left at payday',[CYCLES[trCyc()].label+' from',TR.mode==='goals'?'Goals saved':'Left at payday'],lr.map(function(r){return [trDay(r.start),money(r.v)];}))+'</div></div>';
+  el.innerHTML=h;}
+function trEntry(){var el=$('trEntryLine');if(!el)return;var M=trModel('all'),done=M.rows.filter(function(r){return !r.cur;});
+  el.textContent=M.src&&done.length?('Last '+trWord(1)+': '+(done[done.length-1].left<0?'running over by '+trWhole(done[done.length-1].left):trWhole(done[done.length-1].left)+' left at payday')+'.'):'Trends appear after your first full pay cycle.';}
+function openTrends(){var cur=document.querySelector('section.view.on');TR.prev=cur&&cur.id!=='v-trends'?cur.id.slice(2):TR.prev||'dash';
+  [].forEach.call(document.querySelectorAll('section.view'),function(s){s.classList.toggle('on',s.id==='v-trends');});
+  [].forEach.call(document.querySelectorAll('nav.tabs button[data-v]'),function(x){x.classList.toggle('on',x.dataset.v==='trends');});
+  renderTrends();window.scrollTo(0,0);}
+function closeTrends(){var b=document.querySelector('nav.tabs button[data-v="'+TR.prev+'"]')||document.querySelector('nav.tabs button[data-v="dash"]');b.click();}
+
 
 /* ---------- Sheets ---------- */
 var FINE_POINTER=!!(window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine)').matches);
@@ -1223,7 +1446,7 @@ var CODE_ABC='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O, 1/I/L to avoid typos
 var INVITE_DAYS=7,DAY=86400000;
 var APPLE='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.87-.76-1.47.02-2.83.86-3.59 2.18-1.53 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.24 2.73 2.2 1.1-.04 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.41 1.2-2.47-.03-.01-2.3-.88-2.32-3.5zM14.2 6.13c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.64-1.05 1.68-.92 2.67.97.08 1.96-.49 2.56-1.22z"/></svg>';
 var GOOGLE='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.3-4.8 3.3-7.9z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 0 1 0-4.3V7.1H2.1a11 11 0 0 0 0 9.9l3.7-2.8z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7.1l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>';
-var LOGO='<img class="brandlock" src="icons/logo-lockup.webp" width="660" height="569" alt="Duo Budget">';
+var LOGO='<img class="brandlock" src="icons/logo-lockup.webp" width="660" height="569" alt="Duo Budget" onerror="this.style.display=\'none\'">';
 function genCode(){var c='',a=new Uint32Array(6);try{window.crypto.getRandomValues(a);}catch(e){for(var k=0;k<6;k++)a[k]=Math.floor(Math.random()*1e9);}for(var i=0;i<6;i++)c+=CODE_ABC.charAt(a[i]%CODE_ABC.length);return c;}
 function HH(){return S.household||null;}
 var RET='[30 DAYS, PENDING LEGAL REVIEW]',PROVIDER='[DATA PROVIDER TBC]';
@@ -1607,7 +1830,7 @@ function genTx(conn,acc){
   var p=conn.partner,R=rng(conn.id),out=[],seq=0,t0=today0(),start=dOff(t0,-60);
   var jit=function(v,pct){return r2(v*(1+(R()*2-1)*pct));};
   function add(key,m,amt,date){
-    amt=r2(amt);if(!acc[key]||date<start||date>t0||Math.abs(amt)<0.01)return;
+    amt=r2(amt);if(!acc[key]||(date<start&&!(m==='phone'&&date>=dOff(start,-3)))||date>t0||Math.abs(amt)<0.01)return; // phone: 2 prior debits always in history
     var a=acc[key],mm=MC[m],pend=amt<0&&date>=dOff(t0,-1),iso=isoLocal(date);
     var desc=m==='fromPartner'?'TRANSFER FROM '+String(pName('B')).toUpperCase()+' EVERYDAY':mm[0];
     out.push({id:conn.id+'-'+(++seq),status:pend?'pending':'posted',description:desc,amount:amt.toFixed(2),currency:'AUD',account:a.id,connection:conn.id,institution:conn.institution.id,
@@ -1633,13 +1856,16 @@ function genTx(conn,acc){
     case 'transport':[1,2,8,9].forEach(function(o){add(k,'metro',-f/4,dOff(P,o));});break;
     case 'childcare':add(k,'childcare',-f,dOff(P,4));break;
     case 'card':add(k,'cardPay',-f,dOff(P,2));add('card','cardRecv',f,dOff(P,3));break;}});}
+  // the phone bill recurs on a day relative to today, so one monthly bill is always still due in the current pay window
+  // (tomorrow if that's before the next payday, otherwise today with this month's debit not taken yet)
+  var dueT=dOff(t0,1)<next?dOff(t0,1):t0,dueDay=dueT.getDate();
   function perMonth(m0){lines.forEach(function(i){var mo=perF(i)*26/12,k=src(i);switch(itemTag(i)){
     case 'health-ins':add(k,'health',-mo,md(m0,1));break;
     case 'gym':add(k,'gym',-mo,md(m0,3));break;
     case 'internet':add(k,'net',-mo,md(m0,5));break;
     case 'streaming':add(k,'stream',-mo*.5,md(m0,8));add(k,'tune',-mo*.3,md(m0,15));add(k,'cloud',-mo*.2,md(m0,22));break;
     case 'energy':add(k,'elec',-mo,md(m0,12));break;
-    case 'phone':add(k,'phone',-mo,md(m0,20));break;
+    case 'phone':var pd=md(m0,dueDay);if(pd<dueT)add(k,'phone',-mo,pd);break;
     case 'car-ins':add(k,'carins',-mo,md(m0,25));break;}});}
   if(p==='A'){
     cycles.forEach(function(P){
@@ -2121,10 +2347,16 @@ $('bkCard').addEventListener('click',function(e){if(salaryClick(e))return;var s=
 $('bkSum').addEventListener('click',function(e){if(e.target.closest('#bkSumReview'))openFlow('bkInbox');});
 
 /* ---------- Events ---------- */
+document.addEventListener('click',function(e){if(e.target.closest('[data-open-trends]'))openTrends();});
+$('trBack').addEventListener('click',closeTrends);
+$('v-trends').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+  if(b.dataset.sc){TR.scope=b.dataset.sc;}else if(b.id==='trPrev'){TR.off++;}else if(b.id==='trNext'){TR.off--;}
+  else if(b.dataset.n){TR.n=+b.dataset.n;}else if(b.dataset.mode){TR.mode=b.dataset.mode;}else return;renderTrends();});
 document.querySelector('nav.tabs').addEventListener('click',function(e){
   var b=e.target.closest('button[data-v]');if(!b)return;
   [].forEach.call(this.querySelectorAll('button[data-v]'),function(x){x.classList.toggle('on',x===b);});
   [].forEach.call(document.querySelectorAll('section.view'),function(s){s.classList.toggle('on',s.id==='v-'+b.dataset.v);});
+  if(b.dataset.v==='trends')renderTrends();
   window.scrollTo(0,0);
 });
 $('groups').addEventListener('click',function(e){
@@ -2210,7 +2442,7 @@ function startSync(){
   .catch(function(e){renderSync({state:'error',msg:'Couldn\'t load the sync library.'});});
 }
 load();save();renderAll();startSync();
-window.__duo={state:function(){return S;},invStatus:invStatus,bankActuals:bankActuals,detectSalary:detectSalary,totals:totals,totalsIn:totalsIn,projection:projection,shares:shares,paydaysFor:function(c,d,n){return paydaysFor(c,d,n).map(isoLocal);},payWindow:payWindow,lrPct:lrPct,payAt:function(iso,c,k){return isoLocal(payAt(parseISO(iso),c,k));}};
+window.__duo={state:function(){return S;},trends:function(sc){return trModel(sc);},trInsights:function(sc){return trInsights(trModel(sc));},trBreak:function(sc,off){var M=trModel(sc);return trBreak(M,M.rows[M.rows.length-1-(off||0)]);},trWins:trWins,invStatus:invStatus,bankActuals:bankActuals,detectSalary:detectSalary,totals:totals,totalsIn:totalsIn,projection:projection,shares:shares,paydaysFor:function(c,d,n){return paydaysFor(c,d,n).map(isoLocal);},payWindow:payWindow,lrPct:lrPct,payAt:function(iso,c,k){return isoLocal(payAt(parseISO(iso),c,k));}};
 })();
 </script>
 </body>
