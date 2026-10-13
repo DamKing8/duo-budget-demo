@@ -86,8 +86,6 @@ p.sub{color:var(--muted);margin:0 2px 16px;font-size:14px}
 .item{display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:60px;border-bottom:1px solid var(--line)}
 .item:last-child{border-bottom:0}
 .item .nm{flex:1;min-width:0;cursor:pointer}
-.item.haswrap{flex-wrap:wrap}.item.haswrap>.salary{flex-basis:100%;margin-top:0}
-.item.haswrap>.actrow{flex-basis:100%;min-width:0;cursor:pointer;margin-top:-4px}.actrow .act{margin-top:0}
 .nw{white-space:nowrap}
 .item .nm b{display:block;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .item .nm small{color:var(--dim);font-size:12px}
@@ -270,40 +268,10 @@ input.code-in{text-align:center;font-size:26px;font-weight:800;letter-spacing:10
 .done-ic{width:76px;height:76px;border-radius:50%;margin:24px auto 14px;display:grid;place-items:center;font-size:36px;background:rgba(94,234,212,.15);border:1px solid rgba(94,234,212,.4);color:var(--mint)}
 .shr{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.4}.shr:first-of-type{border-top:0}
 .shr b{flex:none;width:92px;white-space:nowrap}.shr span{color:var(--muted)}
-.pill.sim{background:rgba(251,191,36,.13);color:var(--amber);border-color:rgba(251,191,36,.35)}
-.blogo{width:40px;height:40px;border-radius:12px;display:inline-grid;place-items:center;color:#fff;font-weight:800;font-size:14px;flex:none}
-.bankrow{display:flex;align-items:center;gap:12px;width:100%;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px;cursor:pointer;text-align:left;color:var(--text);min-height:64px}
-.bankrow b{display:block;font-size:16px}.bankrow small{color:var(--muted);font-size:13px}.bankrow .chev{margin-left:auto;color:var(--dim);font-size:24px}
-.simbank{background:#f6f8fb;color:#0f172a;border-radius:18px;overflow:hidden;border:3px dashed var(--amber)}
-.sb-top{display:flex;align-items:center;gap:10px;padding:12px 14px;color:#fff;font-weight:800}
-.sb-top .blogo{width:32px;height:32px;background:rgba(255,255,255,.2)!important;font-size:12px}
-.sb-tag{margin-left:auto;background:#fde68a;color:#78350f;font-size:11px;font-weight:800;padding:4px 8px;border-radius:999px;letter-spacing:.5px}
-.sb-body{padding:16px}.sb-body h3{margin:0 0 8px;font-size:20px}.sb-body p,.sb-body li{font-size:14px;line-height:1.5;color:#334155}.sb-body ul{padding-left:20px;margin:6px 0}
-.sb-note{background:#fff7ed;border:1px solid #fdba74;color:#9a3412;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.4;margin:12px 0}
-.acct{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.mlist .acct:first-child,.acct:first-child{border-top:0}
-.acct .am{font-weight:700;font-variant-numeric:tabular-nums}
-.tick{width:28px;height:28px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;flex:none;font-weight:800;color:#04242c;font-size:15px}
-.tick.on{background:var(--cyan);border-color:var(--cyan)}
 .chkrow{display:flex;gap:12px;align-items:flex-start;background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.25);border-radius:14px;padding:14px;cursor:pointer;margin-top:14px;font-size:14px;line-height:1.4;width:100%;text-align:left;color:var(--text)}
-.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.modes .chip{padding:8px 4px;font-size:12px;min-height:42px;text-align:center;line-height:1.2}
 .chip[disabled]{opacity:.4;cursor:not-allowed}
-.syncbar{height:10px;border-radius:999px;background:#0b1630;overflow:hidden;margin:18px 0}.syncbar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--cyan));transition:width .25s}
-.ssteps div{padding:8px 0;color:var(--dim);font-size:15px}.ssteps div.done{color:var(--mint)}.ssteps div.done:before{content:"✓ "}.ssteps div.cur{color:var(--text);font-weight:600}
-.txr{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);cursor:pointer}.mlist .txr:first-child{border-top:0;padding-top:2px}
-.txr .mi b{font-size:15px;white-space:normal}.txr .am,.acct .am{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}.am.cr{color:var(--mint)}
-.pend{color:var(--dim)!important}
-.ptag{font-size:10px;font-weight:800;color:var(--dim);border:1px solid var(--line);border-radius:6px;padding:1px 5px;margin-left:6px;vertical-align:2px}
-.act{margin-top:6px}
-.act .k{font-weight:700;color:var(--text)}.abar{height:5px;border-radius:9px;background:#0b1630;display:flex;overflow:hidden}.abar i{display:block;height:100%}
-.act>span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
-.salary{background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.3);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.45;margin-top:12px;color:#b5e8df}
-.salary b{color:var(--text)}
-.chkrow[aria-disabled="true"]{opacity:.6}
 .btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
-.blockhint{color:var(--amber);font-size:13px;font-weight:600;margin-top:10px;line-height:1.4}
 .linkrow{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}.linkrow .linkbtn{width:auto;padding:12px 14px;min-height:44px}
-.rbtns{display:flex;gap:8px;margin-top:8px}.rbtns .btn{flex:none}
-ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}ol.rorder li{font-size:14px;line-height:1.4}ol.rorder li b{display:block}ol.rorder li span{color:var(--muted)}
 
 /* ---------- Trends ---------- */
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -497,7 +465,6 @@ ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
     <div class="summary-strip"><div><div class="l" id="stripLbl">Left over this fortnight</div><div class="v" id="stripV">$0</div></div><span class="pill" id="stripPill">Fortnight</span></div>
     <div class="bud-head"><h2 class="page">Budget</h2><button class="tr-link" data-open-trends data-test="budget-trends">Trends</button></div>
     <p class="sub">Tap a name to edit it. Tap the tag to switch between ours, yours and mine.</p>
-    <div id="bkSum"></div>
     <div id="groups"></div>
   </section>
 
@@ -543,7 +510,6 @@ ol.rorder{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
     <h2 class="page">Partners</h2>
     <p class="sub">Your household, and the names that show on every item and split.</p>
     <div class="card" id="hhCard"></div>
-    <div class="card" id="bkCard"></div>
     <div class="card" id="syncCard" data-test="sync-card" hidden></div>
     <div class="card">
       <label class="fl" for="nameA" style="margin-top:0">Your name</label>
@@ -814,7 +780,7 @@ function demo(){
   // Synthetic sample household for sharing. All names, employers, amounts and dates are invented.
   var I=function(n,a,o,c,tag,f){return {id:uid(),name:n,amount:a,freq:f||'fortnight',owner:o,cat:c,tag:tag||''};};
   var t=new Date();t.setHours(0,0,0,0);
-  // Chloe is paid every second Wednesday. Jack picked "monthly on the 15th" when joining; bank sync spots fortnightly pay.
+  // Chloe is paid every second Wednesday. Jack picked "monthly on the 15th" when joining.
   var d=new Date(t);var add=(3-d.getDay()+7)%7||7;d.setDate(d.getDate()+add);
   var jm=new Date(t.getFullYear(),t.getMonth()+(t.getDate()>=15?1:0),15);
   var now=Date.now(),DY=86400000,made=now-21*DY,joined=now-19*DY;
@@ -846,6 +812,8 @@ function demo(){
 }
 var S;
 function load(){try{var raw=localStorage.getItem(KEY);S=raw?JSON.parse(raw):demo();}catch(e){S=demo();}if(!S||!S.items)S=demo();
+  // bank sync was removed: keep who is using the app, drop any old simulated bank data
+  if(S.bank){if(!S.actingAs)S.actingAs=S.bank.actingAs||'A';delete S.bank;}
   // migrate older saves (v1 goals had no date / contributors)
   S.goals=(Array.isArray(S.goals)?S.goals:[]).map(normGoal);
   // v3: every amount carries the frequency it was entered in. Older saves stored per-fortnight numbers,
@@ -868,7 +836,7 @@ function totalsIn(c){var t={};CATS.forEach(function(k){t[k.id]=0;});
   t.out=t.savings+t.personal+t.expenses;t.remainder=t.income-t.out;return t;}
 function totals(){return totalsIn('fortnight');}
 function cv(v){return fromF(v,S.view);}   // per-fortnight derived value -> current display period
-function cvP(v){return fromF(v,S.cycle);} // per-fortnight derived value -> pay cycle (goals, bank)
+function cvP(v){return fromF(v,S.cycle);} // per-fortnight derived value -> pay cycle (goals)
 // largest-remainder rounding: whole percentages that always sum to 100
 function lrPct(vals){var pos=vals.map(function(v){return Math.max(0,v);}),tot=pos.reduce(function(a,b){return a+b;},0);
   if(!(tot>0))return vals.map(function(){return 0;});
@@ -956,7 +924,7 @@ function renderDash(){
   $('fairHint').innerHTML=fh;
 }
 function renderBudget(){
-  var V=S.view,t=totalsIn(V),cy=CYCLES[V],BA=bankActuals();renderBankSum(BA);
+  var V=S.view,t=totalsIn(V),cy=CYCLES[V];
   renderStrip(t);
   $('stripPill').textContent=cy.adj;
   var h='';
@@ -966,10 +934,9 @@ function renderBudget(){
     h+='<div class="group" data-cat="'+c.id+'"><div class="ghead"><div class="t"><span class="dot" style="background:'+c.color+'"></span>'+c.label+'</div><div class="tot" data-test="tot-'+c.id+'">'+money(t[c.id])+'</div></div>'+
       (jsv>0.004?'<div class="gnote" data-test="joint-savings-label">Joint savings ('+money(jsv)+') are counted in joint outgoings (“Ours” on Home).</div>':'')+'<div class="items">';
     its.forEach(function(i){
-      var si=BA.has?salInline(i):'',ah=actHTML(i,BA);
-      h+='<div class="item'+(si||ah?' haswrap':'')+'" data-id="'+i.id+'"><div class="nm" data-act="edit"><b>'+esc(i.name)+'</b><small>'+itemSub(i)+'</small></div>'+
+      h+='<div class="item" data-id="'+i.id+'"><div class="nm" data-act="edit"><b>'+esc(i.name)+'</b><small>'+itemSub(i)+'</small></div>'+
          '<button class="owner '+i.owner+'" data-act="owner" aria-label="Whose it is: tap to switch">'+esc(ownerLabel(i.owner))+'</button>'+
-         '<input class="amt" inputmode="decimal" data-act="amt" value="'+r2(inView(i,V)).toFixed(2)+'" aria-label="Amount for '+esc(i.name)+'">'+(ah?'<div class="actrow" data-act="edit">'+ah+'</div>':'')+si+'</div>';
+         '<input class="amt" inputmode="decimal" data-act="amt" value="'+r2(inView(i,V)).toFixed(2)+'" aria-label="Amount for '+esc(i.name)+'"></div>';
     });
     if(!its.length)h+='<div class="item"><span class="muted" style="font-size:14px">No items yet</span></div>';
     h+='</div><button class="addbtn" data-add="'+c.id+'">+ Add to '+c.label.toLowerCase()+'</button></div>';
@@ -1100,18 +1067,17 @@ function renderHHCard(){
     '<button class="btn ghost block" style="margin-top:12px" id="hhManage">Manage household</button>'+
     (pm?'<button class="btn danger block" style="margin-top:8px" id="hhLeave">Leave household</button>':'');
 }
-function renderSettings(){renderHHCard();renderBankCard();
+function renderSettings(){renderHHCard();
   var pm=memberBy('partner');$('nameB').readOnly=!!pm;$('nameBHint').style.display=pm?'':'none';
   if(pm)$('nameBHint').textContent='Set by '+pm.name+'\'s own account (shown in the household).';
   if(document.activeElement!==$('nameA'))$('nameA').value=S.names.D;
   if(document.activeElement!==$('nameB'))$('nameB').value=S.names.N;
   $('currency').value=S.currency;
 }
-function renderAll(){expireCheck();classifyAll();renderHeader();renderDash();renderBudget();renderCycle();renderGoals();renderSettings();trEntry();if($('v-trends').classList.contains('on'))renderTrends();}
+function renderAll(){renderHeader();renderDash();renderBudget();renderCycle();renderGoals();renderSettings();trEntry();if($('v-trends').classList.contains('on'))renderTrends();}
 /* ---------- Trends (read-only, computed locally from recorded history; nothing synced, no schema change) ----------
    History rows, one per pay window of the household cycle: {start,end,cur,frac,inc:{D,N,J},spend:{itemId:$},unb:{D,N,J},sav:{D,N,J},goals:{both,D,N}}
-   Sources: TRENDS_SYNTH (demo build only: deterministic synthetic history) or the counted bank transactions (simulated bank sync).
-   "Just me" (private) bank accounts never count, exactly like every other household figure. */
+   Source: TRENDS_SYNTH (demo build only: deterministic synthetic history). Other builds show the empty state. */
 var TRENDS_SYNTH=function(wins){ // DEMO_SYNTHETIC_HISTORY
   function seed(str){var h=2166136261;for(var i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return function(){h+=0x6D2B79F5;var t=h;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296;};}
   var VAR={groceries:.14,fuel:.2,energy:.25,pet:.6,card:.25,transport:.18,'':.3};
@@ -1142,20 +1108,7 @@ function trWord(n){var w=CYCLES[trCyc()].per;return n===1||n==null?w:w+'s';}
 function trWins(){var c=trCyc(),cur=payWindow(c,S.payDate),a=parseISO(S.payDate)||today0(),k=payIdx(a,c,cur.start),out=[],t=today0();
   for(var j=TR_N;j>=0;j--){var s=payAt(a,c,k-j),e=payAt(a,c,k-j+1);out.push({start:s,end:e,cur:j===0,frac:j===0?Math.min(1,Math.max(0,(t-s+864e5)/(e-s))):1});}
   return out;}
-function trBankRows(wins){if(!hasBank())return null;var acc=accMap(),items={},first=null;S.items.forEach(function(i){items[i.id]=i;});
-  var rows=wins.map(function(w){return {start:w.start,end:w.end,cur:w.cur,frac:w.frac,inc:{D:0,N:0,J:0},spend:{},unb:{D:0,N:0,J:0},sav:{D:0,N:0,J:0},goals:{both:0,D:0,N:0}};});
-  S.bank.transactions.forEach(function(t){var a=acc[t.account];if(!a||!accCounted(a)||t.review)return;var c=t.budgetCat;if(!c||c==='excluded')return;
-    var d=parseISO(t.transactionDate);if(!first||d<first)first=d;
-    var r=null;for(var k=0;k<rows.length;k++)if(d>=rows[k].start&&d<rows[k].end){r=rows[k];break;}if(!r)return;
-    var it=t.budgetItemId&&items[t.budgetItemId],o=(it&&it.owner)||t.owner||'J';if(!r.inc.hasOwnProperty(o))o='J';
-    if(c==='income')r.inc[o]+=+t.amount;
-    else if(c==='savings'){if(+t.amount>0){r.sav[o]+=+t.amount;r.goals[o==='J'?'both':o]+=+t.amount;}}
-    else if(c==='expenses'||c==='personal'){var v=-(+t.amount);if(it)r.spend[it.id]=(r.spend[it.id]||0)+v;else r.unb[o]+=v;}});
-  if(!first)return null;
-  // only windows the recorded history fully covers (plus the one in progress)
-  rows=rows.filter(function(r){return r.cur||r.start>=first;});
-  return rows.some(function(r){return !r.cur;})?rows:null;}
-function trRows(){var w=trWins();if(typeof TRENDS_SYNTH==='function')return {src:'demo',rows:TRENDS_SYNTH(w)};var b=trBankRows(w);return b?{src:'bank',rows:b}:{src:null,rows:[]};}
+function trRows(){var w=trWins();if(typeof TRENDS_SYNTH==='function')return {src:'demo',rows:TRENDS_SYNTH(w)};return {src:null,rows:[]};}
 function trHasN(){return !!(S.names&&S.names.N)&&(!!memberBy('partner')||S.items.some(function(i){return i.owner==='N';}));}
 function trScopes(){var s=[['all','All'],['shared','Shared'],['D',S.names.D||'Me']];if(trHasN())s.push(['N',S.names.N]);return s;}
 function trOwn(sc){return sc==='all'?['J','D','N']:sc==='shared'?['J']:[sc];}
@@ -1241,7 +1194,7 @@ function renderTrends(){var el=$('trBody');if(!el)return;var sc=trScopes();if(!s
   var M=trModel(),w=trWord(1);
   $('trSub').textContent=M.src?'Per '+w+', from '+(M.src==='demo'?'sample history':'your synced transactions')+'. Read-only, worked out on this device.':'';
   if(!M.src||!M.rows.some(function(r){return !r.cur;})){$('trScope').hidden=true;
-    el.innerHTML='<div class="card tr-empty tr-full" data-test="tr-empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/></svg><b>Trends appear after your first full pay cycle</b><div class="muted" style="font-size:14px;line-height:1.45">Once a whole '+w+' of spending is recorded (for example from a connected bank), you\'ll see how each '+w+' compares here.</div></div>';return;}
+    el.innerHTML='<div class="card tr-empty tr-full" data-test="tr-empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/></svg><b>Trends appear after your first full pay cycle</b><div class="muted" style="font-size:14px;line-height:1.45">Once a whole '+w+' of spending is recorded, you\'ll see how each '+w+' compares here.</div></div>';return;}
   $('trScope').hidden=false;
   var R=M.rows,maxOff=R.length-1;TR.off=Math.max(0,Math.min(TR.off,maxOff));var row=R[R.length-1-TR.off],br=trBreak(M,row),tot=row.spend,pct=lrPct(br.map(function(x){return x.v;}));
   var h='<div class="tr-l"><div class="card" data-test="tr-breakdown"><h3><span>Spending by category</span></h3>'+
@@ -1304,12 +1257,11 @@ $('scrim').addEventListener('click',function(e){if(e.target===this)closeSheet();
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('on');},1800);}
 function parseAmt(s){var v=parseFloat(String(s).replace(/[^0-9.\-]/g,''));return isFinite(v)?v:0;}
 
-var TAG_OPTS=[['','Auto'],['rent','Rent / mortgage'],['groceries','Groceries'],['fuel','Fuel'],['energy','Power & gas'],['phone','Phone'],['internet','Internet'],['health-ins','Health cover'],['car-ins','Car insurance / rego'],['streaming','Subscriptions'],['card','Credit card'],['bnpl','Buy now pay later'],['loan','Loan'],['transport','Transport'],['pet','Pet'],['childcare','Childcare'],['gym','Gym'],['none','Don\'t match']];
 function itemSheet(item,cat){
   var isNew=!item,V=S.view;
-  item=item||{id:uid(),name:'',amount:0,freq:V,owner:'J',cat:cat,tag:''};
+  item=item||{id:uid(),name:'',amount:0,freq:V,owner:'J',cat:cat};
   // default to how it was entered; a new or $0 line defaults to the period being viewed
-  var ownerSel=item.owner,catSel=item.cat,fq=(isNew||!(+item.amount))?V:(item.freq||'fortnight'),tagSel=item.tag||'';
+  var ownerSel=item.owner,catSel=item.cat,fq=(isNew||!(+item.amount))?V:(item.freq||'fortnight');
   var amt0=isNew?'':String(r2(+item.amount)),fq0=fq;
   var h='<h4>'+(isNew?'Add item':'Edit item')+'</h4><div class="muted" style="font-size:14px">Enter it the way you think of it, e.g. $100 a month. It converts exactly.</div>'+
     '<label class="fl">Name</label><input class="field" id="f-name" value="'+esc(item.name)+'" placeholder="e.g. Gym">'+
@@ -1318,13 +1270,11 @@ function itemSheet(item,cat){
     '<div class="hint" id="f-conv"></div>'+
     '<label class="fl">Whose is it?</label><div class="chips" id="f-owner">'+['J','D','N'].map(function(o){return '<button class="chip'+(o===ownerSel?' on':'')+'" data-o="'+o+'">'+esc(ownerLabel(o))+'</button>';}).join('')+'</div>'+
     '<label class="fl">Category</label><div class="chips" id="f-cat">'+CATS.map(function(c){return '<button class="chip'+(c.id===catSel?' on':'')+'" data-c="'+c.id+'">'+c.label+'</button>';}).join('')+'</div>'+
-    '<div id="f-tagwrap"><label class="fl" for="f-tag">Bank sync matches this to</label><select class="field" id="f-tag">'+TAG_OPTS.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===tagSel?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></div>'+
     '<div class="btns">'+(isNew?'':'<button class="btn danger" id="f-del">Delete</button>')+'<button class="btn pri" id="f-save">'+(isNew?'Add':'Save')+'</button></div>';
   openSheet(h,function(sh){
     var q=function(id){return sh.querySelector('#'+id);};
     function showConv(){var v=parseAmt(q('f-amt').value);var o=['week','fortnight','month','year'].filter(function(c){return c!==fq;}).map(function(c){return money(conv(v,fq,c))+' / '+CYCLES[c].per;});
-      q('f-conv').textContent=v?'= '+o.join(' · '):'';q('f-tagwrap').style.display=catSel==='expenses'?'':'none';
-      var auto=q('f-tag').options[0];auto.textContent='Auto'+(function(){var t=itemTag({name:q('f-name').value,tag:''});var m=TAG_OPTS.filter(function(x){return x[0]===t;})[0];return m&&t?' ('+m[1]+')':'';})();}
+      q('f-conv').textContent=v?'= '+o.join(' · '):'';}
     showConv();
     q('f-amt').addEventListener('input',showConv);q('f-name').addEventListener('input',showConv);
     q('f-freq').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;fq=b.dataset.f;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});showConv();});
@@ -1332,7 +1282,7 @@ function itemSheet(item,cat){
     q('f-cat').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;catSel=b.dataset.c;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});showConv();});
     q('f-save').addEventListener('click',function(){
       var nm=q('f-name').value.trim()||'Untitled',raw=q('f-amt').value.trim();
-      item.name=nm;item.owner=ownerSel;item.cat=catSel;item.tag=q('f-tag').value;
+      item.name=nm;item.owner=ownerSel;item.cat=catSel;
       // only rewrite the amount if it was actually changed, so untouched values keep full precision
       if(isNew||raw!==amt0||fq!==fq0)setAmount(item,parseAmt(raw),fq);
       if(isNew)S.items.push(item);save();closeSheet();renderAll();toast(isNew?'Added '+nm:'Saved');
@@ -1461,7 +1411,6 @@ var GOOGLE='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="
 var LOGO='<img class="brandlock" src="icons/logo-lockup.webp" width="660" height="569" alt="Duo Budget" onerror="this.style.display=\'none\'">';
 function genCode(){var c='',a=new Uint32Array(6);try{window.crypto.getRandomValues(a);}catch(e){for(var k=0;k<6;k++)a[k]=Math.floor(Math.random()*1e9);}for(var i=0;i<6;i++)c+=CODE_ABC.charAt(a[i]%CODE_ABC.length);return c;}
 function HH(){return S.household||null;}
-var RET='[30 DAYS, PENDING LEGAL REVIEW]',PROVIDER='[DATA PROVIDER TBC]';
 // someone who left is shown by name with the date, never as "Partner" / "P" (Cleo 3.8)
 function leftName(n){var h=HH(),l=h&&h.lastLeft;return l&&n===l.name&&!memberBy('partner')?n+' (left '+fmtDay(l.at)+')':n;}
 function whoName(o){return leftName(S.names[o]);}
@@ -1477,15 +1426,12 @@ function daysLeft(ts){return Math.max(0,Math.ceil((ts-Date.now())/DAY));}
 function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);}
 function acceptInvite(p){var h=HH();if(!h)return;
   h.members=h.members.filter(function(m){return m.role!=='partner';});
-  // a new partner never sees the previous partner's retained bank history
-  if(S.bank){S.bank.connections.forEach(function(c){if(c.partner==='B'&&c.status!=='active'&&!c.dataDeletedAt)deleteConnData(c);});S.bank.connections=S.bank.connections.filter(function(c){return c.partner!=='B'||c.status==='active';});}
   h.lastLeft=null;h.members.push({userId:'u_'+uid(),role:'partner',name:p.name,email:p.email||'',provider:p.provider||'email',payCycle:p.payCycle||'fortnight',payDate:p.payDate||S.payDate,joinedAt:Date.now(),demo:!!p.demo});
   if(h.invite){h.invite.status='accepted';h.invite.acceptedAt=Date.now();}
   S.names.N=p.name;save();renderAll();}
 function removePartner(reinvite,how){var h=HH();if(!h)return 0;var pm=memberBy('partner'),n=0;
-  var hadBank=!!(S.bank&&activeConn('B'));
-  if(pm){n=dropPartnerGoals();h.lastLeft={name:pm.name,other:S.names.D,hh:h.name,at:Date.now(),how:how||'removed',goals:n,bank:hadBank};}
-  purgePartnerBank('B');h.members=h.members.filter(function(m){return m.role!=='partner';});
+  if(pm){n=dropPartnerGoals();h.lastLeft={name:pm.name,other:S.names.D,hh:h.name,at:Date.now(),how:how||'removed',goals:n};}
+  h.members=h.members.filter(function(m){return m.role!=='partner';});
   // the leaver keeps their name on their lines and in history (not "Partner")
   h.prevPartnerName=null;h.invite=null;if(reinvite)makeInvite();save();renderAll();return n;}
 // Either partner can leave or remove the other. When the household starter (A) goes, the household carries on
@@ -1499,16 +1445,10 @@ function swapPartners(){var h=HH(),pm=memberBy('partner'),ow=memberBy('owner');i
   var oc=S.cycle,od=S.payDate,syncView=S.view===S.cycle;S.cycle=pm.payCycle||oc;S.payDate=pm.payDate||od;if(syncView)S.view=S.cycle;
   ow.role='partner';ow.payCycle=oc;ow.payDate=od;ow.joinedAt=ow.joinedAt||h.createdAt;pm.role='owner';
   S.account={userId:pm.userId,name:pm.name,email:pm.email,provider:pm.provider,createdAt:Date.now()};
-  if(S.bank){var b=S.bank;
-    b.log.forEach(function(l){l.name=l.name||pName(l.partner);l.partner=sp[l.partner]||l.partner;});
-    b.connections.forEach(function(c){c.partner=sp[c.partner]||c.partner;});
-    b.accounts.forEach(function(a){a.ownerPartner=sp[a.ownerPartner]||a.ownerPartner;});
-    b.transactions.forEach(function(t){if(t.owner)t.owner=sp[t.owner]||t.owner;});
-    b.rules.forEach(function(r){if(sp[r.owner])r.owner=sp[r.owner];if(sp[r.createdBy])r.createdBy=sp[r.createdBy];});
-    var sd=b.salaryDismissed||{};b.salaryDismissed={A:sd.B,B:sd.A};b.actingAs=sp[b.actingAs]||'A';}
+  S.actingAs=sp[S.actingAs]||'A';
 }
 // remove/leave for whichever partner p ('A' or 'B'); returns {name, goals}
-function partnerGoes(p,how){var name=pName(p);if(p==='A')swapPartners();var n=removePartner(false,how);if(S.bank)S.bank.actingAs='A';save();renderAll();return {name:name,goals:n};}
+function partnerGoes(p,how){var name=pName(p);if(p==='A')swapPartners();var n=removePartner(false,how);S.actingAs='A';save();renderAll();return {name:name,goals:n};}
 // goals stay when a partner leaves or is removed; that partner's planned contributions drop to $0
 function dropPartnerGoals(){var n=0;S.goals.forEach(function(g){
   if(g.who==='N'){if(g.perF>0)n++;g.perF=0;}
@@ -1518,8 +1458,8 @@ function createHousehold(name,cycle,payDate){S.cycle=cycle;S.payDate=payDate;
   save();renderAll();}
 
 function leaveBody(name,self){var hn=esc(HH().name),p=esc(name);
-  if(self)return 'You\'ll stop seeing '+hn+'. Goals stay in the household, and your planned contributions to them drop to $0. Any real savings you\'ve made stay in your own bank account: nothing is moved. Your bank data is removed from '+p+'\'s view straight away. You keep your own history until you delete it or your consent ends, then it\'s deleted within '+RET+'.';
-  return p+' will stop seeing '+hn+'. Goals stay in the household, and '+p+'\'s planned contributions to them drop to $0, so you\'ll see the new amount needed each '+CYCLES[S.cycle].per+'. Any real savings '+p+' has made stay in their own bank account: nothing is moved. '+p+'\'s bank data is removed from your view straight away. '+p+' keeps their own history until they delete it or their consent ends, then it\'s deleted within '+RET+'.';}
+  if(self)return 'You\'ll stop seeing '+hn+'. Goals stay in the household, and your planned contributions to them drop to $0. Any real savings you\'ve made stay in your own bank account: nothing is moved.';
+  return p+' will stop seeing '+hn+'. Goals stay in the household, and '+p+'\'s planned contributions to them drop to $0, so you\'ll see the new amount needed each '+CYCLES[S.cycle].per+'. Any real savings '+p+' has made stay in their own bank account: nothing is moved.';}
 function exportGoalsCSV(cp){cp=cp||snapGoals();var nD=cp.length?cp[0].nD:S.names.D,nN=cp.length?cp[0].nN:S.names.N,per=CYCLES[S.cycle].per;
   var rows=[['Goal','Target','Saved','Target date',nD+' puts in per '+per,nN+' puts in per '+per]];
   cp.forEach(function(g){rows.push([g.name,g.target,g.saved,g.targetDate,g.D,g.N]);});
@@ -1632,8 +1572,7 @@ var VIEWS={
    '<div class="card"><h3><span>Shared vs private</span></h3>'+
     '<div class="shr"><b>Ours</b><span>Joint items and all goals. Both of you see and edit them.</span></div>'+
     '<div class="shr"><b>Yours/Mine</b><span>Personal items show whose they are. You both have the same access, so either of you can edit any item.</span></div>'+
-    '<div class="shr"><b>Totals only</b><span>For a connected bank account: your partner sees its name, type and balance, plus money in and out by category each pay cycle. No transactions, merchants or descriptions.</span></div>'+
-    '<div class="shr"><b>Just me</b><span>Private. Your partner can\'t see it, and it isn\'t counted in the household budget or left over.</span></div></div>'+
+    '</div>'+
    '<div class="card"><h3><span>Demo controls</span><span class="tag">PROTOTYPE</span></h3>'+
     '<div class="setrow" style="border-top:0;padding-top:0"><div class="l">Simulate partner accepting<small>Instantly joins a demo partner</small></div><button class="switch'+(sim?' on':'')+'" id="m-sim" role="switch" aria-checked="'+sim+'" aria-label="Simulate partner accepting"></button></div>'+
     '<label class="fl" for="m-simname" style="margin-top:0">Demo partner name</label><input class="field" id="m-simname" maxlength="16" value="'+esc(pm?pm.name:(i&&i.forName)||'Jack')+'"'+(sim?' readonly':'')+'>'+
@@ -1644,7 +1583,7 @@ var VIEWS={
    on('m-remove',function(){removeSheet();});
    on('m-leave',function(){leaveSheet();});
    on('m-seeleaver',function(){go(h.lastLeft.how==='removed'?'removed':'left');});
-   var as=q('m-as');if(as)as.addEventListener('click',function(e){var b=e.target.closest('[data-p]');if(!b)return;BK().actingAs=b.dataset.p;save();renderAll();renderFlow();toast('Now using the app as '+pName(b.dataset.p)+' (simulated)');});
+   var as=q('m-as');if(as)as.addEventListener('click',function(e){var b=e.target.closest('[data-p]');if(!b)return;S.actingAs=b.dataset.p;save();renderAll();renderFlow();toast('Now using the app as '+pName(b.dataset.p)+' (simulated)');});
    on('m-resend',function(){i.expiresAt=Date.now()+INVITE_DAYS*DAY;i.sends=(i.sends||0)+1;i.lastSentAt=Date.now();save();renderFlow();toast('Invite resent (demo) · expires '+fmtDay(i.expiresAt));});
    on('m-show',function(){go('invite');});
    on('m-revoke',function(){openSheet('<h4>Revoke invite?</h4><div class="muted" style="font-size:14px">Code '+i.code+' will stop working straight away.</div><div class="btns"><button class="btn ghost" id="x-no">Keep</button><button class="btn danger" id="x-yes">Revoke</button></div>',function(sh){
@@ -1674,7 +1613,7 @@ var VIEWS={
      if(err){q('j-err').textContent=err;return;}F.tmp.code=code;go('joinConfirm');});
   }};},
  joinConfirm:function(){var h=HH(),i=h.invite;return {h:'<div class="card invcard"><div class="av a">'+esc(S.names.D.charAt(0).toUpperCase())+'</div><div class="t" data-test="j-invited"><b>'+esc(S.names.D)+'</b> invited you to <b>'+esc(h.name)+'</b></div><div class="muted" style="font-size:13px;margin-top:6px">Invite expires '+fmtDay(i.expiresAt)+'</div></div>'+
-   '<div class="card"><h3><span>When you join, you\'ll both see</span></h3><ul class="checks"><li>The shared budget, with joint and personal items labelled by whose they are</li><li>Savings goals and who contributes what</li><li>Each other\'s paydays (you keep your own pay cycle)</li></ul><div class="hint">You\'ll both have the same access. Bank accounts you mark “Just me” stay private to you.</div></div>'+
+   '<div class="card"><h3><span>When you join, you\'ll both see</span></h3><ul class="checks"><li>The shared budget, with joint and personal items labelled by whose they are</li><li>Savings goals and who contributes what</li><li>Each other\'s paydays (you keep your own pay cycle)</li></ul><div class="hint">You\'ll both have the same access.</div></div>'+
    '<button class="btn pri block" id="j-accept">Accept & create account</button><button class="linkbtn" id="j-no">Not now</button>',
   bind:function(q){q('j-accept').addEventListener('click',function(){go('joinAccount');});q('j-no').addEventListener('click',function(){F.hist=[];F.step=null;go('members',true);});}};},
  joinAccount:function(){var i=HH().invite;return {h:'<h2 class="page">Create your account</h2><p class="sub">You\'ll use this to sign in on your own phone.</p>'+
@@ -1701,19 +1640,16 @@ var VIEWS={
  left:function(){var h=HH(),l=h.lastLeft,cp=l.copy;
   return {h:'<h2 class="page" data-test="left-title">You\'ve left '+esc(l.hh||h.name)+'</h2>'+
    '<p class="sub" data-test="left-body">'+(cp?'Thanks for planning together. Your read-only copy of the goals is under Goals > Past household, and you can export it any time.':'You didn\'t keep a copy of the goals. Any real savings are still in your own bank accounts.')+'</p>'+
-   (l.bank?'<div class="card" data-test="left-bank"><div class="muted" style="font-size:14px;line-height:1.45">'+esc(l.other)+' can no longer see your bank data. Your own history stays here until you delete it or your consent ends, then it\'s deleted within '+RET+'.</div></div>':'')+
    pastHTML(cp)+
    '<button class="btn pri block" id="lf-own">Start my own household</button><button class="btn ghost block" style="margin-top:8px" id="lf-join">Join with a code</button>'+
-   '<div class="linkrow">'+(cp?'<button class="linkbtn" id="lf-export">Export goals (CSV)</button>':'')+(l.bank?'<button class="linkbtn" id="lf-del">Delete my bank data</button>':'')+'</div>'+
+   '<div class="linkrow">'+(cp?'<button class="linkbtn" id="lf-export">Export goals (CSV)</button>':'')+'</div>'+
    mock('Prototype: simulated on one device. In the real app this is '+esc(l.name)+'\'s own phone. Start and Join are not built here, so both return to '+esc(S.names.D)+'\'s view.'),
   bind:leaverBind};},
  removed:function(){var h=HH(),l=h.lastLeft,cp=l.copy;
   return {h:'<h2 class="page" data-test="removed-title">You\'re no longer part of '+esc(l.hh||h.name)+'</h2>'+
    '<p class="sub">'+esc(l.other)+' removed you from '+esc(l.hh||h.name)+' on '+fmtDay(l.at)+'. You can keep a read-only copy of the goals or export them. Any real savings are still in your own bank accounts.</p>'+
-   (l.bank?'<div class="card"><div class="muted" style="font-size:14px;line-height:1.45">Your bank data is no longer visible to '+esc(l.other)+'. Your own history stays here until you delete it or your consent ends, then it\'s deleted within '+RET+'.</div></div>':'')+
    pastHTML(cp)+
    (cp?'':'<button class="btn pri block" id="lf-keep">Keep a read-only copy</button>')+'<button class="btn ghost block" style="margin-top:8px" id="lf-export">Export goals (CSV)</button><button class="btn ghost block" style="margin-top:8px" id="lf-own">Start my own household</button>'+
-   (l.bank?'<div class="linkrow"><button class="linkbtn" id="lf-del">Delete my bank data</button></div>':'')+
    mock('Prototype: simulated on one device. In the real app this is '+esc(l.name)+'\'s own phone.'),
   bind:leaverBind};},
  joined:function(){var pm=memberBy('partner');return {h:'<div class="done-ic">✓</div><h2 class="page" style="text-align:center">You\'re in, '+esc(pm.name)+'</h2><p class="sub" style="text-align:center">You\'ve joined <b style="color:var(--text)">'+esc(HH().name)+'</b>. '+esc(S.names.D)+' sees you as a member straight away, and your name now shows on every split.</p>'+
@@ -1729,16 +1665,15 @@ function leaverBind(q){var l=HH().lastLeft;var back=function(){F.hist=[];F.step=
   on('lf-own',function(){toast('Not built in this prototype');back();});
   on('lf-join',function(){toast('Not built in this prototype');back();});
   on('lf-export',function(){exportGoalsCSV(l.copy||null);});
-  on('lf-keep',function(){l.copy=snapGoals();save();renderFlow();toast('Read-only copy kept under Goals > Past household');});
-  on('lf-del',function(){deleteRetained('B');l.bank=false;save();renderAll();renderFlow();toast('Deletion started. Your bank data is gone from your view and '+(l.other||'your partner')+'\'s now, and fully removed within '+RET+'.');});}
+  on('lf-keep',function(){l.copy=snapGoals();save();renderFlow();toast('Read-only copy kept under Goals > Past household');});}
 function renderFlow(){
   var st=F.step;if(!st)return;
   if((st==='members'||st==='invite')&&!HH()){F.step='create';st='create';}
-  var bk=st.indexOf('bk')===0,v=VIEWS[st](),partner=!!PSTEPS[st]||(bk&&viewer()==='B'),d=FSTEPS[st];
+  var v=VIEWS[st](),partner=!!PSTEPS[st],d=FSTEPS[st];
   $('flow').classList.toggle('partner',partner);$('flow').dataset.step=st;
   $('flowDots').innerHTML=d?Array.apply(null,{length:d[1]}).map(function(_,k){return '<i'+(k<d[0]?' class="on"':'')+'></i>';}).join(''):'';
   $('flowBack').style.visibility=F.hist.length?'visible':'hidden';
-  $('flowBody').innerHTML=(bk?'<div class="pview" style="gap:6px"><span class="pill sim">Simulated / Prototype</span>'+(viewer()==='B'?'<span class="pill violet">Acting as '+esc(pName('B'))+'</span>':'')+'</div>':partner?'<div class="pview"><span class="pill violet">Partner\'s phone · simulated</span></div>':'')+v.h;
+  $('flowBody').innerHTML=(partner?'<div class="pview"><span class="pill violet">Partner\'s phone · simulated</span></div>':'')+v.h;
   var body=$('flowBody');v.bind(function(id){return body.querySelector('#'+id);});
 }
 $('flowBack').addEventListener('click',flowBack);
@@ -1748,615 +1683,11 @@ $('sbHH').addEventListener('click',openHousehold);
 $('hhCard').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
   if(b.id==='hhSetup'||b.id==='hhManage')openHousehold();else if(b.id==='hhJoin'){openFlow('join');}else if(b.id==='hhLeave')leaveSheet();});
 
-/* ---------- Bank sync: SIMULATED / PROTOTYPE (see docs/bank-sync-mock-spec.md) ----------
-   Fictional banks, accounts, merchants and transactions only. No credentials, no network.
+/* ---------- Which partner is using the app (simulated on one device) ----------
    Partner A = S.names.D (owner code 'D'), Partner B = S.names.N ('N'). */
-var BANKS=[{id:'demo-bank',name:'Demo Bank',short:'DB',color:'#2563eb'},{id:'sample-cu',name:'Sample Credit Union',short:'SC',color:'#059669'},{id:'test-mutual',name:'Test Mutual',short:'TM',color:'#c2410c'}];
-var P2O={A:'D',B:'N'},O2P={D:'A',N:'B',J:'J'};
-var SHARE_LBL={shared:'Shared',private:'Just me',totals:'Totals only'};
-var TYPE_LBL={transaction:'Transaction','savings':'Savings','credit-card':'Credit card'};
-var ACCT_TPL={
- A:[{key:'everyday',name:'Everyday',type:'transaction',product:'Everyday Account',isJoint:false,bal:2148.62},
-    {key:'joint',name:'Joint Bills',type:'transaction',product:'Everyday Account',isJoint:true,bal:1312.4},
-    {key:'saver',name:'Goal Saver',type:'savings',product:'Bonus Saver',isJoint:true,bal:5150}],
- B:[{key:'everyday',name:'Everyday',type:'transaction',product:'Everyday Account',isJoint:false,bal:1406.18},
-    {key:'saver',name:'Rainy Day Saver',type:'savings',product:'Online Saver',isJoint:false,bal:3820.55},
-    {key:'card',name:'Low Rate Card',type:'credit-card',product:'Low Rate Visa',isJoint:false,bal:-642.3}]};
-// fictional merchants: [description, businessName, class, anzsicClass, title, division, divTitle, matchType, matchScore, tags]
-var G_='Retail Trade',H_='Accommodation and Food Services',J_='Information Media and Telecommunications',K_='Financial and Insurance Services',R_='Arts and Recreation Services';
-var MC={
- salA:['NORTHWIND FREIGHT PAYROLL','Northwind Freight','direct-credit',0,0,0,0,'merchantFull',0.97,['income:salary']],
- salB:['RIVERBEND CLINIC PAYROLL','Riverbend Clinic','direct-credit',0,0,0,0,'merchantFull',0.97,['income:salary']],
- toJoint:['TRANSFER TO JOINT BILLS','','transfer',0,0,0,0,'none',0,[]],
- fromEveryday:['TRANSFER FROM EVERYDAY','','transfer',0,0,0,0,'none',0,[]],
- toSaver:['TRANSFER TO GOAL SAVER','','transfer',0,0,0,0,'none',0,[]],
- fromJoint:['TRANSFER FROM JOINT BILLS','','transfer',0,0,0,0,'none',0,[]],
- fromPartner:['TRANSFER FROM PARTNER EVERYDAY','','transfer',0,0,0,0,'none',0,[]],
- toRainy:['TRANSFER TO RAINY DAY SAVER','','transfer',0,0,0,0,'none',0,[]],
- cardPay:['PAYMENT TO LOW RATE CARD','','transfer',0,0,0,0,'none',0,[]],
- cardRecv:['PAYMENT RECEIVED THANK YOU','','transfer',0,0,0,0,'none',0,[]],
- rent:['HARBOURVIEW PROPERTY MGMT RENT','Harbourview Property','payment','6720','Real Estate Services','L','Rental, Hiring and Real Estate Services','merchantFull',0.96,['expense:rent']],
- bnpl:['FLEXIPAY INSTALMENT 0042','FlexiPay','loan-repayment','6230','Non-Depository Financing','K',K_,'merchantPartial',0.81,[]],
- groc1:['FRESHCART SUPERMARKET 118','FreshCart','payment','4110','Supermarket and Grocery Stores','G',G_,'merchantFull',0.95,[]],
- groc2:['GREENLEAF GROCER','Greenleaf Grocer','payment','4110','Supermarket and Grocery Stores','G',G_,'merchantPartial',0.82,[]],
- fuel:['PUMPLINE FUEL 207','Pumpline','payment','4000','Fuel Retailing','G',G_,'merchantFull',0.93,[]],
- vet:['PAWPRINT VET & PET SUPPLIES','Pawprint Vet','payment','6970','Veterinary Services','M','Professional, Scientific and Technical Services','merchantFull',0.9,[]],
- metro:['METROLINK TRANSIT TOPUP','MetroLink','payment','4720','Rail Passenger Transport','I','Transport, Postal and Warehousing','merchantFull',0.88,[]],
- cafe:['BEAN & BYTE CAFE','Bean & Byte Cafe','payment','4511','Cafes and Restaurants','H',H_,'merchantFull',0.93,[]],
- take:['WOK THIS WAY','Wok This Way','payment','4512','Takeaway Food Services','H',H_,'merchantFull',0.9,[]],
- pub:['THE TIPSY POSSUM','The Tipsy Possum','payment','4520','Pubs, Taverns and Bars','H',H_,'merchantFull',0.91,[]],
- retail:['GADGET GROVE','Gadget Grove','payment','4221','Electrical, Electronic and Gas Appliance Retailing','G',G_,'merchantFull',0.89,[]],
- bowl:['BOWL-O-RAMA LANES','Bowl-O-Rama','payment','9131','Sports and Physical Recreation Venues','R',R_,'merchantFull',0.86,[]],
- elec:['BRIGHTSPARK ENERGY','Brightspark Energy','payment','2640','On Selling Electricity','D','Electricity, Gas, Water and Waste Services','merchantFull',0.94,[]],
- phone:['NIMBUS MOBILE','Nimbus Mobile','payment','5809','Other Telecommunications Services','J',J_,'merchantFull',0.92,[]],
- net:['FIBREWAVE INTERNET','Fibrewave Internet','payment','5801','Wired Telecommunications Network Operation','J',J_,'merchantFull',0.92,[]],
- health:['KINDRED HEALTH COVER','Kindred Health','payment','6321','Health Insurance','K',K_,'merchantFull',0.95,[]],
- carins:['ROADSAFE CAR INSURANCE','Roadsafe Insurance','payment','6322','General Insurance','K',K_,'merchantFull',0.95,[]],
- stream:['STREAMBOX SUBSCRIPTION','StreamBox','payment','5700','Internet Publishing and Broadcasting','J',J_,'merchantFull',0.9,[]],
- tune:['TUNEHUB PREMIUM','TuneHub','payment','5700','Internet Publishing and Broadcasting','J',J_,'merchantFull',0.88,[]],
- cloud:['CLOUDVAULT STORAGE','CloudVault','payment','5420','Software Publishing','J',J_,'merchantFull',0.86,[]],
- fee:['MONTHLY ACCOUNT FEE','','bank-fee',0,0,0,0,'none',0,[]],
- interest:['CREDIT INTEREST','','interest',0,0,0,0,'none',0,[]],
- mkt:['SQ *MARKET STALL 22','','payment',0,0,0,0,'none',0,[]],
- corner:['CORNER STORE 2041','Corner Store','payment','4110','Supermarket and Grocery Stores','G',G_,'ml',0.45,[]],
- atm:['ATM WITHDRAWAL 4471','','cash-withdrawal',0,0,0,0,'none',0,[]],
- refund:['REFUND GADGET GROVE','Gadget Grove','refund','4221','Electrical, Electronic and Gas Appliance Retailing','G',G_,'merchantFull',0.9,[]],
- cafe2:['LITTLE LEAF CAFE','Little Leaf Cafe','payment','4511','Cafes and Restaurants','H',H_,'merchantFull',0.92,[]],
- noodle:['NOODLE NOOK','Noodle Nook','payment','4512','Takeaway Food Services','H',H_,'merchantFull',0.9,[]],
- yoga:['STRETCH STUDIO YOGA','Stretch Studio','payment','9131','Sports and Physical Recreation Venues','R',R_,'merchantFull',0.85,[]],
- threads:['THREADS BOUTIQUE','Threads Boutique','payment','4251','Clothing Retailing','G',G_,'merchantFull',0.9,[]],
- books:['PAGES & CO BOOKS','Pages & Co','payment','4244','Newspaper and Book Retailing','G',G_,'merchantFull',0.9,[]],
- payonline:['PAY*ONLINE 88123','','payment',0,0,0,0,'none',0,[]],
- chemist:['CHEMIST CORNER','Chemist Corner','payment','4271','Pharmaceutical, Cosmetic and Toiletry Goods Retailing','G',G_,'ml',0.5,[]],
- carloan:['METRO MOTOR FINANCE','Metro Motor Finance','loan-repayment','6230','Non-Depository Financing','K',K_,'merchantFull',0.93,[]],
- childcare:['LITTLE SPROUTS EARLY LEARNING','Little Sprouts','payment','8710','Child Care Services','Q','Health Care and Social Assistance','merchantFull',0.94,[]],
- gym:['IRONBARK FITNESS','Ironbark Fitness','payment','9111','Health and Fitness Centres and Gymnasia Operation','R',R_,'merchantFull',0.9,[]]
-};
-// Budget lines are matched to bank data by a category tag. Set per line in the edit sheet; "Auto" guesses from generic words in the name.
-var TAGS=[['rent',/rent|mortgage/i],['groceries',/food|grocer/i],['fuel',/fuel|petrol/i],['energy',/electric|power|energy|\bgas\b/i],['phone',/phone|mobile/i],['internet',/internet|nbn|broadband/i],
-  ['car-ins',/car.?(insur|rego)/i],['health-ins',/health/i],['streaming',/subscri|stream/i],['card',/card|credit/i],['bnpl',/bnpl|pay.?later|buy.?now|instal/i],['loan',/loan|financ/i],
-  ['transport',/travel|transport|transit|train|fare/i],['pet',/\bpet|\bvet|\bdog|\bcat\b/i],['childcare',/child|daycare|kinder/i],['gym',/gym|fitness/i]];
-function itemTag(i){if(i.tag)return i.tag;var n=String(i.name||'');for(var k=0;k<TAGS.length;k++)if(TAGS[k][1].test(n))return TAGS[k][0];return '';}
-var CARDPAY=/\bCARD\b|CREDIT CARD|\bVISA\b|MASTERCARD/i;
-function BK(){if(!S.bank)S.bank={actingAs:'A',connections:[],accounts:[],transactions:[],rules:[],salaryDismissed:{},log:[]};return S.bank;}
-function hasBank(){return !!(S.bank&&S.bank.transactions.length);}
+var P2O={A:'D',B:'N'};
 function pName(p){return p==='J'?'Joint':(S.names[P2O[p]]||p);}
-function viewer(){var b=BK();if(b.actingAs==='B'&&!memberBy('partner'))b.actingAs='A';return b.actingAs;}
-function otherP(p){return p==='A'?'B':'A';}
-function activeConn(p){return BK().connections.filter(function(c){return c.partner===p&&c.status==='active';})[0]||null;}
-function bankById(id){return BANKS.filter(function(b){return b.id===id;})[0]||BANKS[0];}
-function blogo(id){var b=bankById(id);return '<span class="blogo" style="background:'+b.color+'">'+b.short+'</span>';}
-function accMap(){var m={};BK().accounts.forEach(function(a){m[a.id]=a;});return m;}
-function bLog(p,action){var b=BK();b.log.unshift({at:Date.now(),partner:p,name:pName(p),action:action});b.log=b.log.slice(0,40);}
-function rng(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return function(){h+=0x6D2B79F5;var t=h;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296;};}
-function LA(cat,re,own){return S.items.filter(function(i){return i.cat===cat&&(!re||re.test(i.name))&&(!own||i.owner===own);}).reduce(function(a,i){return a+perF(i);},0);}
-function dOff(base,n){var d=new Date(base);d.setDate(d.getDate()+n);return d;}
-function addMonthsTs(ts,n){var d=new Date(ts);d.setMonth(d.getMonth()+n);return d.getTime();}
-function accountTemplates(p,bankId){var R=rng(p+bankId);return ACCT_TPL[p].map(function(t){var x=JSON.parse(JSON.stringify(t));
-  x.accountNo='xxxx'+String(1000+Math.floor(R()*9000));
-  if(p==='A'&&t.key==='saver'){var gs=S.goals.reduce(function(a,g){return a+g.saved;},0);if(gs>0)x.bal=r2(gs+R()*40);}
-  return x;});}
-
-/* ~60 days of mock transactions, amounts derived from the budget lines so actuals line up with the plan */
-function genTx(conn,acc){
-  var p=conn.partner,R=rng(conn.id),out=[],seq=0,t0=today0(),start=dOff(t0,-60);
-  var jit=function(v,pct){return r2(v*(1+(R()*2-1)*pct));};
-  function add(key,m,amt,date){
-    amt=r2(amt);if(!acc[key]||(date<start&&!(m==='phone'&&date>=dOff(start,-3)))||date>t0||Math.abs(amt)<0.01)return; // phone: 2 prior debits always in history
-    var a=acc[key],mm=MC[m],pend=amt<0&&date>=dOff(t0,-1),iso=isoLocal(date);
-    var desc=m==='fromPartner'?'TRANSFER FROM '+String(pName('B')).toUpperCase()+' EVERYDAY':mm[0];
-    out.push({id:conn.id+'-'+(++seq),status:pend?'pending':'posted',description:desc,amount:amt.toFixed(2),currency:'AUD',account:a.id,connection:conn.id,institution:conn.institution.id,
-      direction:amt<0?'debit':'credit','class':mm[2],transactionDate:iso,postDate:pend?null:iso,subClass:mm[3]?{code:mm[3],title:mm[4]}:null,
-      enrich:{cleanDescription:mm[1]||desc,merchant:{businessName:mm[1],logoThumb:''},category:{matchType:mm[7],matchScore:String(mm[8]),
-        anzsic:mm[3]?{division:{code:mm[5],title:mm[6]},subdivision:{code:mm[3].slice(0,2)},group:{code:mm[3].slice(0,3)},'class':{code:mm[3],title:mm[4]}}:null},tags:mm[9].slice()},
-      budgetCat:null,budgetItemId:null,owner:null,userOverridden:false});
-  }
-  var next=paydaysFor('fortnight',S.payDate,1)[0],cycles=[];for(var k=1;k<=6;k++)cycles.push(dOff(next,-14*k));
-  var xB=Math.max(0,r2(LA('income',null,'N')-LA('savings',null,'N')-LA('personal',null,'N')-LA('expenses',null,'N')));
-  var xA=Math.max(0,Math.round(LA('expenses',null,'J')+LA('savings',null,'J')-xB));
-  var months=[];for(var mo=-3;mo<=0;mo++)months.push(new Date(t0.getFullYear(),t0.getMonth()+mo,1));
-  var md=function(m0,day){return new Date(m0.getFullYear(),m0.getMonth(),Math.min(day,dim(m0.getFullYear(),m0.getMonth())));};
-  var me=P2O[p],lines=S.items.filter(function(i){return i.cat==='expenses'&&perF(i)>0&&itemTag(i)!=='none'&&(i.owner===me||(p==='A'&&i.owner==='J'));});
-  var src=function(i){return i.owner==='J'?'joint':'everyday';};
-  function perCycle(P){lines.forEach(function(i){var f=perF(i),k=src(i);switch(itemTag(i)){
-    case 'rent':add(k,'rent',-f,dOff(P,1));break;
-    case 'bnpl':add(k,'bnpl',-f,dOff(P,2));break;
-    case 'loan':add(k,'carloan',-f,dOff(P,2));break;
-    case 'groceries':[1,5,9,12].forEach(function(o,ix){add(k,ix===2?'groc2':'groc1',-jit(f/4,0.18),dOff(P,o));});break;
-    case 'fuel':add(k,'fuel',-jit(f/2,0.1),dOff(P,3));add(k,'fuel',-jit(f/2,0.1),dOff(P,10));break;
-    case 'pet':add(k,'vet',-f,dOff(P,6));break;
-    case 'transport':[1,2,8,9].forEach(function(o){add(k,'metro',-f/4,dOff(P,o));});break;
-    case 'childcare':add(k,'childcare',-f,dOff(P,4));break;
-    case 'card':add(k,'cardPay',-f,dOff(P,2));add('card','cardRecv',f,dOff(P,3));break;}});}
-  // the phone bill recurs on a day relative to today, so one monthly bill is always still due in the current pay window
-  // (tomorrow if that's before the next payday, otherwise today with this month's debit not taken yet)
-  var dueT=dOff(t0,1)<next?dOff(t0,1):t0,dueDay=dueT.getDate();
-  function perMonth(m0){lines.forEach(function(i){var mo=perF(i)*26/12,k=src(i);switch(itemTag(i)){
-    case 'health-ins':add(k,'health',-mo,md(m0,1));break;
-    case 'gym':add(k,'gym',-mo,md(m0,3));break;
-    case 'internet':add(k,'net',-mo,md(m0,5));break;
-    case 'streaming':add(k,'stream',-mo*.5,md(m0,8));add(k,'tune',-mo*.3,md(m0,15));add(k,'cloud',-mo*.2,md(m0,22));break;
-    case 'energy':add(k,'elec',-mo,md(m0,12));break;
-    case 'phone':var pd=md(m0,dueDay);if(pd<dueT)add(k,'phone',-mo,pd);break;
-    case 'car-ins':add(k,'carins',-mo,md(m0,25));break;}});}
-  if(p==='A'){
-    cycles.forEach(function(P){
-      add('everyday','salA',LA('income',null,'D'),P);
-      add('everyday','toJoint',-xA,P);add('joint','fromEveryday',xA,dOff(P,1));
-      var ds=LA('savings',null,'D');add('everyday','toSaver',-ds,P);add('saver','fromEveryday',ds,P);
-      var js=LA('savings',null,'J');add('joint','toSaver',-js,dOff(P,1));add('saver','fromJoint',js,dOff(P,1));
-      add('joint','fromPartner',xB,P);
-      perCycle(P);
-      var ps=LA('personal',null,'D');
-      [['cafe',.07,2],['cafe',.06,4],['take',.1,5],['pub',.13,7],['cafe',.07,9],['take',.11,11],['retail',.24,12],['bowl',.22,13]].forEach(function(x){add('everyday',x[0],-jit(ps*x[1],0.1),dOff(P,x[2]));});
-    });
-    months.forEach(function(m0){perMonth(m0);add('joint','fee',-5,md(m0,1));add('saver','interest',jit(4.1,0.2),md(m0,28));});
-    add('everyday','mkt',-23.5,dOff(t0,-9));add('joint','corner',-18.4,dOff(t0,-4));add('everyday','atm',-60,dOff(t0,-15));
-    add('everyday','retail',-29.95,dOff(t0,-12));add('everyday','refund',29.95,dOff(t0,-6));
-  }else{
-    cycles.forEach(function(P){var Q=dOff(P,-1);
-      add('everyday','salB',LA('income',null,'N'),Q);
-      add('everyday','toJoint',-xB,Q);
-      var ns=LA('savings',null,'N');add('everyday','toRainy',-ns,Q);add('saver','fromEveryday',ns,Q);
-      perCycle(Q);
-      var ps=LA('personal',null,'N');
-      [['everyday','cafe2',.08,1],['everyday','noodle',.12,3],['everyday','yoga',.2,4],['card','threads',.25,6],['everyday','cafe2',.07,8],['card','books',.13,10],['everyday','noodle',.15,12]].forEach(function(x){add(x[0],x[1],-jit(ps*x[2],0.1),dOff(Q,x[3]));});
-    });
-    months.forEach(function(m0){perMonth(m0);add('saver','interest',jit(3.2,0.2),md(m0,28));});
-    add('everyday','payonline',-34.99,dOff(t0,-7));add('card','chemist',-27.8,dOff(t0,-11));
-  }
-  return out;
-}
-
-/* ---- classification: user override > (internal transfer) > merchant rule > tags > ANZSIC > transaction class ---- */
-var NOPAIR={refund:1,interest:1,'bank-fee':1,'loan-interest':1};
-function merchKey(t){return String(t.enrich.merchant.businessName||t.enrich.cleanDescription||t.description).toLowerCase().replace(/[^a-z& ]/g,'').replace(/\s+/g,' ').trim();}
-function lineAmtMatch(i,amt){var f=perF(i),m=f*26/12;return f>0&&(Math.abs(amt-f)<=f*0.1||Math.abs(amt-m)<=m*0.1);}
-function findLine(cat,owner,tag,amt,ownerFallback){
-  var o=owner==='J'?'J':P2O[owner],its=S.items.filter(function(i){return i.cat===cat&&itemTag(i)!=='none';}),c;
-  var mine=function(l){return l.filter(function(i){return i.owner===o;})[0];};
-  if(tag){c=its.filter(function(i){return itemTag(i)===tag;});if(c.length)return mine(c)||c[0];}
-  if(amt){c=its.filter(function(i){return lineAmtMatch(i,amt);});if(c.length)return mine(c)||(cat==='expenses'?c[0]:null);}
-  if(ownerFallback){c=its.filter(function(i){return i.owner===o;});if(c.length===1)return c[0];}
-  return null;
-}
-function anzsicRoute(an,a,own){
-  var code=an['class'].code,div=an.division.code,P=function(tag){return {cat:'expenses',owner:own,tag:tag};};
-  if(code==='9111')return P('gym');
-  if(/^(4511|4512|4520)$/.test(code)||/^42/.test(code)||div==='R')return a.isJoint?{cat:'expenses',owner:'J',tag:null}:{cat:'personal',owner:own,tag:null};
-  if(code==='4110')return P('groceries');
-  if(code==='4000')return P('fuel');
-  if(div==='D')return P('energy');
-  if(code==='5801')return P('internet');
-  if(/^58/.test(code))return P('phone');
-  if(code==='6321')return P('health-ins');
-  if(/^63/.test(code))return P('car-ins');
-  if(code==='6970')return P('pet');
-  if(code==='8710')return P('childcare');
-  if(div==='Q')return P('health-ins');
-  if(div==='P')return P('childcare');
-  if(div==='I')return P('transport');
-  if(div==='J')return P('streaming');
-  return null;
-}
-function guessWord(rt){var o=TAG_OPTS.filter(function(x){return x[0]&&x[0]===rt.tag;})[0];return o?o[1].toLowerCase():rt.cat==='personal'?'personal spending':'a household expense';}
-function contribTitle(p){var n=pName(p);return n&&n!=='Partner'?'Transfers from '+n:'Partner transfers';}
-function classify(t,acc,byId){
-  var a=acc[t.account];if(!a)return {budgetCat:null,budgetItemId:null,owner:null,why:'',review:false};
-  var own=a.isJoint?'J':a.ownerPartner,amt=+t.amount,abs=Math.abs(amt),cp=(BK().connections.filter(function(c){return c.id===t.connection;})[0]||{}).partner||a.ownerPartner;
-  var R=function(cat,it,o,why,rev){return {budgetCat:cat,budgetItemId:it?it.id:null,owner:o,why:why,review:!!rev};};
-  if(t.userOverridden)return {budgetCat:t.budgetCat,budgetItemId:t.budgetItemId,owner:t.owner,why:'Your edit',review:false};
-  if(t._pair){var o=byId[t._pair],oa=o&&acc[o.account];
-    if(amt>0){if(a['class'].type==='savings'){var so=oa.isJoint?'J':oa.ownerPartner;return R('savings',findLine('savings',so,null,abs,true),so,'Transfer into savings (goal top-up)');}
-      return R('excluded',null,own,'Transfer between your own accounts');}
-    // repayment to a credit card: if the card is linked (and not "Just me") its purchases count, so the repayment is just a transfer
-    if(oa&&oa['class'].type==='credit-card'){if(accCounted(oa))return R('excluded',null,own,'Card repayment: the card is connected, so its purchases count instead');
-      var cl=findLine('expenses',own,'card',abs);if(cl)return R('expenses',cl,own,'Card repayment: card is “Just me”, so the repayment counts against the card line');}
-    return R('excluded',null,own,'Transfer between your own accounts');}
-  var rule=BK().rules.filter(function(r){return r.key===merchKey(t);})[0];
-  if(rule){var ri=S.items.filter(function(i){return i.id===rule.budgetItemId;})[0];return R(rule.budgetCat,ri,rule.owner==='auto'?own:rule.owner,'Saved rule for '+rule.label);}
-  var tags=t.enrich.tags||[];
-  if(tags.indexOf('income:salary')>=0)return R('income',findLine('income',cp,null,abs,true),cp,'Pay');
-  if(tags.indexOf('expense:rent')>=0||tags.indexOf('expense:mortgage')>=0)return R('expenses',findLine('expenses',own,'rent',abs),own,'Rent');
-  var cat=t.enrich.category||{},low=cat.matchType==='none'||(+cat.matchScore)<0.6;
-  if(cat.anzsic){var rt=anzsicRoute(cat.anzsic,a,own);if(rt)return R(rt.cat,findLine(rt.cat,rt.owner,rt.tag,rt.cat==='expenses'?abs:0,rt.cat==='personal'),rt.owner,low?'Looks like '+guessWord(rt)+', but we weren\'t sure':'Business type: '+cat.anzsic['class'].title.toLowerCase(),low);}
-  switch(t['class']){
-    case 'bank-fee':case 'loan-interest':return R('expenses',findLine('expenses',own,'fees',0),own,t['class']==='bank-fee'?'Bank fee':'Loan interest');
-    case 'interest':return R('income',null,cp,'Interest');
-    case 'loan-repayment':{var L=S.items.filter(function(i){return i.cat==='expenses'&&/^(bnpl|loan)$/.test(itemTag(i));}).sort(function(x,y){return Math.abs(perF(x)-abs)-Math.abs(perF(y)-abs);});
-      return R('expenses',L[0]||findLine('expenses',own,null,abs),own,'Loan repayment');}
-    case 'transfer':
-      if(amt<0&&CARDPAY.test(t.description)){var cl2=findLine('expenses',own,'card',abs);if(cl2)return R('expenses',cl2,own,'Card repayment: the card isn\'t connected, so the repayment counts against the card line');}
-      if(t._contrib)return R('excluded',null,'J',contribTitle(otherP(cp)));
-      return R('excluded',null,own,'Transfer with an account that isn\'t connected',true);
-    case 'cash-withdrawal':return R(a.isJoint?'expenses':'personal',null,own,'Cash withdrawal',true);
-    case 'direct-credit':return R('income',null,cp,'Money in we couldn\'t match yet',true);
-  }
-  return R(null,null,own,'No match yet',true);
-}
-function classifyAll(){
-  var b=S.bank;if(!b||!b.transactions.length)return;
-  var acc=accMap(),byId={},txs=b.transactions;
-  txs.forEach(function(t){t._pair=null;byId[t.id]=t;});
-  var cand=txs.filter(function(t){return !NOPAIR[t['class']]&&acc[t.account]&&!acc[t.account].retained;});
-  var deb=cand.filter(function(t){return +t.amount<0;}),cre=cand.filter(function(t){return +t.amount>0;});
-  [true,false].forEach(function(sameConn){
-    deb.forEach(function(d){if(d._pair)return;var dd=parseISO(d.transactionDate),best=null,bd=99;
-      cre.forEach(function(c){if(c._pair||c.account===d.account||(c.connection===d.connection)!==sameConn||Math.abs(+c.amount+(+d.amount))>0.004)return;
-        var g=Math.abs(parseISO(c.transactionDate)-dd)/DAY;if(g<=3&&g<bd){bd=g;best=c;}});
-      if(best){d._pair=best.id;best._pair=d.id;}});
-  });
-  // recurring transfers INTO a joint account from a partner who hasn't linked their bank: grouped as partner contributions
-  var cpOf=function(t){var c=b.connections.filter(function(x){return x.id===t.connection;})[0];return c?c.partner:acc[t.account].ownerPartner;};
-  var isIn=function(t){var a=acc[t.account];return a&&!a.retained&&a.isJoint&&!t._pair&&t['class']==='transfer'&&+t.amount>0;},cnt={};
-  txs.forEach(function(t){t._contrib=false;if(isIn(t)){var k=merchKey(t);cnt[k]=(cnt[k]||0)+1;}});
-  txs.forEach(function(t){if(isIn(t)&&cnt[merchKey(t)]>=2&&!activeConn(otherP(cpOf(t))))t._contrib=true;});
-  txs.forEach(function(t){var r=classify(t,acc,byId);t.budgetCat=r.budgetCat;t.budgetItemId=r.budgetItemId;t.owner=r.owner;t.why=r.why;t.review=r.review;});
-}
-function expireCheck(){var b=S.bank;if(!b)return;var now=Date.now();b.connections.forEach(function(c){if(c.status==='active'&&c.consent.expiresAt<now)endConnection(c,'expired');
-  else if(c.status!=='active'&&!c.dataDeletedAt&&c.deleteBy&&c.deleteBy<now)deleteConnData(c);});}
-function deleteConnData(c){var b=BK();b.accounts=b.accounts.filter(function(a){return a.connection!==c.id;});b.transactions=b.transactions.filter(function(t){return t.connection!==c.id;});c.accountIds=[];c.dataDeletedAt=Date.now();}
-function connData(c){return !c.dataDeletedAt&&BK().transactions.some(function(t){return t.connection===c.id;});}
-// Ending a connection (disconnect, consent end, leaving) stops syncing and removes the data from the household and the
-// other partner's view straight away. The owner keeps their own history until they delete it or consent ends; then it's
-// deleted within RET (placeholder pending legal review; the demo uses 30 days).
-function endConnection(c,status){var now=Date.now();c.status=status;c.endedAt=now;c.deleteBy=(status==='expired'?now:Math.max(now,c.consent.expiresAt))+30*DAY;
-  BK().accounts.forEach(function(a){if(a.connection===c.id)a.retained=true;});
-  bLog(c.partner,(status==='expired'?'Consent ended for ':status==='left'?'Left household, stopped syncing ':'Disconnected ')+c.institution.name+'. Synced data will be deleted within '+RET);}
-function deleteMyBank(c){var was=c.status==='active';if(was)endConnection(c,'withdrawn');deleteConnData(c);bLog(c.partner,'Deletion requested for '+c.institution.name+' data · removed within '+RET);}
-function deleteRetained(p){if(!S.bank)return 0;var n=0;S.bank.connections.forEach(function(c){if(c.partner===p&&c.status!=='active'&&!c.dataDeletedAt){deleteConnData(c);n++;}});return n;}
-function purgePartnerBank(p){if(!S.bank)return;S.bank.connections.forEach(function(c){if(c.partner===p&&c.status==='active')endConnection(c,'left');});if(S.bank.actingAs===p)S.bank.actingAs='A';}
-function defaultMode(t){return (t.isJoint||t.type==='transaction')?'shared':'totals';}
-function setShareConsent(c,on){c.shareConsent=on;BK().accounts.forEach(function(a){if(a.connection===c.id)a.shareMode=on?defaultMode({isJoint:a.isJoint,type:a['class'].type}):'private';});
-  bLog(c.partner,(on?'Started':'Stopped')+' sharing '+c.institution.name+' data with '+pName(otherP(c.partner)));}
-
-/* visibility: 'Just me' (private) accounts never count in household figures, for either partner.
-   'Totals only' counts in totals; the other partner sees name, type, balance and per-category totals, never transactions. */
-function accCounted(a){return !a.retained&&a.shareMode!=='private';}
-function accListable(a,v){return !a.retained&&(a.shareMode==='shared'||(a.ownerPartner===v&&a.shareMode!=='private'));}
-function cycleBounds(){return payWindow(S.cycle,S.payDate);}
-// each earner's pay (and the savings they move on payday) is measured against THEIR own pay window
-function ownerWindow(o){if(o==='N'){var m=memberBy('partner');if(m&&m.payCycle&&m.payDate)return payWindow(m.payCycle,m.payDate);}return payWindow(S.cycle,S.payDate);}
-function itemWindow(i,hw){return (i.cat==='income'||i.cat==='savings')&&(i.owner==='D'||i.owner==='N')?ownerWindow(i.owner):hw;}
-function bankActuals(){
-  var r={has:false,by:{},spent:0,pending:0,unb:0,unbN:0,review:0,hidden:0,contrib:{n:0,amt:0,win:0},hist:{},wins:{},win:null,expected:0};if(!hasBank())return r;
-  var v=viewer(),acc=accMap(),hw=cycleBounds(),items={};r.win=hw;
-  S.items.forEach(function(i){items[i.id]=i;r.wins[i.id]=itemWindow(i,hw);});
-  S.bank.transactions.forEach(function(t){var a=acc[t.account];if(!a||a.retained)return;
-    if(!accCounted(a)){r.hidden++;return;}r.has=true;
-    var d=parseISO(t.transactionDate),inHW=d>=hw.start&&d<hw.end;
-    if(t._contrib&&!t.userOverridden&&accListable(a,v)){r.contrib.n++;r.contrib.amt+=+t.amount;if(inHW)r.contrib.win+=+t.amount;}
-    if(t.review){if(accListable(a,v))r.review++;return;}
-    var c=t.budgetCat;if(!c||c==='excluded')return;var val=(c==='income'||c==='savings')?+t.amount:-(+t.amount),pd=t.status==='pending';
-    var it=t.budgetItemId&&items[t.budgetItemId];
-    if(it){(r.hist[it.id]=r.hist[it.id]||[]).push({d:d,v:val,k:merchKey(t),pd:pd});var w=r.wins[it.id];
-      if(d>=w.start&&d<w.end){var x=r.by[it.id]||(r.by[it.id]={p:0,q:0});if(pd)x.q+=val;else x.p+=val;}}
-    if((c==='expenses'||c==='personal')&&inHW){if(pd)r.pending+=val;else r.spent+=val;if(!it){r.unb+=val;r.unbN++;}}
-  });
-  S.items.forEach(function(i){if(i.cat!=='expenses'&&i.cat!=='personal')return;var b=billInfo(i,r);r.expected+=b?b.expected:conv(perF(i),'fortnight',hw.cycle);});
-  return r;
-}
-// Monthly bills: if every merchant on a line recurs about monthly, show paid / due / not due in this pay window
-// instead of comparing a lumpy monthly debit with a fortnightly pro-rata.
-function billInfo(i,A){var L=A.hist&&A.hist[i.id];if(!L||!L.length||(i.cat!=='expenses'&&i.cat!=='personal'))return null;
-  var g={};L.forEach(function(x){(g[x.k]=g[x.k]||[]).push(x);});var keys=Object.keys(g);
-  var monthly=keys.every(function(k){var ds=g[k].map(function(x){return +x.d;}).sort(function(a,b){return a-b;});if(ds.length<2)return false;
-    var iv=[];for(var n=1;n<ds.length;n++)iv.push((ds[n]-ds[n-1])/864e5);iv.sort(function(a,b){return a-b;});return iv[Math.floor(iv.length/2)]>=25;});
-  if(!monthly)return null;
-  var w=A.wins[i.id],o={paid:0,pend:0,due:0,dueOn:null,next:null,lastAmt:0,cycle:w.cycle};
-  keys.forEach(function(k){var l=g[k].slice().sort(function(a,b){return a.d-b.d;}),last=l[l.length-1],inW=l.filter(function(x){return x.d>=w.start&&x.d<w.end;});
-    inW.forEach(function(x){if(x.pd)o.pend+=x.v;else o.paid+=x.v;});
-    var nx=payAt(last.d,'month',1);o.lastAmt+=last.v;
-    if(!inW.length&&nx<w.end){o.due+=last.v;if(!o.dueOn||nx<o.dueOn)o.dueOn=nx;}
-    else if(!o.next||nx<o.next)o.next=nx;});
-  o.expected=o.paid+o.pend+o.due;return o;}
-function cardLinked(owner){return BK().accounts.some(function(a){return a['class'].type==='credit-card'&&accCounted(a)&&(owner==='J'||a.ownerPartner===O2P[owner]);});}
-// inline pay-cycle suggestion on an income line when the detected pay cadence disagrees with the configured cycle
-function salInline(i){if(i.cat!=='income')return '';var p=O2P[i.owner];if(p!=='A'&&p!=='B')return '';var d=salaryState(p);if(!d||d.dismissed)return '';
-  var pm=memberBy('partner'),cur=p==='A'?S.cycle:(pm&&pm.payCycle);if(!cur||cur===d.cycle)return '';var adj=CYCLES[d.cycle].adj.toLowerCase();
-  return '<div class="salary" data-test="sal-inline-'+p+'" style="padding:10px 12px;font-size:13px">Pay looks '+adj+' ('+money(d.amount)+', next '+fmtDay(d.next)+'), but '+esc(pName(p))+'\'s pay cycle is set to '+CYCLES[cur].adj.toLowerCase()+'.'+
-    '<div class="rbtns"><button class="btn ghost sm" data-sal="dismiss" data-p="'+p+'">Dismiss</button><button class="btn pri sm" data-sal="use" data-p="'+p+'">Use '+adj+'</button></div></div>';}
-function m2(v){return Math.abs(v)>=100?money(v,{whole:true}):money(v);}
-function actHTML(i,A){
-  if(!A.has)return '';var w=A.wins[i.id]||A.win,per=CYCLES[w.cycle].per,b=billInfo(i,A),tg='data-test="act-'+esc(i.name)+'"';
-  if(b){var exp=b.expected,got=b.paid+b.pend;
-    if(exp>0.004){var wp=Math.min(100,Math.max(0,b.paid)/exp*100),wq=Math.min(100-wp,Math.max(0,b.pend)/exp*100);
-      return '<div class="act" '+tg+' data-bill="'+(b.due>0.004?'due':'paid')+'"><div class="abar"><i style="width:'+wp+'%;background:var(--cyan)"></i><i style="width:'+wq+'%;background:#4b5c80"></i></div><span>'+
-        (got>0.004?'<b>'+m2(got)+'</b> paid'+(b.pend>0.004?' <span class="pend" style="display:inline">(pending)</span>':'')+(b.due>0.004?' · ':' this '+per):'')+
-        (b.due>0.004?'<span class="nw" data-test="due-phrase"><b style="color:var(--amber)">'+(got>0.004?'d':'D')+'ue around '+fmtDay(b.dueOn)+'</b>, this '+per+'</span>':'')+'<br><span style="color:var(--dim)">Monthly bill'+(b.due>0.004?' · about '+m2(b.due):b.next?' · next around '+fmtDay(b.next):'')+'</span></span></div>';}
-    return '<div class="act" '+tg+' data-bill="notdue"><div class="abar" style="opacity:.4"></div><span><span class="k">Not due yet · next around '+fmtDay(b.next)+'</span><br><span style="color:var(--dim)">Monthly bill · about '+m2(b.lastAmt)+'</span></span></div>';}
-  var x=A.by[i.id]||{p:0,q:0},pl=conv(perF(i),'fortnight',w.cycle),verb=i.cat==='income'?'received':i.cat==='savings'?'saved':'spent';
-  var over=(i.cat==='expenses'||i.cat==='personal')&&x.p+x.q>pl+0.005,wp2=pl>0?Math.min(100,Math.max(0,x.p)/pl*100):0,wq2=pl>0?Math.min(100-wp2,Math.max(0,x.q)/pl*100):0;
-  var op=O2P[i.owner];if((op==='A'||op==='B')&&!activeConn(op)&&!(x.p||x.q))return '<div class="act" '+tg+' data-test-unlinked="1"><span>'+(op===viewer()?'<span class="k">Your bank isn\'t connected yet</span><br><span style="color:var(--dim)">Connect yours to see actuals here.</span>':'<span class="k">'+esc(pName(op))+'\'s bank isn\'t connected yet</span><br><span style="color:var(--dim)">Actuals show here once they connect.</span>')+'</span></div>';
-  if(itemTag(i)==='card'&&cardLinked(i.owner))return '<div class="act" '+tg+' data-test-card="linked"><span data-test="card-linked"><span class="k">Card connected.</span><br><span style="color:var(--dim)">Its purchases count in their own lines; repayments are transfers, so nothing is counted here.</span></span></div>';
-  var own=(+w.start!==+A.win.start||+w.end!==+A.win.end)?'<br><span style="color:var(--dim)" data-test="own-window">'+esc(pName(O2P[i.owner]))+'\'s pay '+fmtDay(w.start)+' – '+fmtDay(dOff(w.end,-1))+'</span>':'';
-  return '<div class="act" '+tg+'><div class="abar"><i style="width:'+wp2+'%;background:'+(over?'var(--amber)':'var(--cyan)')+'"></i><i style="width:'+wq2+'%;background:#4b5c80"></i></div>'+
-    '<span><b style="color:'+(over?'var(--amber)':'var(--text)')+'">'+m2(x.p)+'</b> of '+m2(pl)+' '+verb+(w.cycle!==S.view?' <span data-test="act-window">this '+CYCLES[w.cycle].per+'</span>':'')+(over?'<br><span style="color:var(--amber)" data-test="more-than-planned">'+m2(x.p+x.q-pl)+' more than planned</span>':'')+(x.q?'<br><span class="pend" style="display:inline">+ '+m2(x.q)+' pending</span>':'')+own+'</span></div>';
-}
-function renderBankSum(A){
-  var el=$('bkSum');if(!A.has){el.innerHTML='';return;}
-  var cy=CYCLES[S.cycle],cb=A.win,pl=A.expected,pm=memberBy('partner'),cp=activeConn('A')?'B':'A',cpn=contribTitle(cp)==='Partner transfers'?'your partner':pName(cp);
-  var w=pl>0?Math.min(100,A.spent/pl*100):0,wq=pl>0?Math.min(100-w,Math.max(0,A.pending)/pl*100):0;
-  el.innerHTML='<div class="card" data-test="bk-sum"><h3><span>This '+cy.per+' so far</span><span class="tag">SIMULATED / PROTOTYPE</span></h3>'+
-    '<div class="muted" style="font-size:13px">'+fmtDate(cb.start)+' – '+fmtDate(dOff(cb.end,-1))+' · from connected banks</div>'+
-    '<div style="margin-top:6px"><span style="font-size:26px;font-weight:800" data-test="bk-spent">'+money(A.spent)+'</span> <span class="muted">spent of '+money(pl)+' expected</span></div>'+
-    '<div class="abar" style="height:10px;margin-top:10px"><i style="width:'+w+'%;background:linear-gradient(90deg,var(--teal),var(--cyan))"></i><i style="width:'+wq+'%;background:#4b5c80"></i></div>'+
-    '<div class="hint" style="margin-top:8px">'+(A.pending?'<span class="pend">+ '+money(A.pending)+' pending (grey)</span> · ':'')+'Unbudgeted '+money(A.unb)+(A.unbN?' ('+A.unbN+')':'')+'. Monthly bills count only in the '+cy.per+' they fall due.</div>'+
-    (A.contrib.n?'<div class="hint" data-test="bk-contrib"><b>'+esc(contribTitle(cp))+'</b>: '+A.contrib.n+' regular transfers in ('+money(A.contrib.amt)+' over 60 days). Counted as household transfers, not spending, until '+esc(cpn)+' connects their bank.</div>':'')+
-    (A.review?'<button class="btn ghost sm block" style="margin-top:10px" id="bkSumReview">Review '+A.review+' transaction'+(A.review===1?'':'s')+'</button>':'')+
-    '<div class="mock" style="margin-top:10px">Simulated / Prototype: household figures include shared and “Totals only” accounts from both of you. “Just me” accounts aren\'t counted. Items to review aren\'t counted yet.</div></div>';
-}
-
-/* ---- salary detection -> pay cycle suggestion ---- */
-function detectSalary(p){
-  if(!hasBank())return null;var conns={},groups={};S.bank.connections.forEach(function(c){conns[c.id]=c;});
-  S.bank.transactions.forEach(function(t){var c=conns[t.connection];if(!c||c.status!=='active'||c.partner!==p||+t.amount<=0)return;
-    var tagged=(t.enrich.tags||[]).indexOf('income:salary')>=0;if(!tagged&&t['class']!=='direct-credit')return;
-    var k=merchKey(t);(groups[k]=groups[k]||{tagged:tagged,list:[]}).list.push(t);});
-  var best=null;Object.keys(groups).forEach(function(k){var g=groups[k];if(g.list.length<(g.tagged?2:3))return;var tot=g.list.reduce(function(a,t){return a+(+t.amount);},0);if(!best||tot>best.tot)best={g:g,tot:tot};});
-  if(!best)return null;
-  var ds=best.g.list.map(function(t){return parseISO(t.transactionDate);}).sort(function(a,b){return a-b;}),iv=[];
-  for(var i=1;i<ds.length;i++)iv.push(Math.round((ds[i]-ds[i-1])/DAY));iv.sort(function(a,b){return a-b;});var med=iv[Math.floor(iv.length/2)];
-  var cyc=med>=6&&med<=8?'week':med>=13&&med<=15?'fortnight':med>=28&&med<=31?'month':null;if(!cyc)return null;
-  var last=ds[ds.length-1],kk=1;while(payAt(last,cyc,kk)<today0()&&kk<400)kk++;var next=payAt(last,cyc,kk);
-  var am=best.g.list.map(function(t){return +t.amount;}).sort(function(a,b){return a-b;});
-  return {partner:p,cycle:cyc,last:last,next:next,amount:am[Math.floor(am.length/2)],source:best.g.list[0].enrich.merchant.businessName||best.g.list[0].description,count:ds.length};
-}
-function salaryState(p){var d=detectSalary(p);if(!d)return null;var cur;
-  if(p==='A')cur={cycle:S.cycle,next:nextPaydays(1)[0]};else{var m=memberBy('partner');if(!m)return null;cur={cycle:m.payCycle,next:paydaysFor(m.payCycle,m.payDate,1)[0]};}
-  d.matches=cur.cycle===d.cycle&&+cur.next===+d.next;d.sig=d.cycle+'|'+isoLocal(d.next);d.dismissed=(S.bank.salaryDismissed||{})[p]===d.sig;return d;}
-function salaryHTML(p){var d=salaryState(p);if(!d||(d.dismissed&&!d.matches))return '';
-  var who=esc(pName(p));
-  return '<div class="salary" data-test="salary-'+p+'">Pay spotted: <b>'+money(d.amount)+'</b> '+CYCLES[d.cycle].adj.toLowerCase()+' from '+esc(d.source)+', last '+fmtDate(d.last)+'. Next payday <b>'+fmtDate(d.next)+'</b>.'+
-    (d.matches?'<div style="margin-top:6px;color:var(--mint);font-weight:700">✓ Matches '+who+'\'s pay cycle</div>':
-     '<div style="margin-top:6px">'+who+'\'s pay cycle is set differently. Use this?</div><div class="btns" style="margin-top:8px"><button class="btn ghost sm" data-sal="dismiss" data-p="'+p+'">Dismiss</button><button class="btn pri sm" data-sal="use" data-p="'+p+'">Use '+CYCLES[d.cycle].adj.toLowerCase()+'</button></div>')+'</div>';}
-function applySalary(p){var d=detectSalary(p);if(!d)return;
-  if(p==='A'){S.cycle=d.cycle;S.payDate=isoLocal(d.next);}else{var m=memberBy('partner');if(!m)return;m.payCycle=d.cycle;m.payDate=isoLocal(d.next);}
-  bLog(p,'Pay cycle set from detected salary: '+CYCLES[d.cycle].adj.toLowerCase()+', next '+fmtDate(d.next));save();renderAll();toast(pName(p)+'\'s pay cycle updated');}
-function salaryClick(e){var b=e.target.closest('[data-sal]');if(!b)return false;var p=b.dataset.p;
-  if(b.dataset.sal==='use')applySalary(p);else{var d=salaryState(p);BK().salaryDismissed[p]=d&&d.sig;save();renderAll();}
-  if(F.step)renderFlow();return true;}
-
-/* ---- Partner tab card (screen 1) ---- */
-function renderBankCard(){
-  var el=$('bkCard'),pm=memberBy('partner'),v=viewer(),h='<h3><span>Bank connections</span><span class="tag">SIMULATED / PROTOTYPE</span></h3>';
-  if(pm)h+='<label class="fl" style="margin-top:0">Using the app as</label><div class="seg" id="bkAs" style="grid-template-columns:1fr 1fr;margin-bottom:6px">'+['A','B'].map(function(p){return '<button data-p="'+p+'"'+(p===v?' class="on"':'')+'>'+esc(pName(p))+'</button>';}).join('')+'</div>';
-  h+='<div class="mlist">';
-  ['A','B'].forEach(function(p){
-    if(p==='B'&&!pm){var hl=HH()&&HH().lastLeft;h+=hl?'<div class="mrow" data-test="bk-row-left"><div class="av b">'+esc(hl.name.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(hl.name)+' (left '+fmtDay(hl.at)+')</b><small>'+esc(hl.name)+'\'s bank data is no longer shown in '+esc(HH().name)+'.</small></div></div>':'<div class="mrow"><div class="av b pending">+</div><div class="mi"><b>Partner B</b><small>Joins through the household invite, then connects their own bank.</small></div></div>';return;}
-    var c=activeConn(p),n=c?BK().accounts.filter(function(a){return a.connection===c.id;}).length:0;
-    h+='<div class="mrow" data-test="bk-row-'+p+'"><div class="av '+(p==='A'?'a':'b')+'">'+esc(pName(p).charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(pName(p))+(p===v?'<span class="you">You</span>':'')+'</b><small>'+(c?esc(c.institution.name)+' · '+n+' account'+(n===1?'':'s')+' · '+(c.shareConsent?'sharing on':'not shared'):'Not connected')+'</small></div>'+
-      (p===v?'<button class="btn '+(c?'ghost':'pri')+' sm" data-bk="'+(c?'manage':'connect')+'" id="bkConnect'+p+'">'+(c?'Manage':'Connect your bank')+'</button>':'<span class="muted" style="font-size:12px;text-align:right">'+(c?'Connected':'Act as '+esc(pName(p))+'<br>to connect')+'</span>')+'</div>';
-  });
-  h+='</div>'+salaryHTML(v);
-  if(hasBank()||BK().connections.length){var A=bankActuals();
-    h+='<div class="btns" style="flex-wrap:wrap"><button class="btn ghost sm" data-bk="inbox" id="bkInboxBtn">Review inbox'+(A.review?' ('+A.review+')':'')+'</button><button class="btn ghost sm" data-bk="rules" id="bkRulesBtn">Rules</button><button class="btn ghost sm" data-bk="manage" id="bkManageBtn">Consent</button></div>';}
-  h+='<div class="mock">Simulated / Prototype: fictional banks and transactions. No real bank is contacted and no credentials are ever asked for.</div>';
-  el.innerHTML=h;
-}
-function startConnect(){var v=viewer();if(activeConn(v)){openFlow('bkManage');return;}openFlow('bkExplain');F.tmp.months=12;}
-
-/* ---- flow screens 2-9, 11 ---- */
-FSTEPS.bkExplain=[1,7];FSTEPS.bkConsent=[2,7];FSTEPS.bkPick=[3,7];FSTEPS.bkBank=[4,7];FSTEPS.bkAccounts=[5,7];FSTEPS.bkShare=[6,7];FSTEPS.bkSync=[7,7];
-var BK_SCOPES=['Account name, type and number (masked)','Account balance','Transactions: date, amount, description and merchant'];
-function txRow(t,acc){var a=acc[t.account],cr=+t.amount>0,nm=t.enrich.merchant.businessName||t.description;
-  return '<div class="txr" data-tx="'+t.id+'" data-test="tx-row"><div class="mi"><b>'+esc(nm)+(t.status==='pending'?'<span class="ptag">PENDING</span>':'')+'</b><small>'+fmtDate(parseISO(t.transactionDate))+' · '+esc(pName(a.ownerPartner))+'\'s '+esc(a.name)+'</small><small style="color:var(--dim)">'+esc(t.why||'')+'</small></div><div class="am'+(cr?' cr':'')+(t.status==='pending'?' pend':'')+'">'+(cr?'+':'−')+money(Math.abs(+t.amount))+'</div></div>';}
-VIEWS.bkExplain=function(){return {h:'<div class="ob-hero"><div class="logo" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/></svg></div><h2 class="page">Connect your bank</h2><p class="sub">See what you\'ve really spent against the plan each pay cycle.</p></div>'+
-  '<div class="card"><ul class="checks"><li><span><b style="color:var(--text)">Read-only.</b> Duo Budget can see balances and transactions. It can never move money.</span></li><li><span><b style="color:var(--text)">You log in at your bank</b>, never in this app. We never see your password.</span></li><li><span><b style="color:var(--text)">Consent for up to 12 months</b>, and you can withdraw it any time.</span></li><li><span>Uses Australia\'s <b style="color:var(--text)">Consumer Data Right</b> (Open Banking).</span></li></ul></div>'+
-  '<div class="card" style="text-align:center"><div class="muted" style="font-size:12px;font-weight:700">PROVIDED THROUGH</div><div style="font-weight:800;font-size:17px;margin-top:4px">'+PROVIDER+'</div></div>'+
-  '<button class="btn pri block" id="bk-next">Continue</button>'+mock('Simulated / Prototype: no bank, data provider or CDR service is contacted. Banks and data are fictional.'),
- bind:function(q){q('bk-next').addEventListener('click',function(){go('bkConsent');});}};};
-VIEWS.bkConsent=function(){var m=F.tmp.months||12;var ends=new Date(addMonthsTs(Date.now(),m));
- return {h:'<h2 class="page">Your consent</h2><p class="sub">Exactly what you\'re agreeing to.</p>'+
-  '<div class="card"><h3><span>Data requested</span></h3><ul class="checks">'+BK_SCOPES.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ul></div>'+
-  '<div class="card"><h3><span>Why</span></h3><div class="muted" style="font-size:14px;line-height:1.45">To show spending against your budget, match transactions to budget lines, spot paydays and transfers between your own accounts, and share what <i>you</i> choose with '+esc(pName(otherP(viewer())))+'.</div></div>'+
-  '<div class="card"><h3><span>How long</span></h3><div class="chips" id="bk-dur">'+[12,6,3].map(function(n){return '<button class="chip'+(n===m?' on':'')+'" data-m="'+n+'">'+n+' months</button>';}).join('')+'</div><div class="hint">Ends '+fmtLong(ends)+'. We\'ll remind you 30 days and 7 days before, and on the day it ends.</div><div class="hint" data-test="retention">We keep synced data only while your consent is active. When it ends or you withdraw it, your data is deleted within '+RET+'.</div></div>'+
-  '<div class="card"><h3><span>Supporting party</span></h3><div class="muted" style="font-size:14px;line-height:1.45"><b style="color:var(--text)">'+PROVIDER+'</b> collects the data from your bank for Duo Budget. You can withdraw consent any time in Partner → Bank connections.</div></div>'+
-  '<button class="btn pri block" id="bk-agree">I agree</button>'+mock('Simulated / Prototype: agreeing here records a demo consent on this device only.'),
- bind:function(q){q('bk-dur').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;F.tmp.months=+b.dataset.m;renderFlow();});
-  q('bk-agree').addEventListener('click',function(){F.tmp.months=F.tmp.months||12;F.tmp.agreedAt=Date.now();go('bkPick');});}};};
-VIEWS.bkPick=function(){return {h:'<h2 class="page">Choose your bank</h2><p class="sub">Fictional banks for this prototype.</p><div id="bk-banks">'+
-  BANKS.map(function(b){return '<button class="bankrow" data-bank="'+b.id+'">'+blogo(b.id)+'<span><b>'+b.name+'</b><small>Simulated institution</small></span><span class="chev">›</span></button>';}).join('')+'</div>'+
-  mock('Simulated / Prototype: real banks will appear here once a CDR provider is chosen.'),
- bind:function(q){q('bk-banks').addEventListener('click',function(e){var b=e.target.closest('[data-bank]');if(!b)return;F.tmp.bank=b.dataset.bank;F.tmp.accts=null;go('bkBank');});}};};
-VIEWS.bkBank=function(){var b=bankById(F.tmp.bank),m=F.tmp.months||12;
- return {h:'<div class="simbank" data-test="sim-bank"><div class="sb-top" style="background:'+b.color+'">'+blogo(b.id)+'<span>'+b.name+'</span><span class="sb-tag">SIMULATED BANK</span></div><div class="sb-body">'+
-  '<h3>Share data with Duo Budget?</h3><p>Duo Budget, through '+PROVIDER+', is asking for <b>read-only</b> access for <b>'+m+' months</b> to:</p><ul>'+BK_SCOPES.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ul>'+
-  '<div class="sb-note">This is a simulation. A real bank would ask you to sign in here, on its own site or app. No login fields are shown and nothing is checked.</div>'+
-  '<button class="btn block" id="bk-approve" style="background:'+b.color+';color:#fff">Approve sharing</button></div></div>'+mock('Simulated / Prototype: no bank is contacted.'),
- bind:function(q){q('bk-approve').addEventListener('click',function(){go('bkAccounts');});}};};
-VIEWS.bkAccounts=function(){var v=viewer();if(!F.tmp.accts){F.tmp.accts=accountTemplates(v,F.tmp.bank);F.tmp.sel={};F.tmp.accts.forEach(function(t){F.tmp.sel[t.key]=true;});}
- return {h:'<h2 class="page">Choose accounts</h2><p class="sub">'+esc(bankById(F.tmp.bank).name)+' found '+F.tmp.accts.length+' accounts. Pick the ones to bring in.</p><div class="card"><div class="mlist" id="bk-accts">'+
-  F.tmp.accts.map(function(t){var on=F.tmp.sel[t.key];return '<div class="acct" data-k="'+t.key+'" style="cursor:pointer"><span class="tick'+(on?' on':'')+'">'+(on?'✓':'')+'</span><div class="mi"><b>'+esc(t.name)+(t.isJoint?' <span class="you">Joint</span>':'')+'</b><small>'+TYPE_LBL[t.type]+' · '+t.accountNo+'</small></div><div class="am'+(t.bal<0?'':' ')+'">'+money(t.bal)+'</div></div>';}).join('')+'</div></div>'+
-  '<div class="ferr" id="bk-aerr"></div><button class="btn pri block" id="bk-acc-next">Continue</button>'+mock('Simulated / Prototype: fictional accounts and balances.'),
- bind:function(q){q('bk-accts').addEventListener('click',function(e){var r=e.target.closest('[data-k]');if(!r)return;F.tmp.sel[r.dataset.k]=!F.tmp.sel[r.dataset.k];renderFlow();});
-  q('bk-acc-next').addEventListener('click',function(){if(!F.tmp.accts.some(function(t){return F.tmp.sel[t.key];})){q('bk-aerr').textContent='Pick at least one account.';return;}
-   if(!F.tmp.modes){F.tmp.modes={};F.tmp.accts.forEach(function(t){F.tmp.modes[t.key]=defaultMode(t);});}go('bkShare');});}};};
-function shareBlocked(){return !F.tmp.share&&F.tmp.accts.some(function(t){return F.tmp.sel[t.key]&&F.tmp.modes[t.key]!=='private';});}
-var MODE_ORDER=['shared','totals','private'];
-VIEWS.bkShare=function(){var v=viewer(),o=otherP(v),on=!!F.tmp.share,pj=!!memberBy('partner'),blk=shareBlocked(),on2=o,pn=esc(pName(o));
- return {h:'<h2 class="page">Household sharing</h2><p class="sub">Choose what '+esc(pName(o))+' can see from each account. You can change this any time.</p>'+
-  '<div class="card"><div class="mlist" id="bk-modes">'+F.tmp.accts.filter(function(t){return F.tmp.sel[t.key];}).map(function(t){var m=F.tmp.modes[t.key];
-   return '<div class="acct" style="display:block"><div class="mi"><b>'+esc(t.name)+(t.isJoint?' <span class="you">Joint</span>':'')+'</b><small>'+TYPE_LBL[t.type]+' · '+t.accountNo+'</small></div><div class="modes">'+
-    MODE_ORDER.map(function(x){return '<button class="chip'+(m===x?' on':'')+'" data-k="'+t.key+'" data-mode="'+x+'" aria-pressed="'+(m===x)+'">'+(x==='shared'?'Shared with '+pn:SHARE_LBL[x])+'</button>';}).join('')+'</div></div>';}).join('')+'</div>'+
-  '<div class="hint" data-test="share-copy"><b>Shared</b>: '+pn+' sees the transactions. <b>Totals only</b>: '+pn+' sees the account name, type and balance, plus money in and out by category each pay cycle. No individual transactions, merchants or descriptions. <b>Just me</b>: private to you, and not counted in the household budget or left over.</div></div>'+
-  '<button class="chkrow" id="bk-sharechk" role="checkbox" aria-checked="'+on+'"><span class="tick'+(on?' on':'')+'">'+(on?'✓':'')+'</span><span>Share my selected data with <b>'+pn+'</b>'+(pj?'':'<br><small class="muted">'+pn+' hasn\'t joined yet. Sharing starts when they join.</small>')+'</span></button>'+
-  (blk?'<div class="blockhint" data-test="share-block" id="bk-blockhint">Tick the box to share with '+pn+', or set those accounts to Just me.</div>':'')+
-  '<button class="btn pri block" style="margin-top:14px" id="bk-sync"'+(blk?' disabled aria-disabled="true" aria-describedby="bk-blockhint" aria-label="Connect & sync. Unavailable until you tick the sharing box or set those accounts to Just me."':'')+'>Connect & sync</button>'+mock('Simulated / Prototype: sharing only changes what the other partner sees in this demo.'),
- bind:function(q){q('bk-modes').addEventListener('click',function(e){var b=e.target.closest('[data-mode]');if(!b||b.disabled)return;F.tmp.modes[b.dataset.k]=b.dataset.mode;renderFlow();});
-  q('bk-sharechk').addEventListener('click',function(){F.tmp.share=!F.tmp.share;renderFlow();});
-  q('bk-sync').addEventListener('click',function(){if(shareBlocked())return;F.tmp.syncToken=uid();go('bkSync');});}};};
-function doSync(){
-  var v=viewer(),b=BK(),bank=bankById(F.tmp.bank),now=Date.now(),m=F.tmp.months||12;
-  var c={id:'conn_'+uid(),partner:v,institution:{id:bank.id,name:bank.name},status:'active',createdAt:now,lastSync:now,shareConsent:!!F.tmp.share,accountIds:[],
-    consent:{grantedAt:now,months:m,expiresAt:addMonthsTs(now,m),purpose:'Household budget tracking',scopes:BK_SCOPES.slice(),provider:PROVIDER}};
-  var acc={};F.tmp.accts.forEach(function(t){if(!F.tmp.sel[t.key])return;
-    var a={id:'acc_'+uid(),connection:c.id,institution:c.institution,name:t.name,accountNo:t.accountNo,currency:'AUD',balance:t.bal.toFixed(2),availableFunds:(t.type==='credit-card'?5000+t.bal:t.bal).toFixed(2),
-      lastUpdated:new Date(now).toISOString(),'class':{type:t.type,product:t.product},status:'available',ownerPartner:v,shareMode:c.shareConsent?F.tmp.modes[t.key]:'private',isJoint:t.isJoint};
-    acc[t.key]=a;b.accounts.push(a);c.accountIds.push(a.id);});
-  b.connections.push(c);var txs=genTx(c,acc);b.transactions=b.transactions.concat(txs);classifyAll();
-  bLog(v,'Connected '+bank.name+' ('+c.accountIds.length+' accounts, '+txs.length+' transactions, consent '+m+' months)'+(c.shareConsent?', sharing with '+pName(otherP(v)):''));
-  save();F.tmp.result=c.id;
-}
-VIEWS.bkSync=function(){var steps=['Connecting to '+bankById(F.tmp.bank).name+' (simulated)','Fetching accounts','Loading 60 days of transactions','Matching to your budget lines','Spotting transfers and paydays'];
- return {h:'<h2 class="page">Syncing…</h2><p class="sub">This takes a moment in the real app.</p><div class="syncbar"><i id="bk-prog" style="width:0%"></i></div><div class="ssteps" id="bk-steps">'+steps.map(function(s){return '<div>'+s+'</div>';}).join('')+'</div>'+mock('Simulated / Prototype: data is generated on this device.'),
- bind:function(q){var tok=F.tmp.syncToken,i=0;
-  (function tick(){if(F.step!=='bkSync'||F.tmp.syncToken!==tok)return;var rows=q('bk-steps').children;
-   [].forEach.call(rows,function(r,k){r.className=k<i?'done':k===i?'cur':'';});q('bk-prog').style.width=(i/steps.length*100)+'%';
-   if(i>=steps.length){doSync();F.tmp.syncToken=null;F.hist=[];F.step=null;go('bkDone',true);renderAll();return;}i++;setTimeout(tick,260);})();}};};
-VIEWS.bkDone=function(){var c=BK().connections.filter(function(x){return x.id===F.tmp.result;})[0];if(!c){return VIEWS.bkManage();}
- var txs=BK().transactions.filter(function(t){return t.connection===c.id;}),matched=txs.filter(function(t){return t.budgetItemId&&!t.review;}).length,rev=txs.filter(function(t){return t.review;}).length,tr=txs.filter(function(t){return t._pair;}).length;
- return {h:'<div class="done-ic">✓</div><h2 class="page" style="text-align:center">'+esc(c.institution.name)+' connected</h2><p class="sub" style="text-align:center">Consent until '+fmtLong(new Date(c.consent.expiresAt))+'.</p>'+
-  '<div class="kv" data-test="bk-done"><div class="stat"><div class="k">Accounts</div><div class="v">'+c.accountIds.length+'</div></div><div class="stat"><div class="k">Transactions</div><div class="v" data-test="bk-ntx">'+txs.length+'</div><small>last 60 days</small></div>'+
-  '<div class="stat"><div class="k">Matched to budget</div><div class="v">'+matched+'</div></div><div class="stat"><div class="k">To review</div><div class="v" data-test="bk-nrev">'+rev+'</div></div>'+
-  '<div class="stat"><div class="k">Internal transfers</div><div class="v">'+tr+'</div><small>excluded / counted as savings</small></div><div class="stat"><div class="k">Pending</div><div class="v">'+txs.filter(function(t){return t.status==='pending';}).length+'</div><small>shown grey</small></div></div>'+
-  '<div id="bk-sal">'+salaryHTML(c.partner)+'</div>'+
-  '<div class="btns">'+(rev?'<button class="btn ghost" id="bk-to-inbox">Review '+rev+'</button>':'')+'<button class="btn pri" id="bk-to-budget">See budget</button></div>'+mock('Simulated / Prototype: fictional transactions.'),
- bind:function(q){var r=q('bk-to-inbox');if(r)r.addEventListener('click',function(){go('bkInbox');});
-  q('bk-to-budget').addEventListener('click',function(){closeFlow();document.querySelector('nav.tabs button[data-v="budget"]').click();});
-  q('bk-sal').addEventListener('click',salaryClick);}};};
-VIEWS.bkInbox=function(){var v=viewer(),acc=accMap(),cpI=activeConn('A')?'B':'A',cpN=contribTitle(cpI)==='Partner transfers'?'your partner':pName(cpI);
- var list=hasBank()?S.bank.transactions.filter(function(t){var a=acc[t.account];return a&&t.review&&accListable(a,v);}).sort(function(a,b){return a.transactionDate<b.transactionDate?1:-1;}):[];
- var cg={};if(hasBank())S.bank.transactions.forEach(function(t){var a=acc[t.account];if(!a||!t._contrib||t.userOverridden||!accListable(a,v))return;var k=merchKey(t),g=cg[k]||(cg[k]={desc:t.description,n:0,amt:0,last:''});g.n++;g.amt+=+t.amount;if(t.transactionDate>g.last)g.last=t.transactionDate;});
- var cgk=Object.keys(cg),cgH=cgk.length?'<div class="card" data-test="contrib-group"><h3><span>'+esc(contribTitle(cpI))+'</span><span class="gstat ok">Auto</span></h3><div class="mlist">'+cgk.map(function(k){var g=cg[k];return '<div class="mrow"><div class="mi"><b>'+esc(g.desc)+'</b><small>'+g.n+' transfers · last '+fmtDate(parseISO(g.last))+'</small></div><div class="am cr">+'+money(g.amt)+'</div></div>';}).join('')+'</div>'+
-   '<div class="hint">Regular transfers from '+esc(cpN)+' into a joint account. We group them here and don\'t count them as spending. Once '+esc(cpN)+' connects their bank, they match up automatically.</div></div>':'';
- return {h:'<h2 class="page">Review inbox</h2><p class="sub">We weren\'t sure about these. Pick a category, budget line and whose it is. Tick Remember to sort that merchant the same way next time.</p>'+
-  cgH+(list.length?'<div class="card"><div class="mlist" id="bk-inbox" data-test="inbox">'+list.map(function(t){return txRow(t,acc);}).join('')+'</div></div>':'<div class="card" style="text-align:center" data-test="inbox-empty"><div style="font-size:30px">✓</div><b>All caught up</b><div class="muted" style="font-size:14px;margin-top:4px">Nothing to review.</div></div>')+
-  mock('Simulated / Prototype: fictional transactions.'),
- bind:function(q){var l=q('bk-inbox');if(l)l.addEventListener('click',function(e){var r=e.target.closest('[data-tx]');if(r)reviewSheet(r.dataset.tx);});}};};
-function reviewSheet(id){
-  var t=S.bank.transactions.filter(function(x){return x.id===id;})[0];if(!t)return;var acc=accMap(),a=acc[t.account],pm=!!memberBy('partner');
-  var cat=t.budgetCat||(a.isJoint?'expenses':'personal'),line=t.budgetItemId||'',own=t.owner||(a.isJoint?'J':a.ownerPartner),nm=t.enrich.merchant.businessName||t.description,rem=true;
-  var cats=[['income','Income'],['savings','Savings'],['personal','Personal'],['expenses','Expenses'],['excluded','Not in budget']];
-  function lines(){return '<option value="">No specific line</option>'+S.items.filter(function(i){return i.cat===cat;}).map(function(i){return '<option value="'+i.id+'"'+(i.id===line?' selected':'')+'>'+esc(i.name)+' · '+esc(ownerLabel(i.owner))+'</option>';}).join('');}
-  openSheet('<h4>'+esc(nm)+'</h4><div class="muted" style="font-size:14px">'+esc(t.description)+' · '+fmtDate(parseISO(t.transactionDate))+' · '+(+t.amount>0?'+':'−')+money(Math.abs(+t.amount))+'</div>'+
-    '<div class="hint" style="margin-top:6px" data-test="rv-why">Here because: '+esc((t.why||'No match yet').replace(/\.$/,''))+'.</div>'+
-    '<label class="fl">Category</label><div class="chips" id="rv-cat">'+cats.map(function(c){return '<button class="chip'+(c[0]===cat?' on':'')+'" data-c="'+c[0]+'">'+c[1]+'</button>';}).join('')+'</div>'+
-    '<div id="rv-linewrap"><label class="fl" for="rv-line">Budget line</label><select class="field" id="rv-line">'+lines()+'</select></div>'+
-    '<label class="fl">Whose is it?</label><div class="chips" id="rv-own">'+['J','A','B'].filter(function(p){return p!=='B'||pm||a.ownerPartner==='B';}).map(function(p){return '<button class="chip'+(p===own?' on':'')+'" data-o="'+p+'">'+(p==='J'?'Ours':esc(pName(p)))+'</button>';}).join('')+'</div>'+
-    '<button class="chkrow" id="rv-rem" role="checkbox" aria-checked="true"><span class="tick on">✓</span><span>Remember for <b>'+esc(nm)+'</b><br><small class="muted">Future transactions from this merchant go here automatically.</small></span></button>'+
-    '<div class="btns"><button class="btn ghost" id="rv-cancel">Cancel</button><button class="btn pri" id="rv-save">Save</button></div><div class="mock">Simulated / Prototype</div>',function(sh){
-    var q=function(i){return sh.querySelector('#'+i);};
-    function sync(){q('rv-linewrap').style.display=cat==='excluded'?'none':'';}sync();
-    q('rv-cat').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;cat=b.dataset.c;line='';[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});q('rv-line').innerHTML=lines();sync();});
-    q('rv-line').addEventListener('change',function(){line=this.value;});
-    q('rv-own').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;own=b.dataset.o;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});});
-    q('rv-rem').addEventListener('click',function(){rem=!rem;var tk=this.querySelector('.tick');tk.classList.toggle('on',rem);tk.textContent=rem?'✓':'';this.setAttribute('aria-checked',rem);});
-    q('rv-cancel').addEventListener('click',closeSheet);
-    q('rv-save').addEventListener('click',function(){
-      t.userOverridden=true;t.budgetCat=cat;t.budgetItemId=cat==='excluded'?null:(line||null);t.owner=own;var extra=0;
-      if(rem){var key=merchKey(t),rs=S.bank.rules.filter(function(r){return r.key!==key;});
-        rs.push({id:'rule_'+uid(),key:key,label:nm,budgetCat:t.budgetCat,budgetItemId:t.budgetItemId,owner:own,createdBy:viewer(),createdAt:Date.now()});S.bank.rules=rs;
-        classifyAll();extra=S.bank.transactions.filter(function(x){return x.id!==t.id&&!x.userOverridden&&merchKey(x)===key;}).length;}
-      save();closeSheet();renderAll();if(F.step)renderFlow();toast('Saved'+(rem?' · rule added'+(extra?' (+'+extra+' more)':''):''));});
-  });
-}
-VIEWS.bkRules=function(){var rs=hasBank()||BK().rules.length?BK().rules:[],txs=S.bank?S.bank.transactions:[];
- var oc=activeConn('A')?'B':'A',ot=contribTitle(oc),on_=ot==='Partner transfers'?'your partner':pName(oc);
- var order=[['Your edits','Anything you change by hand stays that way.'],['Moving money between your own accounts','Matching amounts in and out within 3 days aren\'t counted as spending. Money into savings counts as savings. Paying off a connected card isn\'t counted twice: its purchases count instead.'],['Saved merchant rules','From “Remember for this merchant” in the review inbox.'],['Bank tags','Labels your bank adds, like salary or rent.'],['Business type','What kind of business it is, like a supermarket or service station.'],['Transaction type','Fees, interest, loan repayments and refunds. Regular transfers from '+on_+' before they connect are grouped as '+ot+'.']];
- return {h:'<h2 class="page">How we sort transactions</h2><p class="sub">Rules are checked in this order. Your own edits always win.</p>'+
-  '<div class="card"><h3><span>In this order</span></h3><ol class="rorder" data-test="rule-order">'+order.map(function(o){return '<li><b>'+o[0]+'</b><span>'+o[1]+'</span></li>';}).join('')+'</ol>'+
-  '<div class="hint">Then we match budget lines by category or by a similar amount. Anything we\'re not sure about goes to the review inbox.</div></div>'+
-  '<div class="card"><h3><span>Saved merchant rules</span><span class="muted" style="font-size:12px">'+rs.length+'</span></h3><div class="mlist" id="bk-rules" data-test="rules">'+
-  (rs.length?rs.map(function(r){var it=S.items.filter(function(i){return i.id===r.budgetItemId;})[0],n=txs.filter(function(t){return merchKey(t)===r.key;}).length;
-    return '<div class="mrow"><div class="mi"><b>'+esc(r.label)+'</b><small>→ '+(r.budgetCat==='excluded'?'Not in budget':esc((CATS.filter(function(c){return c.id===r.budgetCat;})[0]||{label:r.budgetCat}).label))+(it?' · '+esc(it.name):'')+' · '+(r.owner==='J'?'Ours':r.owner==='auto'?'By account':esc(pName(r.owner)))+' · '+n+' transaction'+(n===1?'':'s')+'</small></div><button class="btn danger sm" data-rdel="'+r.id+'">Delete</button></div>';}).join('')
-   :'<div class="muted" style="font-size:14px">No saved rules yet. Add one from the review inbox.</div>')+'</div></div>'+mock('Simulated / Prototype'),
- bind:function(q){q('bk-rules').addEventListener('click',function(e){var b=e.target.closest('[data-rdel]');if(!b)return;var r=BK().rules.filter(function(x){return x.id===b.dataset.rdel;})[0];
-   BK().rules=BK().rules.filter(function(x){return x.id!==b.dataset.rdel;});save();renderAll();renderFlow();toast('Rule deleted'+(r?': '+r.label:''));});}};};
-// what the other partner sees for a "Totals only" account: name, type, balance (above) + per-category totals this pay cycle
-function totalsOnlyHTML(a){var w=cycleBounds(),o={income:0,savings:0,personal:0,expenses:0};
-  S.bank.transactions.forEach(function(t){if(t.account!==a.id||t.review||!o.hasOwnProperty(t.budgetCat))return;var d=parseISO(t.transactionDate);if(d<w.start||d>=w.end)return;o[t.budgetCat]+=(t.budgetCat==='income'||t.budgetCat==='savings')?+t.amount:-(+t.amount);});
-  var parts=[['expenses','Expenses'],['personal','Personal'],['savings','Savings'],['income','Income']].filter(function(x){return Math.abs(o[x[0]])>0.004;}).map(function(x){return x[1]+' <b style="color:var(--text)">'+money(o[x[0]])+'</b>';});
-  return '<div class="hint" data-test="totals-only" style="margin-top:6px">Totals only · this '+CYCLES[S.cycle].per+' ('+fmtDay(w.start)+' – '+fmtDay(dOff(w.end,-1))+'): '+(parts.length?parts.join(' · '):'nothing yet')+'<br>Balance plus money in and out by category. No individual transactions, merchants or descriptions are shared.</div>';}
-// consent reminders at 30 days, 7 days and on expiry (MOCKED notifications: nothing is sent anywhere)
-function remindersHTML(c){var e=c.consent.expiresAt,now=Date.now(),bn=esc(c.institution.name),rows,act=c.status==='active';
-  var rb=function(lbl){return '<div class="rbtns"><button class="btn pri sm" data-renew="'+c.id+'">'+lbl+'</button>';};
-  if(c.status==='expired')rows=[[c.endedAt,'Consent ended','Your '+bn+' consent has ended. Its synced data will be deleted within '+RET+'. Reconnect any time.','<div class="rbtns"><button class="btn pri sm" data-recon="1">Reconnect</button></div>']];
-  // reminder dates are counted back from the actual consent end date (calendar days)
-  var at=function(n){var d=new Date(e);d.setDate(d.getDate()-n);return d.getTime();};
-  if(c.status!=='expired')rows=[[at(30),'30 days to go','Your '+bn+' consent ends on '+fmtLong(new Date(e))+'. Renew to keep your budget up to date.',act?rb('Renew')+'</div>':''],
-    [at(7),'7 days to go','Your '+bn+' consent ends in 7 days. After that, its data is deleted within '+RET+'.',act?rb('Renew')+(c.letEnd?'':'<button class="btn ghost sm" data-letend="'+c.id+'">Don\'t renew</button>')+'</div>':''],
-    [e,'On expiry','Your '+bn+' consent has ended. Its synced data will be deleted within '+RET+'. Reconnect any time.','']];
-  return '<label class="fl">Reminders <span style="color:var(--dim)">(mocked notifications)</span></label><div class="mlist" data-test="reminders">'+rows.map(function(r){var sent=r[0]<=now;
-    return '<div class="mrow" style="padding:8px 0;flex-wrap:wrap"><div class="mi"><b style="font-size:14px">'+r[1]+'</b><small>'+r[2]+'</small>'+r[3]+'</div><span class="gstat '+(sent?'ok':'none')+'" style="white-space:nowrap">'+(sent?'Sent ':'')+fmtDayY(r[0])+'</span></div>';}).join('')+
-    '</div><div class="mock" style="margin-top:6px">Prototype: no push, email or SMS is sent.</div>';}
-function connById(id){return BK().connections.filter(function(x){return x.id===id;})[0];}
-function refreshBank(){save();renderAll();if(F.step)renderFlow();}
-function renewSheet(c){var m=12,bn=esc(c.institution.name),pn=esc(pName(otherP(c.partner)));
-  var end=function(){return fmtLong(new Date(addMonthsTs(Date.now(),m)));};
-  openSheet('<h4 data-test="renew-title">Renew '+bn+' consent?</h4><div class="muted" style="font-size:14px;line-height:1.45">Keep '+bn+' connected so your budget stays up to date. What you share with '+pn+' stays the same.</div>'+
-    '<div class="chips" id="rn-dur" style="margin-top:12px">'+[12,6,3].map(function(n){return '<button class="chip'+(n===m?' on':'')+'" data-m="'+n+'">'+n+' months</button>';}).join('')+'</div>'+
-    '<div class="hint" id="rn-end" data-test="renew-end">New end date: '+end()+'. We\'ll remind you again 30 days and 7 days before, and on the day it ends.</div>'+
-    '<div class="btns"><button class="btn ghost" id="x-no">Not now</button><button class="btn pri" id="x-yes" data-test="renew-confirm">Renew</button></div><div class="mock">Simulated / Prototype: no bank is contacted.</div>',function(sh){
-    var q=function(i){return sh.querySelector('#'+i);};
-    q('rn-dur').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;m=+b.dataset.m;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});q('rn-end').textContent='New end date: '+end()+'. We\'ll remind you again 30 days and 7 days before, and on the day it ends.';});
-    q('x-no').addEventListener('click',closeSheet);
-    q('x-yes').addEventListener('click',function(){var now=Date.now();c.consent.expiresAt=addMonthsTs(now,m);c.consent.months=m;c.consent.renewedAt=now;c.letEnd=false;
-      bLog(c.partner,'Renewed '+c.institution.name+' consent for '+m+' months');closeSheet();refreshBank();toast(c.institution.name+' consent renewed until '+fmtLong(new Date(c.consent.expiresAt)));});});}
-function stopShareSheet(c){var pn=esc(pName(otherP(c.partner))),bn=esc(c.institution.name);
-  openSheet('<h4 data-test="stop-title">Stop sharing with '+pn+'?</h4><div class="muted" style="font-size:14px;line-height:1.45">'+pn+' will stop seeing data from '+bn+' straight away. It stays connected for you, and you can turn sharing back on any time.</div>'+
-    '<div class="btns"><button class="btn ghost" id="x-no">Cancel</button><button class="btn danger" id="x-yes" data-test="stop-confirm">Stop sharing</button></div>',function(sh){
-    sh.querySelector('#x-no').addEventListener('click',closeSheet);
-    sh.querySelector('#x-yes').addEventListener('click',function(){setShareConsent(c,false);closeSheet();refreshBank();toast('Stopped sharing with '+pName(otherP(c.partner)));});});}
-function disconnectSheet(c){var pn=esc(pName(otherP(c.partner))),bn=esc(c.institution.name);
-  openSheet('<h4 data-test="disc-title">Disconnect '+bn+'?</h4><div class="muted" style="font-size:14px;line-height:1.45">We\'ll stop syncing '+bn+'. Your synced data is removed from '+pn+'\'s view straight away. Your own history stays in your view until you delete it or your consent ends, then it\'s deleted within '+RET+'. Saved merchant rules stay.</div>'+
-    '<div class="btns"><button class="btn ghost" id="x-no">Cancel</button><button class="btn danger" id="x-yes" data-test="disc-confirm">Disconnect</button></div>',function(sh){
-    sh.querySelector('#x-no').addEventListener('click',closeSheet);
-    sh.querySelector('#x-yes').addEventListener('click',function(){endConnection(c,'withdrawn');closeSheet();refreshBank();toast(c.institution.name+' disconnected');});});}
-function deleteSheet(c){var pn=esc(pName(otherP(c.partner))),bn=esc(c.institution.name);
-  openSheet('<h4 data-test="del-title">Delete your '+bn+' data?</h4><div class="muted" style="font-size:14px;line-height:1.45">This permanently removes all synced data for these accounts, for you and '+pn+'. Your budget lines, goals and saved merchant rules stay as they are. This can\'t be undone.</div>'+
-    '<div class="btns"><button class="btn ghost" id="x-no">Cancel</button><button class="btn danger" id="x-yes" data-test="del-confirm">Delete my bank data</button></div>',function(sh){
-    sh.querySelector('#x-no').addEventListener('click',closeSheet);
-    sh.querySelector('#x-yes').addEventListener('click',function(){deleteMyBank(c);closeSheet();refreshBank();toast('Deletion started. Your '+c.institution.name+' data is gone from your view and '+pName(otherP(c.partner))+'\'s now, and fully removed within '+RET+'.');});});}
-function historySheet(c){var acc=accMap(),txs=BK().transactions.filter(function(t){return t.connection===c.id;}).sort(function(a,b){return a.transactionDate<b.transactionDate?1:-1;});
-  openSheet('<div class="dhead"><div class="gt"><b>Your '+esc(c.institution.name)+' history</b><small>Only you can see this. Not counted in the household budget.</small></div><button class="xbtn" id="x-close" aria-label="Close">✕</button></div>'+
-    '<div class="mlist" data-test="my-history">'+txs.slice(0,40).map(function(t){return txRow(t,acc);}).join('')+'</div><div class="mock">Simulated / Prototype</div>',function(sh){sh.querySelector('#x-close').addEventListener('click',closeSheet);});}
-VIEWS.bkManage=function(){var v=viewer(),b=BK(),cs=b.connections.filter(function(c){return (c.status==='active'||c.partner===v)&&!c.hideFromList;}).sort(function(x,y){return (x.status==='active'?0:1)-(y.status==='active'?0:1)||y.createdAt-x.createdAt;});
- var stp={active:['ok','Active'],expired:['bad','Expired'],withdrawn:['none','Disconnected'],left:['none','Ended']};
- var h='<h2 class="page">Consent & sharing</h2><p class="sub">Each partner controls their own bank connection.</p><div id="bkm">';
- if(!cs.length)h+='<div class="card muted">No bank connections yet.</div>';
- cs.forEach(function(c){var own=c.partner===v,act=c.status==='active',accs=b.accounts.filter(function(a){return a.connection===c.id;}),st=stp[c.status],on=pName(otherP(c.partner)),bn=esc(c.institution.name),has=connData(c);
-  if(!act&&c.dataDeletedAt)st=['none wrap','Deletion requested · removed within '+RET];
-  h+='<div class="card" data-test="conn-'+c.partner+'-'+c.status+'"><div class="row" style="justify-content:flex-start;gap:12px">'+blogo(c.institution.id)+'<div class="mi"><b>'+bn+'</b><small>Connected by '+esc(pName(c.partner))+(own?' (you)':'')+'</small></div><span class="gstat '+st[0]+'" data-test="conn-status">'+st[1]+'</span></div>'+
-   '<div class="kv" style="margin-top:12px"><div class="stat"><div class="k">Granted</div><div class="v" style="font-size:15px">'+fmtLong(new Date(c.consent.grantedAt))+'</div></div><div class="stat"><div class="k">'+(act?'Ends':'Ended')+'</div><div class="v" style="font-size:15px">'+fmtLong(new Date(act?c.consent.expiresAt:c.endedAt))+'</div><small>'+c.consent.months+'-month consent</small></div></div>'+
-   '<div class="hint">Data: '+c.consent.scopes.join(' · ')+'. Supporting party: '+PROVIDER+'.</div>';
-  if(act){
-   var vis=own?accs:accs.filter(function(a){return a.shareMode!=='private';});
-   h+='<label class="fl">Accounts</label>'+(vis.length?'':'<div class="muted" style="font-size:14px">Nothing shared with you from this bank.</div>')+vis.map(function(a){return '<div class="acct" style="display:block" data-test="acc-'+esc(a.name)+'"><div class="mi"><b>'+esc(a.name)+(a.isJoint?' <span class="you">Joint</span>':'')+'</b><small>'+TYPE_LBL[a['class'].type]+' · '+a.accountNo+' · '+money(+a.balance)+'</small></div>'+
-     (own?'<div class="modes">'+MODE_ORDER.map(function(x){return '<button class="chip'+(a.shareMode===x?' on':'')+'" data-acc="'+a.id+'" data-mode="'+x+'"'+(c.shareConsent?'':' disabled')+'>'+(x==='shared'?'Shared with '+esc(on):SHARE_LBL[x])+'</button>';}).join('')+'</div>'
-     :a.shareMode==='totals'?totalsOnlyHTML(a):'<small class="muted">Shared: you can see its transactions</small>')+'</div>';}).join('');
-   if(own){h+='<div class="setrow" style="border-top:1px solid var(--line);margin-top:8px"><div class="l">Share my data with '+esc(on)+'<small>'+(c.shareConsent?'On: per-account choices above apply':'Off: '+esc(on)+' sees nothing from this bank')+'</small></div><button class="switch'+(c.shareConsent?' on':'')+'" data-share="'+c.id+'" id="bkShareSw'+c.partner+'" role="switch" aria-checked="'+c.shareConsent+'" aria-label="Share my data with '+esc(on)+'"></button></div>'+
-     '<div class="btns" style="flex-wrap:wrap">'+(c.shareConsent?'<button class="btn ghost sm" data-stop="'+c.id+'" id="bkStop'+c.partner+'">Stop sharing</button>':'')+'<button class="btn pri sm" data-renew="'+c.id+'" id="bkRenew'+c.partner+'">Renew consent</button><button class="btn danger sm" data-disc="'+c.id+'" id="bkDisc'+c.partner+'">Disconnect</button><button class="btn danger sm" data-del="'+c.id+'" id="bkDel'+c.partner+'">Delete my bank data</button></div>'+
-     '<div class="hint" data-test="retention">We keep synced data only while consent is active. After it ends or you withdraw it, it\'s deleted within '+RET+'.</div>'+
-     '<div class="btns"><button class="btn ghost sm" data-exp="'+c.id+'" id="bkExp'+c.partner+'">Demo: simulate consent expiry</button></div>'+remindersHTML(c);}
-   else h+='<div class="hint">Only '+esc(pName(c.partner))+' can change or disconnect this.</div>';
-  }else{
-   var lines=c.dataDeletedAt?'<div class="hint" data-test="conn-outcome">Deletion started. Your '+bn+' data is gone from your view and '+esc(on)+'\'s now, and fully removed within '+RET+'.</div>':
-     c.status==='expired'?'<div class="hint" data-test="conn-outcome">Your consent ended on '+fmtLong(new Date(c.endedAt))+', so '+bn+' data stopped updating. Renew it to pick up where you left off.<br>Synced data will be deleted by '+fmtLong(new Date(c.deleteBy))+'. '+RET+'</div>':
-     c.status==='left'?'<div class="hint" data-test="conn-outcome">'+bn+' stopped syncing when you left the household. '+esc(on)+' can no longer see it. Your own history stays here until you delete it or your consent ends, then it\'s deleted within '+RET+'.</div>':
-     '<div class="hint" data-test="conn-outcome">'+bn+' disconnected. No new data will come in, and '+esc(on)+' can no longer see it. Your history is still here for you.</div>';
-   h+=lines+(c.status==='expired'&&!c.dataDeletedAt?remindersHTML(c):'')+'<div class="btns" style="flex-wrap:wrap">'+
-     (has?'<button class="btn ghost sm" data-hist="'+c.id+'">View my history</button><button class="btn danger sm" data-del="'+c.id+'" id="bkDelOld'+c.partner+'">Delete my bank data</button>':'')+
-     (activeConn(v)?'':'<button class="btn pri sm" data-recon="1">Reconnect</button>')+'<button class="btn ghost sm" data-rm="'+c.id+'">Remove from list</button></div>';}
-  h+='</div>';});
- if(b.log.length)h+='<div class="card"><h3><span>Consent history</span></h3><div class="mlist">'+b.log.slice(0,12).map(function(l){return '<div class="mrow" style="padding:8px 0"><div class="mi"><small style="color:var(--text)">'+esc(l.action)+'</small><small data-test="log-who">'+esc(leftName(l.name||pName(l.partner)))+' · '+new Date(l.at).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})+'</small></div></div>';}).join('')+'</div></div>';
- h+='</div>'+mock('Simulated / Prototype: consent, disconnecting and deleting only change demo data on this device.');
- return {h:h,bind:function(q){q('bkm').addEventListener('click',function(e){var t=e.target.closest('button');if(!t||t.disabled)return;var C=connById,d=t.dataset;
-  if(d.mode){var a=b.accounts.filter(function(x){return x.id===d.acc;})[0];a.shareMode=d.mode;bLog(v,a.name+' set to "'+SHARE_LBL[a.shareMode]+'"');refreshBank();}
-  else if(d.share){var c=C(d.share);if(c.shareConsent)stopShareSheet(c);else{setShareConsent(c,true);refreshBank();}}
-  else if(d.stop)stopShareSheet(C(d.stop));
-  else if(d.renew)renewSheet(C(d.renew));
-  else if(d.letend){var c3=C(d.letend);c3.letEnd=true;bLog(c3.partner,'Chose not to renew '+c3.institution.name+' consent');refreshBank();toast('OK, '+c3.institution.name+' stays connected until '+fmtLong(new Date(c3.consent.expiresAt))+'. After that, its data is deleted within '+RET+'. You can renew any time before then.');}
-  else if(d.exp){endConnection(C(d.exp),'expired');refreshBank();toast('Consent ended (demo). Synced data will be deleted within '+RET);}
-  else if(d.disc)disconnectSheet(C(d.disc));
-  else if(d.del)deleteSheet(C(d.del));
-  else if(d.hist)historySheet(C(d.hist));
-  else if(d.rm){var c4=C(d.rm);if(c4.dataDeletedAt)b.connections=b.connections.filter(function(x){return x.id!==d.rm;});else c4.hideFromList=true;refreshBank();}
-  else if(d.recon){startConnect();}
- });}};};
-$('bkCard').addEventListener('click',function(e){if(salaryClick(e))return;var s=e.target.closest('#bkAs [data-p]');if(s){BK().actingAs=s.dataset.p;save();renderAll();toast('Now using the app as '+pName(s.dataset.p)+' (simulated)');return;}
-  var b=e.target.closest('[data-bk]');if(!b)return;var k=b.dataset.bk;if(k==='connect')startConnect();else if(k==='manage')openFlow('bkManage');else if(k==='inbox')openFlow('bkInbox');else if(k==='rules')openFlow('bkRules');});
-$('bkSum').addEventListener('click',function(e){if(e.target.closest('#bkSumReview'))openFlow('bkInbox');});
+function viewer(){if(S.actingAs==='B'&&!memberBy('partner'))S.actingAs='A';return S.actingAs||'A';}
 
 /* ---------- Events ---------- */
 document.addEventListener('click',function(e){if(e.target.closest('[data-open-trends]'))openTrends();});
@@ -2372,7 +1703,6 @@ document.querySelector('nav.tabs').addEventListener('click',function(e){
   window.scrollTo(0,0);
 });
 $('groups').addEventListener('click',function(e){
-  if(salaryClick(e))return;
   var add=e.target.closest('[data-add]');if(add){itemSheet(null,add.dataset.add);return;}
   var row=e.target.closest('.item[data-id]');if(!row)return;
   var it=S.items.find(function(i){return i.id===row.dataset.id;});if(!it)return;
@@ -2454,7 +1784,7 @@ function startSync(){
   .catch(function(e){renderSync({state:'error',msg:'Couldn\'t load the sync library.'});});
 }
 load();save();renderAll();startSync();
-window.__duo={state:function(){return S;},trends:function(sc){return trModel(sc);},trInsights:function(sc){return trInsights(trModel(sc));},trBreak:function(sc,off){var M=trModel(sc);return trBreak(M,M.rows[M.rows.length-1-(off||0)]);},trWins:trWins,invStatus:invStatus,bankActuals:bankActuals,detectSalary:detectSalary,totals:totals,totalsIn:totalsIn,projection:projection,shares:shares,paydaysFor:function(c,d,n){return paydaysFor(c,d,n).map(isoLocal);},payWindow:payWindow,lrPct:lrPct,payAt:function(iso,c,k){return isoLocal(payAt(parseISO(iso),c,k));}};
+window.__duo={state:function(){return S;},trends:function(sc){return trModel(sc);},trInsights:function(sc){return trInsights(trModel(sc));},trBreak:function(sc,off){var M=trModel(sc);return trBreak(M,M.rows[M.rows.length-1-(off||0)]);},trWins:trWins,invStatus:invStatus,totals:totals,totalsIn:totalsIn,projection:projection,shares:shares,paydaysFor:function(c,d,n){return paydaysFor(c,d,n).map(isoLocal);},payWindow:payWindow,lrPct:lrPct,payAt:function(iso,c,k){return isoLocal(payAt(parseISO(iso),c,k));}};
 })();
 </script>
 </body>
