@@ -38,6 +38,11 @@ h2{font-size:24px;margin:0 0 16px}
 .shots figure{margin:0;flex:0 0 72%;max-width:300px;scroll-snap-align:start}
 .shots img{width:100%;height:auto;aspect-ratio:390/844;border-radius:22px;border:1px solid var(--line);display:block;background:var(--bg2)}
 .shots figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+.ipad{display:grid;grid-template-columns:1fr;gap:18px;margin-top:8px}
+.ipad figure{margin:0}
+.ipad img{width:100%;height:auto;aspect-ratio:1180/820;border-radius:16px;border:1px solid var(--line);display:block;background:var(--bg2)}
+.ipad figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+h3.sub{font-size:18px;margin:28px 0 12px}
 .note{font-size:13px;color:var(--muted)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px}
 label{display:block;font-weight:700;font-size:15px;margin:16px 0 6px}
@@ -62,7 +67,7 @@ input[aria-invalid=true]{border-color:#ff8a8a}
 .done h3{font-size:22px;margin:8px 0 6px}.done p{color:var(--muted);margin:0}
 footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}
 [hidden]{display:none!important}
-@media (min-width:720px){.row{grid-template-columns:1fr 1fr}.feats{grid-template-columns:repeat(3,1fr)}.shots{overflow:visible}.shots figure{flex:1 1 0}
+@media (min-width:720px){.row{grid-template-columns:1fr 1fr}.feats{grid-template-columns:repeat(3,1fr)}.shots{overflow:visible}.shots figure{flex:1 1 0}.ipad{grid-template-columns:1fr 1fr}
   .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:36px;align-items:start}.hero .card{margin-top:14px}}
 </style>
 </head>
@@ -122,6 +127,12 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid va
     <figure><img src="img/home.webp" width="390" height="844" loading="lazy" decoding="async" alt="Home screen showing what's left over this fortnight, where the money goes, and the next payday"><figcaption>Home: what's left this fortnight</figcaption></figure>
     <figure><img src="img/budget.webp" width="390" height="844" loading="lazy" decoding="async" alt="Budget screen with income and savings split into ours, yours and mine"><figcaption>Budget: ours, yours and mine</figcaption></figure>
     <figure><img src="img/goals.webp" width="390" height="844" loading="lazy" decoding="async" alt="Goals screen showing shared savings goals and each partner's contribution"><figcaption>Goals: saving together</figcaption></figure>
+    <figure><img src="img/trends.webp" width="390" height="844" loading="lazy" decoding="async" alt="Trends screen showing spending by category this fortnight, with each category compared to the plan"><figcaption>Trends: where it went each fortnight</figcaption></figure>
+  </div>
+  <h3 class="sub">On iPad</h3>
+  <div class="ipad">
+    <figure><img src="img/ipad-home.webp" width="1180" height="820" loading="lazy" decoding="async" alt="Home on iPad in landscape, with what's left over, totals, where the money goes, next payday and trends laid out side by side"><figcaption>Home: the whole fortnight at a glance</figcaption></figure>
+    <figure><img src="img/ipad-trends.webp" width="1180" height="820" loading="lazy" decoding="async" alt="Trends on iPad in landscape, with spending by category next to income vs spending and left at payday charts"><figcaption>Trends: spending and paydays over time</figcaption></figure>
   </div>
   <p class="note">Screens show sample data for a fictional couple, Chloe and Jack.</p>
 </section>
