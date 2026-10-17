@@ -207,7 +207,7 @@ section.view.on{display:block}
 .sheet{width:100%;max-width:480px;background:var(--bg2);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;padding:10px 18px calc(20px + var(--safe-b));animation:up .25s ease;max-height:90vh;overflow:auto}
 .sheet .grab{width:42px;height:5px;border-radius:9px;background:var(--line);margin:4px auto 12px}
 /* sheet top bar: 44px full-width drag area + close X */
-.sh-top{position:sticky;top:0;z-index:3;height:44px;margin:-10px -18px 6px;display:flex;align-items:center;justify-content:center;background:var(--bg2);touch-action:none;cursor:grab;border-radius:24px 24px 0 0}
+.sh-top{position:sticky;top:-10px;z-index:3;height:44px;margin:-10px -18px 6px;display:flex;align-items:center;justify-content:center;background:var(--bg2);touch-action:none;cursor:grab;border-radius:24px 24px 0 0}
 .sh-top .grab{width:44px;height:5px;margin:0;background:#8A8577}
 .sh-x{position:absolute;right:6px;top:0;width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0}
 .sh-x svg{width:20px;height:20px}.sh-x:active{background:rgba(31,36,48,.08)}
@@ -370,7 +370,7 @@ input.code-in{text-align:center;font-size:26px;font-weight:800;letter-spacing:10
   .scrim{align-items:center;padding:calc(24px + var(--safe-t)) calc(24px + var(--safe-r)) calc(24px + var(--safe-b)) calc(24px + var(--safe-l))}
   .sheet{max-width:560px;border-radius:24px;border-bottom:1px solid var(--line);padding:22px 26px 26px;max-height:calc(100vh - 48px);animation:pop .2s ease;box-shadow:0 30px 80px rgba(60,45,20,.18)}
   .sheet .grab{display:none}
-  .sh-top{margin:-22px -26px 6px;cursor:default;touch-action:auto}.sh-x{right:10px;top:4px}
+  .sh-top{top:-22px;margin:-22px -26px 6px;cursor:default;touch-action:auto}.sh-x{right:10px;top:4px}
   @keyframes pop{from{transform:scale(.97);opacity:.4}to{transform:none;opacity:1}}
   /* full-screen flows -> centred card */
   .flow,.flow.partner{background:rgba(60,45,20,.66);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
@@ -407,7 +407,7 @@ input.code-in{text-align:center;font-size:26px;font-weight:800;letter-spacing:10
   #groups>.group{break-inside:avoid;-webkit-column-break-inside:avoid;display:inline-block;width:100%}
   #goals{grid-template-columns:repeat(3,minmax(0,1fr))}
   .scrim.panel{justify-content:flex-end;align-items:stretch;padding:0}
-  .scrim.panel .sh-top{margin-top:calc(-22px - var(--safe-t))}
+  .scrim.panel .sh-top{top:calc(-22px - var(--safe-t));margin-top:calc(-22px - var(--safe-t))}
   .scrim.panel .sheet{max-width:460px;height:100%;max-height:none;border-radius:24px 0 0 24px;border-right:0;border-bottom:0;padding:calc(22px + var(--safe-t)) calc(26px + var(--safe-r)) calc(26px + var(--safe-b)) 26px;animation:slidein .22s ease}
   @keyframes slidein{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
 }
@@ -626,7 +626,7 @@ section.view.on{display:block}
 .sheet{width:100%;max-width:480px;background:var(--bg2);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;padding:10px 18px calc(20px + var(--safe-b));animation:up .25s ease;max-height:90vh;overflow:auto}
 .sheet .grab{width:42px;height:5px;border-radius:9px;background:var(--line);margin:4px auto 12px}
 /* sheet top bar: 44px full-width drag area + close X */
-.sh-top{position:sticky;top:0;z-index:3;height:44px;margin:-10px -18px 6px;display:flex;align-items:center;justify-content:center;background:var(--bg2);touch-action:none;cursor:grab;border-radius:24px 24px 0 0}
+.sh-top{position:sticky;top:-10px;z-index:3;height:44px;margin:-10px -18px 6px;display:flex;align-items:center;justify-content:center;background:var(--bg2);touch-action:none;cursor:grab;border-radius:24px 24px 0 0}
 .sh-top .grab{width:44px;height:5px;margin:0;background:#4a5b7d}
 .sh-x{position:absolute;right:6px;top:0;width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0}
 .sh-x svg{width:20px;height:20px}.sh-x:active{background:rgba(255,255,255,.08)}
@@ -789,7 +789,7 @@ input.code-in{text-align:center;font-size:26px;font-weight:800;letter-spacing:10
   .scrim{align-items:center;padding:calc(24px + var(--safe-t)) calc(24px + var(--safe-r)) calc(24px + var(--safe-b)) calc(24px + var(--safe-l))}
   .sheet{max-width:560px;border-radius:24px;border-bottom:1px solid var(--line);padding:22px 26px 26px;max-height:calc(100vh - 48px);animation:pop .2s ease;box-shadow:0 30px 80px rgba(0,0,0,.5)}
   .sheet .grab{display:none}
-  .sh-top{margin:-22px -26px 6px;cursor:default;touch-action:auto}.sh-x{right:10px;top:4px}
+  .sh-top{top:-22px;margin:-22px -26px 6px;cursor:default;touch-action:auto}.sh-x{right:10px;top:4px}
   @keyframes pop{from{transform:scale(.97);opacity:.4}to{transform:none;opacity:1}}
   /* full-screen flows -> centred card */
   .flow,.flow.partner{background:rgba(3,8,20,.66);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
@@ -826,7 +826,7 @@ input.code-in{text-align:center;font-size:26px;font-weight:800;letter-spacing:10
   #groups>.group{break-inside:avoid;-webkit-column-break-inside:avoid;display:inline-block;width:100%}
   #goals{grid-template-columns:repeat(3,minmax(0,1fr))}
   .scrim.panel{justify-content:flex-end;align-items:stretch;padding:0}
-  .scrim.panel .sh-top{margin-top:calc(-22px - var(--safe-t))}
+  .scrim.panel .sh-top{top:calc(-22px - var(--safe-t));margin-top:calc(-22px - var(--safe-t))}
   .scrim.panel .sheet{max-width:460px;height:100%;max-height:none;border-radius:24px 0 0 24px;border-right:0;border-bottom:0;padding:calc(22px + var(--safe-t)) calc(26px + var(--safe-r)) calc(26px + var(--safe-b)) 26px;animation:slidein .22s ease}
   @keyframes slidein{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
 }
