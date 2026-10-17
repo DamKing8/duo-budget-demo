@@ -73,6 +73,16 @@ input[aria-invalid=true]{border-color:var(--err)}
 .status.bad{background:var(--errbg);border:1px solid var(--errline);color:var(--err)}
 .done{text-align:center;padding:10px 0}.done svg{width:48px;height:48px;color:var(--ok)}
 .done h3{font-family:var(--serif);font-weight:500;font-size:24px;margin:8px 0 6px}.done p{color:var(--muted);margin:0}
+/* store treatment: text only before launch (no Apple/Google logos, no badge look-alikes) */
+.stores{margin:18px 0 8px}
+.store-pill{display:inline-flex;align-items:center;gap:12px;font-size:15px;color:var(--text);background:var(--tagbg);border:1px solid var(--tagline);border-radius:16px;padding:10px 18px 10px 14px;line-height:1.35}
+.store-pill b{display:block;color:var(--tagtx);font-weight:700}
+.store-pill svg{width:22px;height:22px;flex:none;color:var(--tagtx)}
+.store-sub{font-size:14px;color:var(--muted);margin:8px 0 0}
+.store-badges{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.store-badges a{display:inline-block;height:48px}.store-badges a svg{height:48px;width:auto;display:block}
+[data-stores=soon] .stores-live,[data-stores=live] .stores-soon{display:none!important}
+.legal{font-size:12px;line-height:1.5}
 footer{margin-top:52px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion:no-preference){
@@ -86,7 +96,7 @@ footer{margin-top:52px;font-size:13px;color:var(--muted);border-top:1px solid va
   .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:36px;align-items:start}.hero .card{margin-top:14px}}
 </style>
 </head>
-<body>
+<body data-stores="soon"><!-- LAUNCH SWITCH: set data-stores="live" only once the app is live in BOTH stores (launch checklist) -->
 <div class="wrap">
 <header>
   <picture><source srcset="img/logo.webp" type="image/webp"><img class="logo" src="img/logo.png" width="74" height="64" alt="Duo Budget"></picture><span class="tag">Coming soon</span>
@@ -97,6 +107,18 @@ footer{margin-top:52px;font-size:13px;color:var(--muted);border-top:1px solid va
     <h1>Plan each pay cycle together, around <em>both your paydays</em></h1>
     <p class="lead">Duo Budget is a budget planning app for couples. Plan around when each of you actually gets paid, so you can both see what's left this pay cycle and plan what's coming next.</p>
     <a class="cta" href="#join">Join the waitlist</a>
+    <div class="stores">
+      <div class="stores-soon"><span class="store-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M11 18h2"/></svg><span><b>Coming soon</b>for iPhone, iPad and Android&trade; devices</span></span>
+        <p class="store-sub">Duo Budget is on its way to the App Store and Google Play.</p></div>
+      <div class="stores-live store-badges">
+        <!-- OFFICIAL BADGES GO HERE at launch, unmodified, App Store first, same height (min 40px), clear space 1/4 badge height:
+             1. <a href="https://apps.apple.com/au/app/duo-budget/id__________"> + Apple "Download on the App Store" black badge SVG </a>
+             2. <a href="https://play.google.com/store/apps/details?id=__________"> + Google "Get it on Google Play" badge SVG </a>
+             Placeholder slots below are not links. -->
+        <span class="badge-slot" data-badge="app-store"></span>
+        <span class="badge-slot" data-badge="google-play"></span>
+      </div>
+    </div>
   </div>
   <div class="card" id="join">
     <form id="wl" novalidate>
@@ -155,6 +177,8 @@ footer{margin-top:52px;font-size:13px;color:var(--muted);border-top:1px solid va
 <footer>
   <p>Duo Budget is in pre-launch. <a href="../">Try the demo</a> · <a href="./privacy.html">Privacy policy</a></p>
   <p>© 2026 Duo Budget</p>
+  <p class="legal stores-soon">iPhone, iPad and App Store are trademarks of Apple Inc., registered in the U.S. and other countries. Android and Google Play are trademarks of Google LLC.</p>
+  <p class="legal stores-live">Apple, the Apple logo, iPhone, iPad and App Store are trademarks of Apple Inc., registered in the U.S. and other countries. Android, Google Play and the Google Play logo are trademarks of Google LLC.</p>
 </footer>
 </div>
 <script>

@@ -840,6 +840,18 @@ nav.tabs{background:rgba(12,22,44,.88)!important}
 @media (hover:hover) and (prefers-reduced-motion:no-preference){.card:hover{box-shadow:0 14px 36px rgba(0,0,0,.35)}}
 </style>
 <style id="th-shared">
+/* ===== Store treatment (coming soon). Text only: no Apple or Google logos or badge look-alikes until launch ===== */
+.stores{text-align:center}
+.store-pill{display:inline-flex;align-items:center;gap:10px;text-align:left;font-size:13px;color:var(--text);background:transparent;background:color-mix(in srgb,var(--cyan) 9%,transparent);border:1px solid var(--line);border-color:color-mix(in srgb,var(--cyan) 30%,transparent);border-radius:14px;padding:8px 14px 8px 12px;line-height:1.3}
+.store-pill b{display:block;color:var(--cyan);font-weight:700}
+.store-pill svg{width:20px;height:20px;flex:none;color:var(--cyan)}
+.stores p.store-sub{font-size:13px;color:var(--muted);margin:8px 0 0}
+.stores p.store-legal{font-size:11px;color:var(--dim);margin:10px 0 0;line-height:1.45}
+.store-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:4px}
+.store-badges .badge-slot{display:inline-block;height:40px;min-width:120px}
+.ob-hero .stores{margin:14px 0 0}
+#storeCard .stores{text-align:left}#storeCard .store-badges{justify-content:flex-start}
+#storeCard h3{margin:0 0 10px;font-size:16px}
 /* ===== Even grid (v3): squared-up rows on iPad; Budget untouched ===== */
 @media (min-width:768px){#goals{align-items:stretch}#goals>.goal,#goals>.card{height:100%;margin-bottom:0}}
 @media (min-width:1000px){
@@ -1014,6 +1026,7 @@ window.__duoApplyTheme();})();</script>
       <div class="setrow"><div class="l">Reset demo data<small>Restores the sample household (Chloe & Jack)</small></div><button class="btn danger sm" id="resetBtn">Reset</button></div>
       <div class="setrow"><div class="l">Storage<small>Saved on this device only</small></div><span class="muted" style="font-size:13px">localStorage</span></div>
     </div>
+    <div class="card" id="storeCard" data-test="store-card"><h3>Get the app</h3></div>
     <p class="muted" style="text-align:center;font-size:12px">Duo Budget · prototype v0.1 · demo build, all data made up</p>
   </section>
 </div>
@@ -1564,7 +1577,8 @@ function renderSettings(){renderHHCard();
   if(document.activeElement!==$('nameB'))$('nameB').value=S.names.N;
   $('currency').value=S.currency;
 }
-function renderAll(){renderHeader();renderDash();renderBudget();renderCycle();renderGoals();renderSettings();trEntry();if($('v-trends').classList.contains('on'))renderTrends();}
+function renderStores(){var c=document.getElementById('storeCard');if(c)c.innerHTML='<h3>Get the app</h3>'+storeHTML();}
+function renderAll(){renderStores();renderHeader();renderDash();renderBudget();renderCycle();renderGoals();renderSettings();trEntry();if($('v-trends').classList.contains('on'))renderTrends();}
 /* ---------- Trends (read-only, computed locally from recorded history; nothing synced, no schema change) ----------
    History rows, one per pay window of the household cycle: {start,end,cur,frac,inc:{D,N,J},spend:{itemId:$},unb:{D,N,J},sav:{D,N,J},goals:{both,D,N}}
    Source: TRENDS_SYNTH (demo build only: deterministic synthetic history). Other builds show the empty state. */
@@ -1994,8 +2008,27 @@ function readAcct(q,pfx){var n=q(pfx+'-name').value.trim(),e=q(pfx+'-email').val
   if(!n)err='Enter your name.';else if(!validEmail(e))err='Enter a valid email address.';else if(pw.length<8)err='Password needs at least 8 characters.';
   if(err){q(pfx+'-err').textContent=err;return null;}return {name:n,email:e,provider:'email'};} // password deliberately discarded
 
+// ===== Store treatment: ONE switch for launch. =====
+// live:false -> "coming soon" text pill (allowed before launch: plain referential product names, no marks).
+// live:true  -> official badges. Only flip once Duo Budget is live in BOTH stores (see launch checklist), then:
+//   1. paste Apple's "Download on the App Store" black badge SVG and Google's "Get it on Google Play" badge SVG
+//      (unmodified, downloaded from the official pages) into BADGE_SVG below,
+//   2. set the two store URLs, 3. set live:true. Badges are then real links to the store pages.
+var STORES={live:false,iPad:true,
+  appStoreUrl:'',   // https://apps.apple.com/au/app/duo-budget/id__________
+  googlePlayUrl:'', // https://play.google.com/store/apps/details?id=__________
+  BADGE_SVG:{appStore:'' /* OFFICIAL APP STORE BADGE SVG GOES HERE */,googlePlay:'' /* OFFICIAL GOOGLE PLAY BADGE SVG GOES HERE */}};
+function storeHTML(short){var ip=STORES.iPad?'iPhone, iPad':'iPhone';
+  if(!STORES.live)return '<div class="stores" data-test="stores-soon"><span class="store-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M11 18h2"/></svg><span><b>Coming soon</b>for '+ip+' and Android&trade; devices</span></span>'+
+    (short?'':'<p class="store-sub">Duo Budget is on its way to the App Store and Google Play.</p>'+
+    '<p class="store-legal">'+ip+' and App Store are trademarks of Apple Inc., registered in the U.S. and other countries. Android and Google Play are trademarks of Google LLC.</p>')+'</div>';
+  // live: official artwork only, App Store badge first, same height (Google Play must be same size or larger)
+  return '<div class="stores" data-test="stores-live"><div class="store-badges">'+
+    '<a class="badge-slot" href="'+STORES.appStoreUrl+'" aria-label="Download on the App Store">'+STORES.BADGE_SVG.appStore+'</a>'+
+    '<a class="badge-slot" href="'+STORES.googlePlayUrl+'" aria-label="Get it on Google Play">'+STORES.BADGE_SVG.googlePlay+'</a></div>'+
+    (short?'':'<p class="store-legal">Apple, the Apple logo, '+ip+' and App Store are trademarks of Apple Inc., registered in the U.S. and other countries. Android, Google Play and the Google Play logo are trademarks of Google LLC.</p>')+'</div>';}
 var VIEWS={
- welcome:function(){return {h:'<div class="ob-hero">'+LOGO+'<h2 class="page">Budget together</h2><p class="sub">Create your account, set up your household, then invite your partner to share it.</p></div>'+
+ welcome:function(){return {h:'<div class="ob-hero">'+LOGO+'<h2 class="page">Budget together</h2><p class="sub">Create your account, set up your household, then invite your partner to share it.</p>'+storeHTML(true)+'</div>'+
    '<button class="btn apple block" id="ob-apple">'+APPLE+'Sign in with Apple</button>'+
    '<button class="btn google block" id="ob-google">'+GOOGLE+'Continue with Google</button>'+
    '<div class="or">or sign up with email</div>'+acctFields('ob',S.names.D)+
