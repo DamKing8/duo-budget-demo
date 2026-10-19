@@ -1,0 +1,510 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000010 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000050 /* AppDelegate.swift */; };
+		A10000000000000000000011 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000051 /* SceneDelegate.swift */; };
+		A10000000000000000000012 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000052 /* WebViewController.swift */; };
+		A10000000000000000000013 /* BundleSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000053 /* BundleSchemeHandler.swift */; };
+		A10000000000000000000014 /* SpeechBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000054 /* SpeechBridge.swift */; };
+		A10000000000000000000015 /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000055 /* WidgetSnapshot.swift */; };
+		A10000000000000000000016 /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000055 /* WidgetSnapshot.swift */; };
+		A10000000000000000000017 /* DuoWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000056 /* DuoWidget.swift */; };
+		A10000000000000000000018 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000057 /* LaunchScreen.storyboard */; };
+		A10000000000000000000019 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000058 /* Assets.xcassets */; };
+		A1000000000000000000001A /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000059 /* index.html */; };
+		A1000000000000000000001B /* supabase.js in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000005A /* supabase.js */; };
+		A1000000000000000000001C /* manifest.webmanifest in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000005B /* manifest.webmanifest */; };
+		A1000000000000000000001D /* sw.js in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000005C /* sw.js */; };
+		A1000000000000000000001E /* icons in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000005D /* icons */; };
+		A1000000000000000000001F /* DuoWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A1000000000000000000005E /* DuoWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, CodeSignOnCopy, ); }; };
+		A10000000000000000000020 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000060 /* WebKit.framework */; };
+		A10000000000000000000021 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000061 /* AVFoundation.framework */; };
+		A10000000000000000000022 /* Speech.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000062 /* Speech.framework */; };
+		A10000000000000000000023 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000063 /* WidgetKit.framework */; };
+		A10000000000000000000024 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000064 /* SwiftUI.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A10000000000000000000030 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000000000000000000003;
+			remoteInfo = DuoWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A10000000000000000000040 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A1000000000000000000001F /* DuoWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A10000000000000000000050 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A10000000000000000000051 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		A10000000000000000000052 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
+		A10000000000000000000053 /* BundleSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleSchemeHandler.swift; sourceTree = "<group>"; };
+		A10000000000000000000054 /* SpeechBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechBridge.swift; sourceTree = "<group>"; };
+		A10000000000000000000055 /* WidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshot.swift; sourceTree = "<group>"; };
+		A10000000000000000000056 /* DuoWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuoWidget.swift; sourceTree = "<group>"; };
+		A10000000000000000000057 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		A10000000000000000000058 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A10000000000000000000059 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = index.html; path = ../index.html; sourceTree = SOURCE_ROOT; };
+		A1000000000000000000005A /* supabase.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = supabase.js; path = ../supabase.js; sourceTree = SOURCE_ROOT; };
+		A1000000000000000000005B /* manifest.webmanifest */ = {isa = PBXFileReference; lastKnownFileType = text; name = manifest.webmanifest; path = ../manifest.webmanifest; sourceTree = SOURCE_ROOT; };
+		A1000000000000000000005C /* sw.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = sw.js; path = ../sw.js; sourceTree = SOURCE_ROOT; };
+		A1000000000000000000005D /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = ../icons; sourceTree = SOURCE_ROOT; };
+		A1000000000000000000005E /* DuoWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DuoWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1000000000000000000005F /* DuoBudget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuoBudget.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000060 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		A10000000000000000000061 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		A10000000000000000000062 /* Speech.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Speech.framework; path = System/Library/Frameworks/Speech.framework; sourceTree = SDKROOT; };
+		A10000000000000000000063 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		A10000000000000000000064 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		A10000000000000000000065 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A10000000000000000000066 /* DuoBudget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuoBudget.entitlements; sourceTree = "<group>"; };
+		A10000000000000000000067 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A10000000000000000000068 /* DuoWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuoWidget.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A10000000000000000000041 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000020 /* WebKit.framework in Frameworks */,
+				A10000000000000000000021 /* AVFoundation.framework in Frameworks */,
+				A10000000000000000000022 /* Speech.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000042 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000023 /* WidgetKit.framework in Frameworks */,
+				A10000000000000000000024 /* SwiftUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A10000000000000000000070 = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000071 /* DuoBudget */,
+				A10000000000000000000072 /* DuoWidget */,
+				A10000000000000000000073 /* Shared */,
+				A10000000000000000000074 /* Web */,
+				A10000000000000000000075 /* Frameworks */,
+				A10000000000000000000076 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A10000000000000000000071 /* DuoBudget */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000050 /* AppDelegate.swift */,
+				A10000000000000000000051 /* SceneDelegate.swift */,
+				A10000000000000000000052 /* WebViewController.swift */,
+				A10000000000000000000053 /* BundleSchemeHandler.swift */,
+				A10000000000000000000054 /* SpeechBridge.swift */,
+				A10000000000000000000058 /* Assets.xcassets */,
+				A10000000000000000000077 /* Base.lproj */,
+				A10000000000000000000065 /* Info.plist */,
+				A10000000000000000000066 /* DuoBudget.entitlements */,
+			);
+			path = DuoBudget;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000072 /* DuoWidget */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000056 /* DuoWidget.swift */,
+				A10000000000000000000067 /* Info.plist */,
+				A10000000000000000000068 /* DuoWidget.entitlements */,
+			);
+			path = DuoWidget;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000073 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000055 /* WidgetSnapshot.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000074 /* Web */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000059 /* index.html */,
+				A1000000000000000000005A /* supabase.js */,
+				A1000000000000000000005B /* manifest.webmanifest */,
+				A1000000000000000000005C /* sw.js */,
+				A1000000000000000000005D /* icons */,
+			);
+			name = Web;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000075 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000060 /* WebKit.framework */,
+				A10000000000000000000061 /* AVFoundation.framework */,
+				A10000000000000000000062 /* Speech.framework */,
+				A10000000000000000000063 /* WidgetKit.framework */,
+				A10000000000000000000064 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000076 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1000000000000000000005F /* DuoBudget.app */,
+				A1000000000000000000005E /* DuoWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000077 /* Base.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000057 /* LaunchScreen.storyboard */,
+			);
+			path = Base.lproj;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000000000000000000002 /* DuoBudget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000090 /* Build configuration list for PBXNativeTarget "DuoBudget" */;
+			buildPhases = (
+				A10000000000000000000043 /* Sources */,
+				A10000000000000000000041 /* Frameworks */,
+				A10000000000000000000044 /* Resources */,
+				A10000000000000000000040 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A10000000000000000000031 /* PBXTargetDependency */,
+			);
+			name = DuoBudget;
+			productName = DuoBudget;
+			productReference = A1000000000000000000005F /* DuoBudget.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A10000000000000000000003 /* DuoWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000091 /* Build configuration list for PBXNativeTarget "DuoWidget" */;
+			buildPhases = (
+				A10000000000000000000045 /* Sources */,
+				A10000000000000000000042 /* Frameworks */,
+				A10000000000000000000046 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DuoWidget;
+			productName = DuoWidget;
+			productReference = A1000000000000000000005E /* DuoWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					A10000000000000000000002 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					A10000000000000000000003 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = A10000000000000000000092 /* Build configuration list for PBXProject "DuoBudget" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A10000000000000000000070;
+			productRefGroup = A10000000000000000000076 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A10000000000000000000002 /* DuoBudget */,
+				A10000000000000000000003 /* DuoWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A10000000000000000000044 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000018 /* LaunchScreen.storyboard in Resources */,
+				A10000000000000000000019 /* Assets.xcassets in Resources */,
+				A1000000000000000000001A /* index.html in Resources */,
+				A1000000000000000000001B /* supabase.js in Resources */,
+				A1000000000000000000001C /* manifest.webmanifest in Resources */,
+				A1000000000000000000001D /* sw.js in Resources */,
+				A1000000000000000000001E /* icons in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000046 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A10000000000000000000043 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000010 /* AppDelegate.swift in Sources */,
+				A10000000000000000000011 /* SceneDelegate.swift in Sources */,
+				A10000000000000000000012 /* WebViewController.swift in Sources */,
+				A10000000000000000000013 /* BundleSchemeHandler.swift in Sources */,
+				A10000000000000000000014 /* SpeechBridge.swift in Sources */,
+				A10000000000000000000015 /* WidgetSnapshot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000000000000000000045 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000017 /* DuoWidget.swift in Sources */,
+				A10000000000000000000016 /* WidgetSnapshot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A10000000000000000000031 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000000000000000000003 /* DuoWidget */;
+			targetProxy = A10000000000000000000030 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A100000000000000000000A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A100000000000000000000A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A100000000000000000000A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
+				CODE_SIGN_ENTITLEMENTS = DuoBudget/DuoBudget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = DuoBudget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = au.com.duobudget.app;
+				PRODUCT_NAME = DuoBudget;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A100000000000000000000A3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
+				CODE_SIGN_ENTITLEMENTS = DuoBudget/DuoBudget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = DuoBudget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = au.com.duobudget.app;
+				PRODUCT_NAME = DuoBudget;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A100000000000000000000A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = DuoWidget/DuoWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = DuoWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = au.com.duobudget.app.widget;
+				PRODUCT_NAME = DuoWidget;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A100000000000000000000A5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = DuoWidget/DuoWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = DuoWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = au.com.duobudget.app.widget;
+				PRODUCT_NAME = DuoWidget;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A10000000000000000000090 /* Build configuration list for PBXNativeTarget "DuoBudget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A100000000000000000000A2 /* Debug */,
+				A100000000000000000000A3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000091 /* Build configuration list for PBXNativeTarget "DuoWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A100000000000000000000A4 /* Debug */,
+				A100000000000000000000A5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000092 /* Build configuration list for PBXProject "DuoBudget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A100000000000000000000A0 /* Debug */,
+				A100000000000000000000A1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A10000000000000000000001 /* Project object */;
+}

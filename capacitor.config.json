@@ -1,0 +1,12 @@
+{
+  "appId": "au.com.duobudget.app",
+  "appName": "Duo Budget",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#FBF7EF"
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "duo-budget",
+  "private": true,
+  "description": "Duo Budget planning app. The iPhone shell is the native project in ios/. Capacitor is an optional later wrapper.",
+  "scripts": {
+    "sync:www": "node ios/sync-www.js"
+  },
+  "dependencies": {
+    "@capacitor/core": "6.2.0",
+    "@capacitor/ios": "6.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "6.2.0"
+  }
+}

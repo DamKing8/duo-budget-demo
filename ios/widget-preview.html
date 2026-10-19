@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duo Budget widget preview</title>
+<style>
+  body{margin:0;background:#efe8dc;color:#1f2430;font:16px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+  main{max-width:980px;margin:0 auto;padding:28px 20px 48px}
+  h1{font-family:Georgia,serif;font-weight:600;font-size:28px;margin:0 0 6px}
+  .note{color:#5c564c;max-width:62ch;margin:0 0 22px}
+  h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#0f766e;margin:28px 0 12px}
+  .row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+  .widget{background:#fbf7ef;border-radius:22px;box-shadow:0 10px 28px rgba(60,40,10,.12);padding:16px;box-sizing:border-box}
+  .small{width:158px;height:158px}
+  .medium{width:338px;height:158px;display:flex;gap:16px;align-items:center}
+  .lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#0f5f57}
+  .fig{font-family:Georgia,serif;font-size:32px;font-weight:700;margin:6px 0 4px}
+  .sub{font-size:13px;color:#5c564c}
+  .lock{background:#111;color:#fff;border-radius:28px;padding:22px 18px;width:320px}
+  .lock time{display:block;font-size:54px;font-weight:200;letter-spacing:-1px}
+  .lock .date{opacity:.8;margin-bottom:14px}
+  .inline{background:#222;border-radius:999px;padding:6px 12px;font-size:13px;display:inline-block}
+  .circ{width:64px;height:64px;border-radius:50%;background:#222;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700}
+  .circ small{font-weight:500;font-size:10px;opacity:.8}
+  .rect{background:#222;border-radius:16px;padding:10px 12px;width:180px;margin-top:10px}
+  .rect b{display:block;font-size:18px}
+  .pwa{background:#fff;border-radius:16px;padding:14px 16px;width:280px}
+  .pwa li{margin:6px 0}
+  pre{background:#1f2430;color:#f4eee2;border-radius:16px;padding:14px 16px;overflow:auto;font-size:12px;line-height:1.45}
+  .tag{font-size:12px;color:#5c564c;margin-top:8px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Home screen and lock screen</h1>
+  <p class="note">Layout preview of the WidgetKit extension in <code>ios/DuoWidget</code>. Figures are the sample snapshot (Chloe &amp; Jack, made-up). A signed iPhone build replaces them from the App Group. This page is not the widget binary.</p>
+
+  <h2>Home screen</h2>
+  <div class="row" data-test="home-widgets">
+    <div>
+      <div class="widget small" data-test="widget-small">
+        <div class="lbl">Left this fortnight</div>
+        <div class="fig">$842</div>
+        <div class="sub">Wed 28 Oct · 9 days</div>
+      </div>
+      <div class="tag">systemSmall</div>
+    </div>
+    <div>
+      <div class="widget medium" data-test="widget-medium">
+        <div>
+          <div class="lbl">Left this fortnight</div>
+          <div class="fig">$842</div>
+          <div class="sub">AUD</div>
+        </div>
+        <div>
+          <div class="sub">Next pay</div>
+          <div style="font-weight:700;font-size:18px">Wed 28 Oct · 9 days</div>
+          <div class="sub">Chloe &amp; Jack</div>
+        </div>
+      </div>
+      <div class="tag">systemMedium</div>
+    </div>
+  </div>
+
+  <h2>Lock screen accessories</h2>
+  <div class="lock" data-test="lock-screen">
+    <div class="date">Wednesday 28 October</div>
+    <time>9:41</time>
+    <div class="inline" data-test="widget-inline">Left $842 · Wed 28 Oct · 9 days</div>
+    <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+      <div class="circ" data-test="widget-circular">9<small>days</small></div>
+      <div class="rect" data-test="widget-rect">
+        <div class="sub" style="color:#ddd">Left this fortnight</div>
+        <b>$842</b>
+        <div class="sub" style="color:#ddd">Wed 28 Oct · 9 days</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Web fallback — app shortcuts</h2>
+  <div class="pwa" data-test="pwa-shortcuts">
+    <b>manifest.webmanifest</b>
+    <ul>
+      <li>Left to spend → <code>index.html#home</code></li>
+      <li>Add expense → <code>index.html#add-expense</code></li>
+      <li>Pay cycle → <code>index.html#cycle</code></li>
+    </ul>
+    <div class="tag">Installable PWA. Shortcuts are the home-screen fallback where WidgetKit cannot run.</div>
+  </div>
+
+  <h2>iOS project</h2>
+  <pre data-test="ios-tree">ios/DuoBudget.xcodeproj/project.pbxproj
+ios/DuoBudget.xcodeproj/xcshareddata/xcschemes/DuoBudget.xcscheme
+ios/DuoBudget/AppDelegate.swift
+ios/DuoBudget/SceneDelegate.swift
+ios/DuoBudget/WebViewController.swift
+ios/DuoBudget/BundleSchemeHandler.swift
+ios/DuoBudget/SpeechBridge.swift
+ios/DuoBudget/Info.plist
+ios/DuoBudget/DuoBudget.entitlements
+ios/DuoBudget/Base.lproj/LaunchScreen.storyboard
+ios/DuoBudget/Assets.xcassets/AppIcon.appiconset/AppIcon.png
+ios/DuoWidget/DuoWidget.swift
+ios/DuoWidget/Info.plist
+ios/DuoWidget/DuoWidget.entitlements
+ios/Shared/WidgetSnapshot.swift
+App Group: group.au.com.duobudget.shared
+Bundles: au.com.duobudget.app · au.com.duobudget.app.widget</pre>
+</main>
+</body>
+</html>
