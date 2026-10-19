@@ -944,6 +944,7 @@ html[data-theme=dark] .toast-undo{color:#0E7490}
   #v-dash.on,#groups,#goals,#trBody{display:grid;grid-template-columns:1fr 1fr;column-gap:12px;align-items:start}
   #v-cycle.on,#v-settings.on{display:grid;grid-template-columns:1fr 1fr;column-gap:12px;align-items:start}
   #v-dash .dcol,#v-trends .tr-l,#v-trends .tr-r{display:contents}
+  #v-dash .dash-title,#v-cycle>h2.page,#v-cycle>p.sub,#v-settings>h2.page,#v-settings>p.sub,#v-settings>p.muted{grid-column:1/-1}
 }
 @media (min-width:768px){
   #groups{display:grid!important;grid-template-columns:1fr 1fr;column-gap:var(--gap,18px);align-items:start}
@@ -2309,11 +2310,12 @@ $('groups').addEventListener('click',function(e){
   var sw=e.target.closest('[data-act="swipe-del"]');if(sw){var row=sw.closest('.item[data-id]');var it=row&&S.items.find(function(i){return i.id===row.dataset.id;});if(it)removeItem(it);return;}
   var voice=e.target.closest('[data-voice]');if(voice){openVoice();return;}
   var add=e.target.closest('[data-add]');if(add){itemSheet(null,add.dataset.add);return;}
+  if(e.target.closest('input,textarea,select'))return;
   var row=e.target.closest('.item[data-id]');if(!row)return;
   var it=S.items.find(function(i){return i.id===row.dataset.id;});if(!it)return;
   var act=e.target.closest('[data-act]');act=act&&act.dataset.act;
   if(act==='owner'){var order=['J','D','N'];it.owner=order[(order.indexOf(it.owner)+1)%3];save();renderAll();}
-  else if(act==='edit')itemSheet(it);
+  else itemSheet(it);
 });
 $('groups').addEventListener('input',function(e){
   if(e.target.dataset.act!=='amt')return;var row=e.target.closest('.item');var it=S.items.find(function(i){return i.id===row.dataset.id;});if(!it)return;
@@ -2559,7 +2561,7 @@ function initLayout(){
     window.__duoSuppressClick=true;
     var tab=root.getAttribute('data-layout-tab');
     var order=resolvedOrder(tab,layoutIds(root));
-    drag={card:card,root:root,tab:tab,ghost:ghost,pid:h.pid,dx:h.x-rect.left,dy:h.y-rect.top,id:card.getAttribute('data-layout'),order:order,start:order.slice()};
+    drag={card:card,root:root,tab:tab,ghost:ghost,pid:h.pid,dx:h.x-rect.left,dy:h.y-rect.top,id:card.getAttribute('data-layout'),order:order,start:order.slice(),freeze:null};
     hold=null;
     try{card.setPointerCapture(h.pid);}catch(e){}
   }
@@ -2587,11 +2589,21 @@ function initLayout(){
     }
     if(!drag||e.pointerId!==drag.pid)return;
     drag.ghost.style.left=(e.clientX-drag.dx)+'px';drag.ghost.style.top=(e.clientY-drag.dy)+'px';
+    if(drag.freeze){
+      var f=drag.freeze;
+      var inside=e.clientX>=f.left&&e.clientX<=f.right&&e.clientY>=f.top&&e.clientY<=f.bottom;
+      if(inside){if(e.cancelable)e.preventDefault();return;}
+      drag.freeze=null;
+    }
     var target=cardAt(e.clientX,e.clientY);
     if(target){
       var id=target.getAttribute('data-layout'),from=drag.order.indexOf(drag.id),to=drag.order.indexOf(id);
-      if(from>=0&&to>=0&&from!==to){var moved=drag.order.splice(from,1)[0];drag.order.splice(to,0,moved);
-        layoutOverride={tab:drag.tab,order:drag.order.slice()};layoutApply();}
+      if(from>=0&&to>=0&&from!==to){
+        var rect=target.getBoundingClientRect();
+        drag.freeze={left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom};
+        var moved=drag.order.splice(from,1)[0];drag.order.splice(to,0,moved);
+        layoutOverride={tab:drag.tab,order:drag.order.slice()};layoutApply();
+      }
     }
     if(e.cancelable)e.preventDefault();
   },true);
@@ -2643,7 +2655,7 @@ function initSwipe(){
     var dx=e.clientX-s.x,dy=e.clientY-s.y;
     if(!s.on){
       if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){s=null;return;}
-      if(dx<-12&&Math.abs(dx)>Math.abs(dy)){s.on=true;s.item.classList.add('swipe-drag');}
+      if(dx<-12&&Math.abs(dx)>Math.abs(dy)){s.on=true;s.item.classList.add('swipe-drag');try{s.front.setPointerCapture(e.pointerId);}catch(err){}}
       else return;
     }
     s.dx=Math.min(0,dx);s.front.style.transform='translateX('+Math.max(s.dx,-s.w)+'px)';
@@ -2762,6 +2774,7 @@ initLayout();
 initSwipe();
 bindConverter();
 applyDeepLink();
+window.addEventListener('hashchange',applyDeepLink);
 window.addEventListener('online',function(){FX.offline=false;fetchFX();});
 window.addEventListener('offline',function(){FX.offline=!!FX.asOf;FX.error=FX.asOf?'':'offline';var fx=$('fxAsOf');if(fx)fx.textContent=fxStatusText();});
 if('serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('sw.js').catch(function(){});}
