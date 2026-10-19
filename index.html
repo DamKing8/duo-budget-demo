@@ -17,6 +17,7 @@
       --teal: #0F766E;
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     html, body { margin: 0; min-height: 100%; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
@@ -25,41 +26,115 @@
         radial-gradient(120% 60% at 100% 0%, rgba(14,116,144,.13), transparent 60%),
         radial-gradient(90% 50% at 0% 100%, rgba(15,118,110,.10), transparent 55%),
         var(--bg);
-      padding: 32px 16px 48px;
     }
-    .wrap { width: 100%; max-width: 1080px; margin: 0 auto; }
-    .hero {
-      max-width: 520px;
-      margin: 0 auto 36px;
+    a { color: inherit; }
+
+    /* —— Sticky nav —— */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(251,247,239,.88);
+      border-bottom: 1px solid rgba(230,221,204,.85);
     }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 36px 28px 28px;
-      box-shadow: 0 18px 50px rgba(31,36,48,.06);
+    .nav-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
     }
-    .mark {
-      display: inline-flex;
+    .nav-brand {
+      display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 22px;
+      text-decoration: none;
+      color: var(--text);
+      min-width: 0;
     }
-    .logo {
-      width: 28px; height: 28px; border-radius: 9px;
+    .nav-brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
       display: block;
+      flex: 0 0 auto;
     }
-    .brand { font-weight: 700; letter-spacing: -0.02em; font-size: 15px; }
-    .tagline {
-      margin-left: 4px;
-      color: var(--muted);
+    .nav-brand-text { min-width: 0; }
+    .nav-brand-name {
+      display: block;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .nav-brand-tag {
+      display: block;
+      font-size: 12px;
       font-weight: 500;
-      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.2;
+      margin-top: 1px;
     }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px 18px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav-links a.nav-link {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .nav-links a.nav-link:hover { color: var(--cyan); }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff !important;
+      text-decoration: none;
+      background: linear-gradient(135deg, var(--cyan), var(--teal));
+      white-space: nowrap;
+      box-shadow: 0 6px 16px rgba(14,116,144,.22);
+    }
+    .nav-cta:hover { filter: brightness(1.05); }
+
+    /* —— Layout —— */
+    .wrap {
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 36px 20px 48px;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+    @media (min-width: 900px) {
+      .hero {
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        gap: 48px;
+        min-height: 520px;
+      }
+    }
+
     .eyebrow {
       display: inline-block;
-      margin: 0 0 12px;
-      padding: 4px 10px;
+      margin: 0 0 14px;
+      padding: 5px 12px;
       border-radius: 999px;
       background: rgba(14,116,144,.1);
       color: var(--cyan);
@@ -69,26 +144,27 @@
       text-transform: uppercase;
     }
     h1 {
-      margin: 0 0 14px;
-      font-size: clamp(28px, 6.5vw, 36px);
-      line-height: 1.15;
-      letter-spacing: -0.03em;
+      margin: 0 0 16px;
+      font-size: clamp(30px, 5.5vw, 44px);
+      line-height: 1.12;
+      letter-spacing: -0.035em;
     }
     .pitch {
-      margin: 0 0 18px;
+      margin: 0 0 20px;
       color: var(--muted);
-      font-size: 16px;
+      font-size: 17px;
       line-height: 1.55;
+      max-width: 36em;
     }
     .body {
-      margin: 0 0 26px;
+      margin: 0 0 28px;
       padding: 0;
       list-style: none;
     }
     .body li {
       position: relative;
-      padding-left: 16px;
-      margin: 0 0 10px;
+      padding-left: 18px;
+      margin: 0 0 11px;
       color: var(--muted);
       font-size: 15px;
       line-height: 1.5;
@@ -96,9 +172,22 @@
     .body li::before {
       content: "";
       position: absolute;
-      left: 0; top: 0.55em;
-      width: 6px; height: 6px; border-radius: 50%;
+      left: 0;
+      top: 0.55em;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
       background: linear-gradient(135deg, var(--cyan), var(--teal));
+    }
+
+    /* —— Form —— */
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px 18px;
+      box-shadow: 0 14px 40px rgba(31,36,48,.06);
+      max-width: 440px;
     }
     label {
       display: block;
@@ -122,7 +211,7 @@
       border-color: var(--cyan);
       box-shadow: 0 0 0 3px rgba(14,116,144,.15);
     }
-    button {
+    button[type="submit"] {
       flex: 0 0 auto;
       border: 0;
       border-radius: 12px;
@@ -133,16 +222,16 @@
       background: linear-gradient(135deg, var(--cyan), var(--teal));
       cursor: pointer;
     }
-    button:hover { filter: brightness(1.05); }
+    button[type="submit"]:hover { filter: brightness(1.05); }
     .note {
-      margin: 14px 0 0;
+      margin: 12px 0 0;
       font-size: 12px;
       color: var(--muted);
       line-height: 1.4;
     }
     .ok {
       display: none;
-      margin-top: 16px;
+      margin-top: 14px;
       padding: 12px 14px;
       border-radius: 12px;
       background: #E3F2EE;
@@ -152,182 +241,237 @@
     }
     .ok.show { display: block; }
 
-    .shots {
-      margin: 0 0 28px;
-    }
-    .shots-head {
-      text-align: center;
-      margin: 0 0 18px;
-    }
-    .shots-head h2 {
-      margin: 0 0 6px;
-      font-size: 20px;
-      letter-spacing: -0.02em;
-    }
-    .shots-head p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .rail {
+    /* —— Phone mockups (two only) —— */
+    .phones {
+      position: relative;
       display: flex;
+      justify-content: center;
+      align-items: flex-end;
       gap: 18px;
-      overflow-x: auto;
-      padding: 8px 4px 20px;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
+      padding: 8px 0 12px;
+      min-height: 380px;
     }
-    .rail::-webkit-scrollbar { height: 6px; }
-    .rail::-webkit-scrollbar-thumb {
-      background: #D5CBB8;
-      border-radius: 999px;
-    }
-    .frame {
-      flex: 0 0 auto;
-      scroll-snap-align: start;
-      width: 168px;
+    .phone {
+      margin: 0;
       text-align: center;
+      flex: 0 0 auto;
+      width: min(210px, 42vw);
     }
-    .frame.tablet { width: 280px; }
+    .phone.rear {
+      width: min(190px, 38vw);
+      transform: translateY(18px);
+      opacity: 0.98;
+    }
+    .phone.front {
+      width: min(220px, 44vw);
+      z-index: 2;
+      transform: translateY(-6px);
+    }
+    @media (min-width: 900px) {
+      .phones { min-height: 480px; gap: 22px; }
+      .phone.rear { width: 210px; }
+      .phone.front { width: 240px; }
+    }
     .bezel {
       background: #1a1d24;
-      border-radius: 22px;
-      padding: 10px 8px;
-      box-shadow: 0 14px 36px rgba(31,36,48,.14);
+      border-radius: 28px;
+      padding: 12px 10px;
+      box-shadow: 0 22px 50px rgba(31,36,48,.18);
       border: 1px solid #2a2f3a;
-    }
-    .frame.tablet .bezel {
-      border-radius: 14px;
-      padding: 12px 12px;
     }
     .bezel img {
       display: block;
       width: 100%;
       height: auto;
-      border-radius: 12px;
+      border-radius: 16px;
       background: #111;
     }
-    .frame.tablet .bezel img { border-radius: 6px; }
     .cap {
-      margin: 10px 0 0;
-      font-size: 12px;
+      margin: 12px 0 0;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text);
     }
-    .cap span {
-      display: block;
-      font-weight: 500;
-      color: var(--muted);
-      margin-top: 2px;
-    }
 
-    .links {
-      margin-top: 8px;
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
-      font-size: 12px;
+
+    /* —— Store badges (coming soon, non-link) —— */
+    .stores {
+      margin-top: 22px;
+      max-width: 440px;
     }
-    .links a { color: var(--muted); text-decoration: none; }
-    .links a:hover { color: var(--cyan); }
-    .foot {
-      margin-top: 14px;
-      text-align: center;
+    .stores-label {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.01em;
+    }
+    .store-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .store-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 40px;
+      padding: 0 14px 0 12px;
+      border-radius: 10px;
+      background: #1a1d24;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      cursor: default;
+      user-select: none;
+      border: 1px solid #2a2f3a;
+      box-shadow: 0 6px 14px rgba(31,36,48,.10);
+    }
+    .store-badge svg {
+      display: block;
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+    }
+    .store-badge .store-name {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .store-badge .store-kicker {
+      font-size: 9px;
+      font-weight: 500;
+      opacity: 0.75;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .store-badge .store-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .stores-platforms {
+      margin: 10px 0 0;
       font-size: 12px;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.4;
     }
-    .foot a { color: var(--cyan); }
+    /* —— Footer —— */
+    .foot {
+      margin-top: 56px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .foot a { color: var(--cyan); text-decoration: none; }
+    .foot a:hover { text-decoration: underline; }
+
+    @media (max-width: 480px) {
+      .nav-inner { padding: 10px 14px; gap: 10px; }
+      .nav-brand-tag { display: none; }
+      .nav-links { gap: 8px 12px; }
+      .nav-links a.nav-link { font-size: 13px; }
+      .nav-cta { padding: 8px 12px; font-size: 13px; }
+      .wrap { padding: 28px 16px 40px; }
+      .phones { gap: 12px; min-height: 320px; }
+    }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <div class="hero">
-      <div class="card">
-        <div class="mark">
-          <img class="logo" src="img/logo.webp" width="28" height="28" alt="Duo Budget">
-          <span class="brand">Duo Budget</span>
-          <span class="tagline">Plan it together.</span>
-        </div>
-        <p class="eyebrow">Waitlist · Made in Queensland</p>
-        <h1>Two pays. One plan. No more “who paid for what?”</h1>
-        <p class="pitch">Duo Budget is the budget planning app for couples, built around your real pay cycles: weekly, fortnightly or monthly.</p>
-        <ul class="body">
-          <li>Plan the bills, the groceries and the fun stuff together, so you both know what is sorted before payday lands.</li>
-          <li>No bank logins. No spreadsheets. Just one shared plan you will actually stick to.</li>
-          <li>Light and dark mode on iPhone, Android and iPad.</li>
-        </ul>
-        <form id="waitlist" action="mailto:hello@duobudget.com.au" method="get" enctype="text/plain">
-          <input type="hidden" name="subject" value="Duo Budget waitlist">
-          <label for="email">Be first in when we launch</label>
-          <div class="row">
-            <input id="email" name="body" type="email" required autocomplete="email" placeholder="your@email.com" inputmode="email">
-            <button type="submit">Get early access</button>
-          </div>
-          <p class="note">One email when we go live. No spam.</p>
-        </form>
-        <div class="ok" id="thanks" role="status">You are on the list. We will let you know when Duo Budget lands.</div>
-      </div>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="/">
+        <img src="img/logo.webp" width="32" height="32" alt="">
+        <span class="nav-brand-text">
+          <span class="nav-brand-name">Duo Budget</span>
+          <span class="nav-brand-tag">Plan together. Stay clear.</span>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a class="nav-link" href="/privacy.html">Privacy</a>
+        <a class="nav-link" href="/delete-account.html">Delete account</a>
+        <a class="nav-cta" href="#waitlist">Join waitlist</a>
+      </nav>
     </div>
+  </header>
 
-    <section class="shots" aria-labelledby="shots-title">
-      <div class="shots-head">
-        <h2 id="shots-title">A peek inside the app</h2>
-        <p>Demo screens · Light and dark · iPhone, Android and iPad</p>
+  <main class="wrap">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="copy">
+        <p class="eyebrow">Waitlist · Made in Queensland</p>
+        <h1 id="hero-title">Your pays. One shared plan.</h1>
+        <p class="pitch">Duo Budget is the budget planning app for couples, built around your real pay cycles — weekly, fortnightly or monthly.</p>
+        <ul class="body">
+          <li>Plan bills, groceries and fun money together before payday hits.</li>
+          <li>No bank logins. No spreadsheets. One plan you’ll both stick to.</li>
+          <li>Light and dark · iPhone and Android.</li>
+        </ul>
+        <div class="form-card" id="waitlist">
+          <form action="mailto:hello@duobudget.com.au" method="get" enctype="text/plain">
+            <input type="hidden" name="subject" value="Duo Budget waitlist">
+            <label for="email">Get early access</label>
+            <div class="row">
+              <input id="email" name="body" type="email" required autocomplete="email" placeholder="your@email.com" inputmode="email">
+              <button type="submit">Join waitlist</button>
+            </div>
+            <p class="note">One email when we go live. No spam.</p>
+          </form>
+          <div class="ok" id="thanks" role="status">You are on the list. We will let you know when Duo Budget lands.</div>
+        </div>
+
+        <div class="stores" aria-label="Coming soon on App Store and Google Play">
+          <p class="stores-label">Coming soon on</p>
+          <div class="store-badges">
+            <span class="store-badge" role="img" aria-label="App Store — coming soon" aria-disabled="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M16.365 12.23c-.03-3.01 2.46-4.46 2.57-4.53-1.4-2.05-3.58-2.33-4.35-2.36-1.85-.19-3.61 1.09-4.55 1.09-.94 0-2.39-1.06-3.93-1.03-2.02.03-3.88 1.18-4.92 2.99-2.1 3.64-.54 9.03 1.51 11.98 1 1.44 2.19 3.05 3.75 2.99 1.51-.06 2.08-.97 3.9-.97 1.82 0 2.34.97 3.93.94 1.63-.03 2.66-1.46 3.65-2.91 1.15-1.68 1.62-3.3 1.65-3.38-.04-.02-3.15-1.21-3.21-4.81zM13.5 3.98c.82-.99 1.37-2.37 1.22-3.74-1.18.05-2.61.79-3.46 1.78-.76.88-1.43 2.29-1.25 3.64 1.32.1 2.67-.67 3.49-1.68z"/>
+              </svg>
+              <span class="store-name">
+                <span class="store-kicker">Download on the</span>
+                <span class="store-title">App Store</span>
+              </span>
+            </span>
+            <span class="store-badge" role="img" aria-label="Google Play — coming soon" aria-disabled="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M8 5.14v13.72c0 .55.58.9 1.05.62l10.06-6.86a.75.75 0 0 0 0-1.24L9.05 4.52A.75.75 0 0 0 8 5.14z"/>
+              </svg>
+              <span class="store-name">
+                <span class="store-kicker">Get it on</span>
+                <span class="store-title">Google Play</span>
+              </span>
+            </span>
+          </div>
+          <p class="stores-platforms">iPhone · Android</p>
+        </div>
       </div>
-      <div class="rail" role="list">
-        <figure class="frame" role="listitem">
-          <div class="bezel"><img src="img/android-light-home.webp" width="480" height="853" alt="Duo Budget home on Android in light mode" loading="lazy"></div>
-          <figcaption class="cap">Android · Light<span>Home</span></figcaption>
+
+      <div class="phones" aria-label="App preview">
+        <figure class="phone rear">
+          <div class="bezel">
+            <img src="img/iphone-light-home.webp" width="480" height="1043" alt="Duo Budget home on iPhone in light mode" loading="eager">
+          </div>
+          <figcaption class="cap">Home · Light</figcaption>
         </figure>
-        <figure class="frame" role="listitem">
-          <div class="bezel"><img src="img/android-dark-home.webp" width="480" height="853" alt="Duo Budget home on Android in dark mode" loading="lazy"></div>
-          <figcaption class="cap">Android · Dark<span>Home</span></figcaption>
-        </figure>
-        <figure class="frame" role="listitem">
-          <div class="bezel"><img src="img/iphone-light-budget.webp" width="480" height="1043" alt="Duo Budget budget screen on iPhone in light mode" loading="lazy"></div>
-          <figcaption class="cap">iPhone · Light<span>Budget</span></figcaption>
-        </figure>
-        <figure class="frame" role="listitem">
-          <div class="bezel"><img src="img/iphone-dark-budget.webp" width="480" height="1043" alt="Duo Budget budget screen on iPhone in dark mode" loading="lazy"></div>
-          <figcaption class="cap">iPhone · Dark<span>Budget</span></figcaption>
-        </figure>
-        <figure class="frame" role="listitem">
-          <div class="bezel"><img src="img/android-light-trends.webp" width="480" height="853" alt="Duo Budget trends on Android in light mode" loading="lazy"></div>
-          <figcaption class="cap">Android · Light<span>Trends</span></figcaption>
-        </figure>
-        <figure class="frame" role="listitem">
-          <div class="bezel"><img src="img/iphone-dark-trends.webp" width="480" height="1043" alt="Duo Budget trends on iPhone in dark mode" loading="lazy"></div>
-          <figcaption class="cap">iPhone · Dark<span>Trends</span></figcaption>
-        </figure>
-        <figure class="frame tablet" role="listitem">
-          <div class="bezel"><img src="img/ipad-light-home.webp" width="900" height="675" alt="Duo Budget home on iPad in light mode" loading="lazy"></div>
-          <figcaption class="cap">iPad · Light<span>Home</span></figcaption>
-        </figure>
-        <figure class="frame tablet" role="listitem">
-          <div class="bezel"><img src="img/ipad-dark-home.webp" width="900" height="675" alt="Duo Budget home on iPad in dark mode" loading="lazy"></div>
-          <figcaption class="cap">iPad · Dark<span>Home</span></figcaption>
-        </figure>
-        <figure class="frame tablet" role="listitem">
-          <div class="bezel"><img src="img/ipad-light-budget.webp" width="900" height="675" alt="Duo Budget budget on iPad in light mode" loading="lazy"></div>
-          <figcaption class="cap">iPad · Light<span>Budget</span></figcaption>
-        </figure>
-        <figure class="frame tablet" role="listitem">
-          <div class="bezel"><img src="img/ipad-dark-budget.webp" width="900" height="675" alt="Duo Budget budget on iPad in dark mode" loading="lazy"></div>
-          <figcaption class="cap">iPad · Dark<span>Budget</span></figcaption>
+        <figure class="phone front">
+          <div class="bezel">
+            <img src="img/android-dark-budget.webp" width="480" height="853" alt="Duo Budget budget on Android in dark mode" loading="eager">
+          </div>
+          <figcaption class="cap">Budget · Dark</figcaption>
         </figure>
       </div>
     </section>
 
-    <div class="links">
-      <a href="/privacy.html">Privacy</a>
-      <a href="/delete-account.html">Delete account</a>
-    </div>
     <p class="foot">Questions? <a href="mailto:support@duobudget.com.au">support@duobudget.com.au</a><br>Queensland, Australia · Duo Budget</p>
   </main>
+
   <script>
-    document.getElementById('waitlist').addEventListener('submit', function () {
+    document.querySelector('#waitlist form').addEventListener('submit', function () {
       var email = document.getElementById('email').value.trim();
       if (!email) return;
       this.querySelector('input[name="body"]').value = 'Please add me to the Duo Budget waitlist: ' + email;
