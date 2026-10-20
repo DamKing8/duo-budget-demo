@@ -999,6 +999,52 @@ button.otp-resend:disabled{opacity:.55}
 @media (min-width:768px){
   #v-settings>h2.page,#v-settings>p.sub,#v-settings>p.muted,#v-cycle>h2.page,#v-cycle>p.sub,#v-trends>.tr-head,#v-trends>p.sub,#v-trends>.tr-scope{grid-column:1/-1}
 }
+/* Wide tablet: #v-trends is a 2-column grid, but the cards live in #trBody.
+   Without a span, #trBody sits in column 1 only (~457px at 1280). Phone and <1080 stay as they are. */
+@media (min-width:1080px){
+  #v-trends.on>#trBody{grid-column:1/-1;min-width:0}
+}
+/* Tablet/iPad: goal detail and the partner invite fill the content column, same chrome as other screens.
+   Phone (<=767px) keeps the bottom sheet and the full-screen flow. */
+@media (min-width:768px){
+  html.sheet-open:has(#scrim.panel.on),
+  html.sheet-open:has(#scrim.panel.on) body{overflow:hidden}
+  .scrim.panel.on{
+    left:calc(var(--side) + var(--safe-l, 0px));
+    align-items:flex-start;justify-content:center;
+    padding:calc(26px + var(--safe-t)) calc(28px + var(--safe-r)) calc(40px + var(--safe-b)) 28px;
+    overflow:auto;-webkit-backdrop-filter:none;backdrop-filter:none;
+  }
+  html[data-theme="light"] .scrim.panel.on,
+  html[data-theme="light"] .flow.on[data-step="invite"]{
+    background:radial-gradient(110% 55% at 100% 0%,rgba(14,116,144,.07),transparent 60%),radial-gradient(90% 50% at 0% 0%,rgba(109,74,216,.05),transparent 60%),#FBF7EF;
+    background-attachment:fixed;
+  }
+  html[data-theme="dark"] .scrim.panel.on,
+  html[data-theme="dark"] .flow.on[data-step="invite"]{
+    background:radial-gradient(120% 60% at 100% 0%,rgba(34,211,238,.13),transparent 60%),radial-gradient(90% 50% at 0% 10%,rgba(20,184,166,.10),transparent 60%),var(--bg);
+    background-attachment:fixed;
+  }
+  .scrim.panel.on .sheet{
+    width:100%;max-width:1080px;height:auto;max-height:none;margin:0 auto;
+    padding:0;border:0;border-radius:0;box-shadow:none;background:transparent;overflow:visible;
+    animation:fade .2s ease;
+  }
+  .scrim.panel.on .sh-top{display:none}
+  .flow.on[data-step="invite"]{
+    left:calc(var(--side) + var(--safe-l, 0px));
+    padding:calc(26px + var(--safe-t)) calc(28px + var(--safe-r)) calc(40px + var(--safe-b)) 28px;
+    -webkit-backdrop-filter:none;backdrop-filter:none;
+  }
+  .flow.on[data-step="invite"] .flow-in{
+    width:100%;max-width:1080px;margin:0 auto;padding:0;
+    background:transparent;border:0;border-radius:0;box-shadow:none;
+  }
+}
+@media (min-width:1080px){
+  .scrim.panel.on,
+  .flow.on[data-step="invite"]{padding-left:32px;padding-right:calc(32px + var(--safe-r))}
+}
 </style>
 </head>
 <body>
@@ -1419,7 +1465,7 @@ function demo(){
     goals:[
       {id:uid(),name:'Japan trip',emoji:'🗾',target:7800,saved:2140,perF:130,targetDate:isoLocal(monthEndIn(10)),who:'both',split:'even',customF:{D:0,N:0}},
       {id:uid(),name:'Rainy day buffer',emoji:'☔',target:12000,saved:4620,perF:130,targetDate:isoLocal(monthEndIn(20)),who:'both',split:'income',customF:{D:0,N:0}},
-      {id:uid(),name:'Car deposit',emoji:'🚗',target:5000,saved:900,perF:80,targetDate:isoLocal(monthEndIn(14)),who:'D',split:'even',customF:{D:0,N:0}}
+      {id:uid(),name:'Car deposit',emoji:'🚗',target:5000,saved:900,perF:128.13,targetDate:isoLocal(monthEndIn(14)),who:'D',split:'even',customF:{D:0,N:0}}
     ],
     account:{userId:'u_demo_a',name:'Chloe',email:'chloe@example.com',provider:'email',createdAt:made},
     household:{id:'hh_demo',name:'Chloe & Jack',createdAt:made,prevPartnerName:'Partner',lastLeft:null,
@@ -2051,7 +2097,7 @@ function memberBy(role){var h=HH();if(!h)return null;for(var i=0;i<h.members.len
 function invStatus(){var h=HH(),i=h&&h.invite;if(!i)return 'none';if(i.status==='pending'&&Date.now()>i.expiresAt)return 'expired';return i.status;}
 function makeInvite(){var h=HH(),now=Date.now(),old=h.invite||{};
   h.invite={id:'inv_'+uid(),code:genCode(),channel:old.channel||'link',to:old.to||'',forName:old.forName||'',status:'pending',createdAt:now,expiresAt:now+INVITE_DAYS*DAY,sends:0,invitedBy:memberBy('owner').userId};}
-function inviteLink(code){return 'duobudget.app/join/'+code;}
+function inviteLink(code){return 'duobudget.com.au/join/'+code;}
 function fmtDayY(ts){var d=new Date(ts);return d.toLocaleDateString('en-AU',d.getFullYear()===new Date().getFullYear()?{day:'numeric',month:'short'}:{day:'numeric',month:'short',year:'numeric'});}
 function fmtDay(ts){return new Date(ts).toLocaleDateString('en-AU',{day:'numeric',month:'short'});}
 function daysLeft(ts){return Math.max(0,Math.ceil((ts-Date.now())/DAY));}
@@ -2349,6 +2395,8 @@ $('v-trends').addEventListener('click',function(e){var b=e.target.closest('butto
   else if(b.dataset.n){TR.n=+b.dataset.n;}else if(b.dataset.mode){TR.mode=b.dataset.mode;}else return;renderTrends();});
 document.querySelector('nav.tabs').addEventListener('click',function(e){
   var b=e.target.closest('button[data-v]');if(!b)return;
+  if($('scrim').classList.contains('on')&&$('scrim').classList.contains('panel'))closeSheet();
+  if($('flow').classList.contains('on')&&$('flow').dataset.step==='invite')closeFlow();
   [].forEach.call(this.querySelectorAll('button[data-v]'),function(x){x.classList.toggle('on',x===b);});
   [].forEach.call(document.querySelectorAll('section.view'),function(s){s.classList.toggle('on',s.id==='v-'+b.dataset.v);});
   if(b.dataset.v==='trends')renderTrends();
