@@ -250,6 +250,22 @@
       font-weight: 600;
     }
     .ok.show { display: block; }
+    .try-demo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1.5px solid var(--cyan);
+      background: #fff;
+      color: var(--cyan);
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .try-demo:hover { background: rgba(14,116,144,.08); }
 
     /* —— Phone mockups (two only) —— */
     .phones {
@@ -399,11 +415,27 @@
       padding: 18px 16px;
       box-shadow: 0 10px 28px rgba(31,36,48,.04);
     }
+    .feature-group {
+      margin: 4px 0 14px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--cyan);
+    }
+    .feature-group.soon {
+      margin-top: 32px;
+      color: var(--muted);
+    }
     .feature-card h3 {
       margin: 0 0 8px;
       font-size: 15px;
       font-weight: 700;
       letter-spacing: -0.02em;
+    }
+    .feature-card.soon {
+      background: transparent;
+      box-shadow: none;
     }
     .feature-card p {
       margin: 0;
@@ -476,6 +508,7 @@
       </a>
       <nav class="nav-links" aria-label="Primary">
         <a class="nav-link" href="#features">Features</a>
+        <a class="nav-link" href="/demo/">Try the demo</a>
         <a class="nav-link" href="/privacy.html">Privacy</a>
         <a class="nav-link" href="/delete-account.html">Delete account</a>
         <a class="nav-cta" href="#waitlist">Join waitlist</a>
@@ -504,6 +537,7 @@
             </div>
             <p class="note">One email when we go live. No spam.</p>
           </form>
+          <a class="try-demo" href="/demo/">Try the demo</a>
           <div class="ok" id="thanks" role="status">You are on the list. We will let you know when Duo Budget lands.</div>
         </div>
 
@@ -550,32 +584,60 @@
     </section>
 
     <section class="features" id="features" aria-labelledby="features-title">
-      <h2 id="features-title">Built for how couples actually get paid</h2>
-      <p class="features-intro">Real product strengths from Duo Budget — a budget planning app for two, not a finance feed. Manual planning first. No bank logins.</p>
+      <h2 id="features-title">A budget you plan together</h2>
+      <p class="features-intro">Duo Budget is a budget planning app for couples. Here is what you can try in the demo, and what is still on the way.</p>
+      <h3 class="feature-group">In the demo now</h3>
       <div class="feature-grid">
         <article class="feature-card">
-          <h3>Pay-cycle budgeting</h3>
-          <p>Weekly, fortnightly or monthly. Plan around payday, not a calendar month that never matches your pays.</p>
+          <h3>Drag to arrange Home</h3>
+          <p>Hold a Home card and drop it on another row or column.</p>
         </article>
         <article class="feature-card">
-          <h3>One shared plan</h3>
-          <p>Invite your partner. Both of you see the same household plan and edit it together.</p>
+          <h3>Reorder expenses</h3>
+          <p>Hold an expense, then drag it up or down within its group.</p>
         </article>
         <article class="feature-card">
-          <h3>Ours, yours and mine</h3>
-          <p>Joint bills next to personal spending. Clear ownership without merging every dollar.</p>
+          <h3>Swipe to delete</h3>
+          <p>Swipe an expense left to delete it. Undo puts it back.</p>
+        </article>
+        <article class="feature-card">
+          <h3>Australian dollars</h3>
+          <p>AUD by default, with live currency conversion when you want another currency.</p>
+        </article>
+        <article class="feature-card">
+          <h3>Add by voice</h3>
+          <p>Say an expense and add it to the budget.</p>
+        </article>
+        <article class="feature-card">
+          <h3>Pay-cycle views</h3>
+          <p>Week, fortnight, month or year, with your upcoming paydays listed.</p>
         </article>
         <article class="feature-card">
           <h3>Shared goals</h3>
-          <p>Holiday, deposit, emergency fund — target, date, and who’s chipping in each pay.</p>
+          <p>A goal you both chip in towards, on the same plan.</p>
         </article>
         <article class="feature-card">
-          <h3>Trends that stay honest</h3>
-          <p>See where the money goes this pay cycle, so you know what’s left before the next payday.</p>
+          <h3>Two paydays</h3>
+          <p>Your payday and your partner’s, shown together for the household.</p>
         </article>
-        <article class="feature-card">
-          <h3>iPhone, iPad and Android</h3>
-          <p>Light and dark. Phone tabs or a side menu on tablet. Syncs across your devices.</p>
+      </div>
+      <h3 class="feature-group soon">Coming soon</h3>
+      <div class="feature-grid">
+        <article class="feature-card soon">
+          <h3>Sign in and sync</h3>
+          <p>An email code to sign in, then the plan stays in step on both phones.</p>
+        </article>
+        <article class="feature-card soon">
+          <h3>Home and lock screen</h3>
+          <p>A home-screen widget and a lock-screen view.</p>
+        </article>
+        <article class="feature-card soon">
+          <h3>iPhone app</h3>
+          <p>The native iPhone app.</p>
+        </article>
+        <article class="feature-card soon">
+          <h3>Move between groups</h3>
+          <p>Drag an expense from one category into another.</p>
         </article>
       </div>
     </section>
