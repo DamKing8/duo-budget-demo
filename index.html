@@ -251,8 +251,6 @@
       font-weight: 600;
     }
     .ok.show { display: block; }
-    /* Mailto opens the email app and never confirms a signup, so this stays hidden. */
-    #thanks { display: none; }
     .try-demo {
       display: flex;
       align-items: center;
@@ -542,7 +540,7 @@
             <p class="note">This opens your email app with a ready-to-send message. We'll email you once when Duo Budget is ready, and nothing else.</p>
           </form>
           <a class="try-demo" href="/demo/">Try the demo, no sign-up needed</a>
-          <div class="ok" id="thanks" role="status" hidden>Thanks, you're on the list. We'll let you know when Duo Budget is ready.</div>
+          <div class="ok" id="thanks" role="status">Thanks, you're on the list. We'll let you know when Duo Budget is ready.</div>
         </div>
 
         <div class="stores" aria-label="Coming soon on App Store and Google Play">
@@ -663,6 +661,7 @@
       var email = document.getElementById('email').value.trim();
       if (!email) return;
       this.querySelector('input[name="body"]').value = 'Please add me to the Duo Budget waitlist: ' + email;
+      document.getElementById('thanks').classList.add('show');
     });
   </script>
 </body>
