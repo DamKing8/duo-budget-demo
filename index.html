@@ -927,6 +927,13 @@ html[data-theme=dark] .toast-undo{color:#0E7490}
 .swipe-actions button{flex:1;border:0;background:var(--rose);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
 .swipe-front{display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:60px;background:var(--card);position:relative;z-index:1;transition:transform .18s ease;touch-action:pan-y}
 .item.swipe-drag .swipe-front{transition:none}
+.otp-wrap{position:relative;margin-top:14px}
+.otp-cells{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.otp-cells span{height:54px;border:1px solid var(--line);border-radius:14px;background:rgba(31,36,48,.03);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.otp-cells span.fill{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(14,116,144,.18)}
+.otp-catch{position:absolute;inset:0;width:100%;height:100%;margin:0;border:0;padding:0;opacity:0;font-size:16px;background:transparent}
+.email-note{color:var(--muted);font-size:14px;line-height:1.45}
+button.otp-resend:disabled{opacity:.55}
 .fx-result{margin-top:12px;font-size:22px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
 .fx-result small{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-top:4px}
 .voice-parsed{background:rgba(14,116,144,.08);border:1px solid rgba(14,116,144,.28);border-radius:14px;padding:12px 14px;margin-top:12px;font-size:14px;line-height:1.45}
@@ -1304,6 +1311,15 @@ function create(opts){
     start:start,onLocalSave:onLocalSave,flush:flush,pull:pull,status:function(){return status;},meta:function(){return meta;},
     debug:function(){return debugInfo(status.state);},
     signIn:function(){dbg.lastError='-';return client.auth.signInWithOAuth({provider:'google',options:{redirectTo:opts.redirectTo||(typeof location!=='undefined'?location.origin+location.pathname:undefined)}}).then(function(r){if(r&&r.error)fail(r.error.code||'oauth_start_failed','Couldn\'t start Google sign-in: '+r.error.message);return r;},function(e){fail('oauth_start_failed','Couldn\'t start Google sign-in: '+((e&&e.message)||e));});},
+    // Email code. No emailRedirectTo: the 6-digit code must work from any origin, including a preview tunnel.
+    signInWithEmail:function(email){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.signInWithOtp)return Promise.resolve({error:{message:'Email sign-in isn\'t available in this build.'}});
+      return client.auth.signInWithOtp({email:String(email||'').trim(),options:{shouldCreateUser:true}}).then(function(r){return r||{};},function(e){return {error:{message:(e&&e.message)||'Couldn\'t send the code.'}};});},
+    verifyEmailCode:function(email,token){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.verifyOtp)return Promise.resolve({error:{message:'Email sign-in isn\'t available in this build.'}});
+      return client.auth.verifyOtp({email:String(email||'').trim(),token:String(token||'').replace(/\D/g,''),type:'email'}).then(function(r){
+        var s=r&&r.data&&r.data.session;if(s)return afterAuth(s).then(function(){return r;});return r||{};
+      },function(e){return {error:{message:(e&&e.message)||'Couldn\'t check that code.'}};});},
     signOut:function(){if(channel&&client.removeChannel)client.removeChannel(channel);channel=null;return client.auth.signOut().then(function(){return afterAuth(null);});},
     createHousehold:function(name,display){return client.rpc('create_household',{p_name:name,p_display_name:display}).then(function(r){if(r.error)throw r.error;return loadHousehold();});},
     createInvite:function(){return client.rpc('create_invite',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return r.data;});},
@@ -2362,17 +2378,94 @@ function partnerMember(){return S.household&&S.household.members?S.household.mem
 function syncApp(){return {getState:function(){return S;},commit:function(){save();renderAll();},localId:uid,
   getPay:function(s){if(s==='D')return {cycle:S.cycle,next:S.payDate};var m=partnerMember();return m&&m.payDate?{cycle:m.payCycle||S.cycle,next:m.payDate}:null;},
   setPay:function(s,v){if(s==='D'){S.cycle=v.cycle;S.payDate=v.next;}else{var m=partnerMember();if(m){m.payCycle=v.cycle;m.payDate=v.next;}}}};}
+var emailSign={email:'',error:'',sentAt:0,timer:0};
+var EMAIL_RESEND_MS=30000;
+function otpProblem(err,phase){
+  var code=String((err&&err.code)||''),msg=String((err&&err.message)||''),low=(code+' '+msg).toLowerCase();
+  if(/rate|too many|over_email_send_rate_limit|over_request/.test(low))return 'Too many codes were sent. Wait a minute, then try again.';
+  if(phase==='send'){
+    if(/valid email|invalid email|unable to validate email/.test(low))return 'That email doesn’t look right. Check it and try again.';
+    return 'Couldn’t send a code just now. Check the email and try again.';
+  }
+  var expired=/expired/.test(low),wrong=/invalid|wrong|mismatch/.test(low);
+  if(expired&&!wrong)return 'That code has expired. Send a new one.';
+  if(wrong&&!expired)return 'That code doesn’t match. Check the 6 digits and try again.';
+  if(expired&&wrong)return 'That code is wrong, or it has expired. Check the digits, or send a new one.';
+  return 'Couldn’t sign in with that code. Try again, or send a new one.';
+}
+function openEmailCode(email){
+  if(emailSign.timer)clearInterval(emailSign.timer);
+  var html='<h4>Enter your code</h4><p class="email-note">We sent a 6-digit code to <b>'+esc(email)+'</b>. Type it here to sign in. It isn’t a link, so it works from this screen.</p>'+
+    '<div class="otp-wrap"><div class="otp-cells" aria-hidden="true" data-test="otp-cells">'+'<span></span>'.repeat(6)+'</div>'+
+    '<input class="otp-catch" id="email-code" data-test="email-code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" enterkeyhint="done" aria-label="6-digit code"></div>'+
+    '<div class="ferr" id="email-code-err" data-test="email-code-err"></div>'+
+    '<div class="btns"><button class="btn pri" type="button" id="email-verify" data-test="email-verify">Sign in</button></div>'+
+    '<button class="btn ghost block otp-resend" type="button" id="email-resend" data-test="email-resend">Resend code</button>'+
+    '<button class="linkbtn" type="button" id="email-back" data-test="email-back">Use a different email</button>';
+  openSheet(html,function(sh){
+    var input=sh.querySelector('#email-code'),err=sh.querySelector('#email-code-err'),cells=[].slice.call(sh.querySelectorAll('.otp-cells span'));
+    var verifyBtn=sh.querySelector('#email-verify'),resend=sh.querySelector('#email-resend'),busy=false;
+    function digits(s){return String(s||'').replace(/\D/g,'').slice(0,6);}
+    function paint(){var v=digits(input.value);if(input.value!==v)input.value=v;cells.forEach(function(c,i){c.textContent=v[i]||'';c.classList.toggle('fill',!!v[i]);});}
+    function tick(){
+      if(!$('scrim').classList.contains('on')||!document.getElementById('email-code')){clearInterval(emailSign.timer);emailSign.timer=0;return;}
+      var left=Math.ceil((EMAIL_RESEND_MS-(Date.now()-emailSign.sentAt))/1000);
+      if(left>0){resend.disabled=true;resend.textContent='Resend in '+left+'s';}
+      else{resend.disabled=false;resend.textContent='Resend code';}
+    }
+    function submit(){
+      if(busy)return;var code=digits(input.value);
+      if(code.length!==6){err.textContent='Enter all 6 digits.';return;}
+      busy=true;verifyBtn.disabled=true;err.textContent='';
+      __sync.verifyEmailCode(email,code).then(function(r){
+        busy=false;verifyBtn.disabled=false;
+        if(r&&r.error){err.textContent=otpProblem(r.error,'verify');return;}
+        if(!(r&&r.data&&r.data.session)){err.textContent='Couldn’t sign in with that code. Try again, or send a new one.';return;}
+        closeSheet();
+      },function(){busy=false;verifyBtn.disabled=false;err.textContent='Couldn’t finish signing in. Try the code again.';});
+    }
+    input.addEventListener('input',function(){err.textContent='';paint();if(digits(input.value).length===6)submit();});
+    input.addEventListener('paste',function(e){var text=e.clipboardData&&e.clipboardData.getData('text');if(text==null)return;e.preventDefault();input.value=digits(text);paint();if(input.value.length===6)submit();});
+    input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();submit();}});
+    verifyBtn.addEventListener('click',submit);
+    resend.addEventListener('click',function(){
+      if(resend.disabled)return;resend.disabled=true;resend.textContent='Sending…';err.textContent='';
+      __sync.signInWithEmail(email).then(function(r){
+        if(r&&r.error){err.textContent=otpProblem(r.error,'send');tick();return;}
+        emailSign.sentAt=Date.now();input.value='';paint();err.textContent='';tick();
+      });
+    });
+    sh.querySelector('#email-back').addEventListener('click',function(){closeSheet();var f=document.getElementById('syncEmail');if(f)f.focus();});
+    emailSign.sentAt=emailSign.sentAt||Date.now();tick();emailSign.timer=setInterval(tick,250);
+    setTimeout(function(){try{input.focus();}catch(e){}},40);
+  });
+}
 function renderSync(st){var el=document.getElementById('syncCard');if(!el)return;el.hidden=false;
   var lbl={blocked:'Off on this build',starting:'Starting…','signed-out':'Not signed in','no-household':'Signed in, no household yet',pending:'Changes waiting to sync',synced:'Synced',offline:'Offline, saved on this phone',error:'Sync problem'}[st.state]||st.state;
   var h='<div class="row"><b>Cloud sync</b><span class="gstat '+(st.state==='synced'?'ok':st.state==='error'?'bad':st.state==='pending'||st.state==='offline'?'warn':'none')+'" data-test="sync-state">'+esc(lbl)+'</span></div>'+
     '<div class="hint" data-test="sync-msg">'+esc(st.msg||(st.user?'Signed in as '+st.user+(st.pending?' · '+st.pending+' waiting':''):'Beta. Synced data: budget lines, goals and pay cycles.'))+'</div>';
-  if(st.state==='signed-out'||(st.state==='error'&&!st.user))h+='<div class="btns"><button class="btn google block" id="syncSignIn">Sign in with Google</button></div>';
+  if(st.state==='signed-out'||(st.state==='error'&&!st.user))h+='<div class="btns"><button class="btn google block" id="syncSignIn" type="button">Sign in with Google</button></div>'+
+    '<div class="or">or use email</div><label class="fl" for="syncEmail">Email</label><input class="field" id="syncEmail" data-test="sync-email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" value="'+esc(emailSign.email)+'">'+
+    '<p class="email-note">We’ll email a 6-digit code. No password, and no link to tap.</p><div class="ferr" id="syncEmailErr" data-test="sync-email-err">'+esc(emailSign.error)+'</div>'+
+    '<button class="btn pri block" id="syncEmailSend" type="button" data-test="sync-email-send" style="margin-top:12px">Email me a code</button>';
   if(st.state==='no-household')h+='<label class="fl" for="syncCode">Enter join code</label><input id="syncCode" class="field sync-code" data-test="join-code" placeholder="8 letters or numbers" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"><div class="btns"><button class="btn pri" id="syncJoin">Join</button><button class="btn ghost" id="syncCreate">Start a household</button></div>';
   if(['synced','pending','offline','error','no-household'].indexOf(st.state)>=0&&st.user)h+='<div class="btns"><button class="btn ghost" id="syncOut">Sign out</button></div>';
   var d=st.debug;if(d)h+='<div class="hint" style="font-size:11px;opacity:.75;margin-top:10px;word-break:break-word" data-test="sync-debug">Sync status: '+esc([d.state,'app '+d.mode,'storage '+d.storage,'session '+d.session,'household '+d.household,'queue '+d.pending,'online '+d.online,'last event '+d.lastEvent,'return '+d.urlReturn,'error '+d.lastError].join(' · '))+'</div>';
   el.innerHTML=h;
   var on=function(id,f){var b=document.getElementById(id);if(b)b.addEventListener('click',f);};
   on('syncSignIn',function(){try{sessionStorage.setItem('duo.syncReturn','1');}catch(e){}__sync.signIn();});
+  var emailInput=document.getElementById('syncEmail');
+  if(emailInput)emailInput.addEventListener('input',function(){emailSign.email=this.value;emailSign.error='';var er=document.getElementById('syncEmailErr');if(er)er.textContent='';});
+  on('syncEmailSend',function(){
+    var field=document.getElementById('syncEmail'),addr=(field&&field.value||'').trim();emailSign.email=addr;
+    if(!validEmail(addr)){emailSign.error='Enter a valid email address.';var er=document.getElementById('syncEmailErr');if(er)er.textContent=emailSign.error;return;}
+    emailSign.error='';var btn=document.getElementById('syncEmailSend');if(btn){btn.disabled=true;btn.textContent='Sending…';}
+    __sync.signInWithEmail(addr).then(function(r){
+      if(r&&r.error){emailSign.error=otpProblem(r.error,'send');renderSync(__sync.status());return;}
+      emailSign.sentAt=Date.now();openEmailCode(addr);
+      if(btn){btn.disabled=false;btn.textContent='Email me a code';}
+    });
+  });
   revealSyncAfterReturn(st);on('syncOut',function(){__sync.signOut();});
   on('syncCreate',function(){__sync.createHousehold(S.names.D+(S.names.N&&S.names.N!=='Partner'?' & '+S.names.N:''),S.names.D).catch(function(e){toast(e.message);});});
   on('syncJoin',function(){__sync.joinHousehold(document.getElementById('syncCode').value,S.names.D).then(function(r){if(r&&r.ok===false)toast(r.reason==='too_many_attempts'?'Too many tries. Try again in an hour.':'That code didn\'t work. Check it with your partner.');}).catch(function(e){toast(e.message);});});}
