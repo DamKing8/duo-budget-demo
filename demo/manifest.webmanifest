@@ -1,0 +1,74 @@
+{
+  "id": "/demo/",
+  "name": "Duo Budget",
+  "short_name": "Duo Budget",
+  "description": "Budget planning for two. Shared and personal money, by pay cycle.",
+  "start_url": "/demo/",
+  "scope": "/demo/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FBF7EF",
+  "theme_color": "#FBF7EF",
+  "lang": "en-AU",
+  "icons": [
+    {
+      "src": "/demo/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/demo/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/demo/icons/logo-apple-touch.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Left to spend",
+      "short_name": "Home",
+      "description": "What\u2019s left this pay",
+      "url": "/demo/#home",
+      "icons": [
+        {
+          "src": "/demo/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Add expense",
+      "short_name": "Add",
+      "description": "Add an expense by voice or by hand",
+      "url": "/demo/#add-expense",
+      "icons": [
+        {
+          "src": "/demo/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Pay cycle",
+      "short_name": "Pay",
+      "description": "Next payday and amounts per cycle",
+      "url": "/demo/#cycle",
+      "icons": [
+        {
+          "src": "/demo/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
