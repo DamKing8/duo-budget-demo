@@ -917,7 +917,8 @@ window.__duoApplyTheme();})();</script>
 /* Upgrades shared by both themes: layout drag, swipe-delete, voice, currency. */
 .layout-hint{color:var(--muted);font-size:12px;margin:-4px 2px 12px;line-height:1.4}
 [data-layout]{-webkit-touch-callout:none}
-.layout-ghost{position:fixed;z-index:70;left:0;top:0;margin:0!important;pointer-events:none;opacity:.96;overflow:visible!important;animation:none!important;border-radius:22px;box-shadow:none;will-change:transform;transition:none}
+.layout-ghost{position:fixed;z-index:70;left:0;top:0;margin:0!important;pointer-events:none;opacity:.96;overflow:visible!important;animation:none!important;border-radius:22px;box-shadow:none;will-change:transform;transition:none;isolation:isolate;color:var(--text);-webkit-text-fill-color:currentColor}
+.layout-ghost *{-webkit-text-fill-color:currentColor}
 .layout-ghost::after{content:"";position:absolute;inset:0;border-radius:22px;pointer-events:none;z-index:-1;box-shadow:0 28px 70px rgba(0,0,0,.42),0 10px 24px rgba(0,0,0,.24);opacity:0;transition:opacity .12s linear}
 .layout-ghost.on::after{opacity:1}
 .layout-ghost.settling{transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
@@ -932,7 +933,10 @@ html[data-theme=dark] .toast-undo{color:#0E7490}
 .swipe-actions button{flex:1;border:0;background:var(--rose);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
 .swipe-front{display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:60px;background:var(--card);position:relative;z-index:1;transition:transform .18s ease;touch-action:pan-y}
 .item.swipe-drag .swipe-front{transition:none}
-.expense-ghost{position:fixed;z-index:70;left:0;top:0;margin:0!important;pointer-events:none;opacity:.98;border-radius:16px;overflow:visible!important;animation:none!important;box-shadow:none;will-change:transform;transition:none}
+.expense-ghost{position:fixed!important;z-index:70;left:0!important;top:0!important;margin:0!important;pointer-events:none;opacity:.98;border-radius:16px;overflow:visible!important;animation:none!important;box-shadow:none;will-change:transform;transition:none;isolation:isolate;background:var(--card);color:var(--text);-webkit-text-fill-color:currentColor}
+.expense-ghost *{-webkit-text-fill-color:currentColor}
+.expense-ghost .swipe-front{background:var(--card);color:var(--text);border-radius:16px}
+.expense-ghost::before{content:"";position:absolute;inset:5px;border-radius:11px;border:2px dashed var(--cyan);pointer-events:none;z-index:2}
 .expense-ghost::after{content:"";position:absolute;inset:0;border-radius:16px;pointer-events:none;z-index:-1;box-shadow:0 28px 64px rgba(0,0,0,.46),0 8px 20px rgba(0,0,0,.28);opacity:0;transition:opacity .12s linear}
 .expense-ghost.on::after{opacity:1}
 .expense-ghost.settling{transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
