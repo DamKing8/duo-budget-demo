@@ -622,7 +622,7 @@
                   <option value=""></option>
                   <option value="weekly">Weekly</option>
                   <option value="fortnightly">Fortnightly</option>
-                  <option value="twice-monthly">Twice a month</option>
+                  <option value="twice_monthly">Twice a month</option>
                   <option value="monthly">Monthly</option>
                   <option value="other">Other</option>
                 </select>
@@ -633,23 +633,24 @@
                   <option value=""></option>
                   <option value="weekly">Weekly</option>
                   <option value="fortnightly">Fortnightly</option>
-                  <option value="twice-monthly">Twice a month</option>
+                  <option value="twice_monthly">Twice a month</option>
                   <option value="monthly">Monthly</option>
                   <option value="other">Other</option>
                 </select>
               </div>
             </div>
+            <p class="field-error" id="cycle-error" hidden></p>
             <div class="consent">
               <input id="consent" name="consent" type="checkbox" aria-describedby="consent-error">
               <div>
-                <label for="consent">Email me when Duo Budget is ready. I can unsubscribe any time.</label>
+                <label for="consent">Yes, email me Duo Budget launch and beta updates. Unsubscribe any time.</label>
                 <a href="/privacy.html">Privacy</a>
               </div>
             </div>
             <p class="field-error" id="consent-error" hidden></p>
             <div class="hp" aria-hidden="true">
-              <label for="company">Company</label>
-              <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+              <label for="website">Website</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
             </div>
             <button type="submit">Join waitlist</button>
             <p class="form-error" id="form-error" role="alert" hidden></p>
@@ -774,31 +775,35 @@
 
   <script>
     (function () {
-      var ENDPOINT = 'https://ksrffninlyioqobvdvhu.supabase.co/rest/v1/waitlist';
+      var ENDPOINT = 'https://ksrffninlyioqobvdvhu.supabase.co/rest/v1/rpc/join_waitlist';
       var KEY = 'sb_publishable_kYFCNsoHhW537_RtxtOxKg_4agyXKDI';
-      var CONSENT_VERSION = 'wl-2026-10-20';
-      /* Remap these if public.waitlist uses different column names, or an RPC. */
+      var CONSENT_VERSION = 'waitlist-v2-2026-10';
+      var THANKS = 'Thanks, you\'re on the list. We\'ll let you know when Duo Budget is ready.';
+      var RATE_LIMIT = 'Too many sign-ups right now. Please try again in a minute.';
+      /* RPC argument names. Change these here if the function signature changes. */
       var COL = {
-        email: 'email',
-        source: 'source',
-        page: 'page',
-        payCycle: 'pay_cycle',
-        partnerPayCycle: 'partner_pay_cycle',
-        consent: 'consent',
-        consentVersion: 'consent_version',
-        userAgent: 'user_agent'
+        email: 'p_email',
+        consent: 'p_consent',
+        consentVersion: 'p_consent_version',
+        payCycle: 'p_pay_cycle',
+        partnerPayCycle: 'p_partner_pay_cycle',
+        source: 'p_source',
+        userAgent: 'p_user_agent',
+        website: 'p_website'
       };
-      var CYCLES = { weekly: 1, fortnightly: 1, 'twice-monthly': 1, monthly: 1, other: 1 };
+      var CYCLES = { weekly: 1, fortnightly: 1, twice_monthly: 1, monthly: 1, other: 1 };
+      var EMAIL_RE = /^[a-z0-9._%+'-]+@[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/;
       var form = document.getElementById('waitlist-form');
       var emailEl = document.getElementById('email');
       var consentEl = document.getElementById('consent');
-      var companyEl = document.getElementById('company');
+      var websiteEl = document.getElementById('website');
       var payEl = document.getElementById('pay-cycle');
       var partnerEl = document.getElementById('partner-pay-cycle');
       var btn = form.querySelector('button[type="submit"]');
       var thanks = document.getElementById('thanks');
       var emailErr = document.getElementById('email-error');
       var consentErr = document.getElementById('consent-error');
+      var cycleErr = document.getElementById('cycle-error');
       var formErr = document.getElementById('form-error');
 
       function setErr(el, msg) {
@@ -812,21 +817,21 @@
         var src = new URLSearchParams(location.search).get('src');
         if (src == null) return null;
         src = String(src).trim();
-        return src ? src.slice(0, 64) : null;
+        return src ? src.slice(0, 80) : null;
       }
       function validEmail(v) {
-        return v.length > 0 && v.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        return v.length >= 6 && v.length <= 254 && EMAIL_RE.test(v);
       }
       function requestBody(email) {
         var body = {};
         body[COL.email] = email;
-        body[COL.source] = sourceOrNull();
-        body[COL.page] = String(location.pathname || '/').slice(0, 200);
-        body[COL.payCycle] = cycleOrNull(payEl);
-        body[COL.partnerPayCycle] = cycleOrNull(partnerEl);
         body[COL.consent] = true;
         body[COL.consentVersion] = CONSENT_VERSION;
-        body[COL.userAgent] = String(navigator.userAgent || '').slice(0, 400);
+        body[COL.payCycle] = cycleOrNull(payEl);
+        body[COL.partnerPayCycle] = cycleOrNull(partnerEl);
+        body[COL.source] = sourceOrNull();
+        body[COL.userAgent] = String(navigator.userAgent || '').slice(0, 300);
+        body[COL.website] = websiteEl.value;
         return body;
       }
       function done(text) {
@@ -844,13 +849,20 @@
         formErr.appendChild(link);
         formErr.appendChild(document.createTextNode(' to join.'));
       }
+      function showNotice(text) {
+        formErr.hidden = false;
+        formErr.textContent = text;
+      }
 
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         setErr(emailErr, '');
         setErr(consentErr, '');
+        setErr(cycleErr, '');
         formErr.hidden = true;
         formErr.textContent = '';
+        payEl.removeAttribute('aria-invalid');
+        partnerEl.removeAttribute('aria-invalid');
 
         var email = emailEl.value.trim().toLowerCase();
         emailEl.value = email;
@@ -871,8 +883,8 @@
         }
         if (!ok) return;
 
-        if (companyEl.value.trim()) {
-          done('Thanks, you\'re on the list. We\'ll let you know when Duo Budget is ready.');
+        if (websiteEl.value.trim()) {
+          done(THANKS);
           return;
         }
 
@@ -884,20 +896,45 @@
           headers: {
             apikey: KEY,
             Authorization: 'Bearer ' + KEY,
-            'Content-Type': 'application/json',
-            Prefer: 'return=minimal'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(body)
         }).then(function (res) {
-          if (res.status === 201) {
-            done('Thanks, you\'re on the list. We\'ll let you know when Duo Budget is ready.');
+          if (res.status >= 200 && res.status < 300) {
+            done(THANKS);
             return;
           }
           return res.text().then(function (text) {
-            var code = '';
-            try { code = JSON.parse(text).code; } catch (err) {}
-            if (res.status === 409 || code === '23505') {
+            var payload = {};
+            try { payload = JSON.parse(text) || {}; } catch (err) {}
+            var message = String(payload.message || '');
+            var code = String(payload.code || '');
+            if (res.status === 409) {
               done('You\'re already on the list. We\'ll let you know when Duo Budget is ready.');
+              return;
+            }
+            if (res.status === 429 || code === 'PT429') {
+              btn.disabled = false;
+              showNotice(RATE_LIMIT);
+              return;
+            }
+            if (res.status === 400 && message.indexOf('invalid_email') !== -1) {
+              btn.disabled = false;
+              setErr(emailErr, 'Enter an email address like you@example.com.');
+              emailEl.setAttribute('aria-invalid', 'true');
+              return;
+            }
+            if (res.status === 400 && message.indexOf('consent_required') !== -1) {
+              btn.disabled = false;
+              setErr(consentErr, 'Tick the box so we can email you.');
+              consentEl.setAttribute('aria-invalid', 'true');
+              return;
+            }
+            if (res.status === 400 && message.indexOf('invalid_pay_cycle') !== -1) {
+              btn.disabled = false;
+              setErr(cycleErr, 'Choose a pay cycle from the list.');
+              payEl.setAttribute('aria-invalid', 'true');
+              partnerEl.setAttribute('aria-invalid', 'true');
               return;
             }
             btn.disabled = false;
