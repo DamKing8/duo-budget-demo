@@ -2614,7 +2614,18 @@ function initLayout(){
     g.card.classList.remove('layout-src');document.body.classList.remove('layout-dragging');
     if(g.ghost&&g.ghost.parentNode)g.ghost.parentNode.removeChild(g.ghost);
     layoutOverride=null;
-    if(!sameArr(g.start,g.order)){S.layout=S.layout||{};S.layout[g.tab]=g.order.slice();save();toast('Layout saved');}
+    if(!sameArr(g.start,g.order)){
+      var hadPrev=!!(S.layout&&Object.prototype.hasOwnProperty.call(S.layout,g.tab));
+      var prev=hadPrev?S.layout[g.tab].slice():null;
+      S.layout=S.layout||{};
+      S.layout[g.tab]=g.order.slice();
+      save();
+      toast('Layout saved <button type="button" class="toast-undo" data-test="undo-layout">Undo</button>',{html:true,ms:5200,action:function(){
+        if(prev){S.layout=S.layout||{};S.layout[g.tab]=prev.slice();}
+        else if(S.layout){delete S.layout[g.tab];if(!Object.keys(S.layout).length)S.layout=null;}
+        save();layoutApply();toast('Layout restored');
+      }});
+    }
     layoutApply();
     window.__duoSuppressClick=true;
     setTimeout(function(){window.__duoSuppressClick=false;},350);
