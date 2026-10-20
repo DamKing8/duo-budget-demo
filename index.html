@@ -192,6 +192,7 @@
 
     /* —— Form —— */
     .form-card {
+      position: relative;
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: 18px;
@@ -206,23 +207,99 @@
       margin-bottom: 8px;
     }
     .row { display: flex; gap: 8px; flex-wrap: wrap; }
-    input[type="email"] {
-      flex: 1 1 180px;
+    input[type="email"],
+    .form-card select {
+      display: block;
+      width: 100%;
       min-width: 0;
+      min-height: 44px;
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 12px 14px;
+      padding: 10px 12px;
       font-size: 16px;
       background: #FFFDF9;
       color: var(--text);
       outline: none;
     }
-    input[type="email"]:focus {
+    input[type="email"]:focus,
+    .form-card select:focus {
       border-color: var(--cyan);
       box-shadow: 0 0 0 3px rgba(14,116,144,.15);
     }
+    .cycles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 10px;
+      margin-top: 12px;
+      align-items: end;
+    }
+    .cycles label {
+      min-height: 2.6em;
+      margin-bottom: 4px;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    .consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 14px;
+      min-height: 44px;
+    }
+    .consent input {
+      width: 22px;
+      height: 22px;
+      margin: 1px 0 0;
+      flex: 0 0 22px;
+      accent-color: var(--teal);
+    }
+    .consent label {
+      display: inline;
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.45;
+    }
+    .consent a {
+      margin-left: 6px;
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .consent a:hover { text-decoration: underline; }
+    .field-error,
+    .form-error {
+      margin: 8px 0 0;
+      color: #9F1239;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .form-error a { color: var(--cyan); }
+    input[aria-invalid="true"],
+    select[aria-invalid="true"] {
+      border-color: #9F1239;
+    }
+    .hp {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1px;
+      height: 1px;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      clip-path: inset(50%);
+      border: 0;
+      white-space: nowrap;
+    }
     button[type="submit"] {
-      flex: 0 0 auto;
+      display: block;
+      width: 100%;
+      margin-top: 14px;
       border: 0;
       border-radius: 12px;
       padding: 12px 18px;
@@ -234,6 +311,11 @@
       cursor: pointer;
     }
     button[type="submit"]:hover { filter: brightness(1.05); }
+    button[type="submit"]:disabled {
+      opacity: 0.65;
+      cursor: default;
+      filter: none;
+    }
     .note {
       margin: 12px 0 0;
       font-size: 12px;
@@ -530,17 +612,52 @@
           <li>No bank logins and no spreadsheets. You enter your own numbers.</li>
         </ul>
         <div class="form-card" id="waitlist">
-          <form action="mailto:hello@duobudget.com.au" method="get" enctype="text/plain">
-            <input type="hidden" name="subject" value="Duo Budget waitlist">
+          <form id="waitlist-form" novalidate>
             <label for="email">Get early access</label>
-            <div class="row">
-              <input id="email" name="body" type="email" required autocomplete="email" placeholder="you@example.com" inputmode="email">
-              <button type="submit">Join waitlist</button>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" inputmode="email" maxlength="254" aria-describedby="email-error">
+            <p class="field-error" id="email-error" hidden></p>
+            <div class="cycles">
+              <div>
+                <label for="pay-cycle">Your pay cycle</label>
+                <select id="pay-cycle" name="pay_cycle">
+                  <option value=""></option>
+                  <option value="weekly">Weekly</option>
+                  <option value="fortnightly">Fortnightly</option>
+                  <option value="twice-monthly">Twice a month</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label for="partner-pay-cycle">Partner's pay cycle</label>
+                <select id="partner-pay-cycle" name="partner_pay_cycle">
+                  <option value=""></option>
+                  <option value="weekly">Weekly</option>
+                  <option value="fortnightly">Fortnightly</option>
+                  <option value="twice-monthly">Twice a month</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
             </div>
-            <p class="note">This opens your email app with a ready-to-send message. We'll email you once when Duo Budget is ready, and nothing else.</p>
+            <div class="consent">
+              <input id="consent" name="consent" type="checkbox" aria-describedby="consent-error">
+              <div>
+                <label for="consent">Email me when Duo Budget is ready. I can unsubscribe any time.</label>
+                <a href="/privacy.html">Privacy</a>
+              </div>
+            </div>
+            <p class="field-error" id="consent-error" hidden></p>
+            <div class="hp" aria-hidden="true">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+            </div>
+            <button type="submit">Join waitlist</button>
+            <p class="form-error" id="form-error" role="alert" hidden></p>
+            <p class="note">We'll email you once when Duo Budget is ready, and nothing else.</p>
           </form>
-          <a class="try-demo" href="/demo/">Try the demo, no sign-up needed</a>
           <div class="ok" id="thanks" role="status">Thanks, you're on the list. We'll let you know when Duo Budget is ready.</div>
+          <a class="try-demo" href="/demo/">Try the demo, no sign-up needed</a>
         </div>
 
         <div class="stores" aria-label="Coming soon on App Store and Google Play">
@@ -657,12 +774,142 @@
   </main>
 
   <script>
-    document.querySelector('#waitlist form').addEventListener('submit', function () {
-      var email = document.getElementById('email').value.trim();
-      if (!email) return;
-      this.querySelector('input[name="body"]').value = 'Please add me to the Duo Budget waitlist: ' + email;
-      document.getElementById('thanks').classList.add('show');
-    });
+    (function () {
+      var ENDPOINT = 'https://ksrffninlyioqobvdvhu.supabase.co/rest/v1/waitlist';
+      var KEY = 'sb_publishable_kYFCNsoHhW537_RtxtOxKg_4agyXKDI';
+      var CONSENT_VERSION = 'wl-2026-10-20';
+      /* Remap these if public.waitlist uses different column names, or an RPC. */
+      var COL = {
+        email: 'email',
+        source: 'source',
+        page: 'page',
+        payCycle: 'pay_cycle',
+        partnerPayCycle: 'partner_pay_cycle',
+        consent: 'consent',
+        consentVersion: 'consent_version',
+        userAgent: 'user_agent'
+      };
+      var CYCLES = { weekly: 1, fortnightly: 1, 'twice-monthly': 1, monthly: 1, other: 1 };
+      var form = document.getElementById('waitlist-form');
+      var emailEl = document.getElementById('email');
+      var consentEl = document.getElementById('consent');
+      var companyEl = document.getElementById('company');
+      var payEl = document.getElementById('pay-cycle');
+      var partnerEl = document.getElementById('partner-pay-cycle');
+      var btn = form.querySelector('button[type="submit"]');
+      var thanks = document.getElementById('thanks');
+      var emailErr = document.getElementById('email-error');
+      var consentErr = document.getElementById('consent-error');
+      var formErr = document.getElementById('form-error');
+
+      function setErr(el, msg) {
+        el.hidden = !msg;
+        el.textContent = msg || '';
+      }
+      function cycleOrNull(el) {
+        return CYCLES[el.value] ? el.value : null;
+      }
+      function sourceOrNull() {
+        var src = new URLSearchParams(location.search).get('src');
+        if (src == null) return null;
+        src = String(src).trim();
+        return src ? src.slice(0, 64) : null;
+      }
+      function validEmail(v) {
+        return v.length > 0 && v.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      }
+      function requestBody(email) {
+        var body = {};
+        body[COL.email] = email;
+        body[COL.source] = sourceOrNull();
+        body[COL.page] = String(location.pathname || '/').slice(0, 200);
+        body[COL.payCycle] = cycleOrNull(payEl);
+        body[COL.partnerPayCycle] = cycleOrNull(partnerEl);
+        body[COL.consent] = true;
+        body[COL.consentVersion] = CONSENT_VERSION;
+        body[COL.userAgent] = String(navigator.userAgent || '').slice(0, 400);
+        return body;
+      }
+      function done(text) {
+        thanks.textContent = text;
+        thanks.classList.add('show');
+        form.hidden = true;
+      }
+      function showFail() {
+        formErr.hidden = false;
+        formErr.textContent = '';
+        formErr.appendChild(document.createTextNode('Sorry, that didn\'t go through. Please try again, or email '));
+        var link = document.createElement('a');
+        link.href = 'mailto:hello@duobudget.com.au';
+        link.textContent = 'hello@duobudget.com.au';
+        formErr.appendChild(link);
+        formErr.appendChild(document.createTextNode(' to join.'));
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        setErr(emailErr, '');
+        setErr(consentErr, '');
+        formErr.hidden = true;
+        formErr.textContent = '';
+
+        var email = emailEl.value.trim().toLowerCase();
+        emailEl.value = email;
+        var ok = true;
+        if (!validEmail(email)) {
+          setErr(emailErr, 'Enter an email address like you@example.com.');
+          emailEl.setAttribute('aria-invalid', 'true');
+          ok = false;
+        } else {
+          emailEl.removeAttribute('aria-invalid');
+        }
+        if (!consentEl.checked) {
+          setErr(consentErr, 'Tick the box so we can email you.');
+          consentEl.setAttribute('aria-invalid', 'true');
+          ok = false;
+        } else {
+          consentEl.removeAttribute('aria-invalid');
+        }
+        if (!ok) return;
+
+        if (companyEl.value.trim()) {
+          done('Thanks, you\'re on the list. We\'ll let you know when Duo Budget is ready.');
+          return;
+        }
+
+        var body = requestBody(email);
+
+        btn.disabled = true;
+        fetch(ENDPOINT, {
+          method: 'POST',
+          headers: {
+            apikey: KEY,
+            Authorization: 'Bearer ' + KEY,
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal'
+          },
+          body: JSON.stringify(body)
+        }).then(function (res) {
+          if (res.status === 201) {
+            done('Thanks, you\'re on the list. We\'ll let you know when Duo Budget is ready.');
+            return;
+          }
+          return res.text().then(function (text) {
+            var code = '';
+            try { code = JSON.parse(text).code; } catch (err) {}
+            if (res.status === 409 || code === '23505') {
+              done('You\'re already on the list. We\'ll let you know when Duo Budget is ready.');
+              return;
+            }
+            btn.disabled = false;
+            showFail();
+          });
+        }, function () {
+          btn.disabled = false;
+          showFail();
+        });
+      });
+    })();
   </script>
 </body>
 </html>
