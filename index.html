@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Duo Budget — Join the waitlist</title>
-  <meta name="description" content="Join the Duo Budget waitlist. The budget planning app for couples, built around your real pay cycles.">
+  <title>Duo Budget | Budget planning for couples</title>
+  <meta name="description" content="Duo Budget is a budget planning app for couples. Plan each pay cycle together, around both paydays. Join the waitlist or try the demo.">
   <meta name="theme-color" content="#FBF7EF">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
@@ -226,6 +226,7 @@
       border: 0;
       border-radius: 12px;
       padding: 12px 18px;
+      min-height: 44px;
       font-size: 15px;
       font-weight: 600;
       color: #fff;
@@ -250,6 +251,8 @@
       font-weight: 600;
     }
     .ok.show { display: block; }
+    /* Mailto opens the email app and never confirms a signup, so this stays hidden. */
+    #thanks { display: none; }
     .try-demo {
       display: flex;
       align-items: center;
@@ -257,6 +260,7 @@
       width: 100%;
       margin-top: 14px;
       padding: 12px 18px;
+      min-height: 44px;
       border-radius: 12px;
       border: 1.5px solid var(--cyan);
       background: #fff;
@@ -488,8 +492,8 @@
       .nav-inner { padding: 10px 14px; gap: 10px; }
       .nav-brand-tag { display: none; }
       .nav-links { gap: 8px 12px; }
-      .nav-links a.nav-link { font-size: 13px; }
-      .nav-cta { padding: 8px 12px; font-size: 13px; }
+      .nav-links a.nav-link { font-size: 13px; min-height: 44px; display: inline-flex; align-items: center; }
+      .nav-cta { padding: 10px 14px; min-height: 44px; font-size: 13px; }
       .wrap { padding: 28px 16px 40px; }
       .phones { gap: 12px; min-height: 320px; }
       .ipad-frame { padding: 10px 10px 14px; border-radius: 16px; }
@@ -519,26 +523,26 @@
   <main class="wrap">
     <section class="hero" aria-labelledby="hero-title">
       <div class="copy">
-        <p class="eyebrow">Waitlist · Made in Queensland</p>
-        <h1 id="hero-title">Your pays. One shared plan.</h1>
-        <p class="pitch">Duo Budget is the budget planning app for couples, built around your real pay cycles — weekly, fortnightly or monthly.</p>
+        <p class="eyebrow">Waitlist open · Made in Queensland</p>
+        <h1 id="hero-title">Two paydays. One plan.</h1>
+        <p class="pitch">Budget planning, built for two. Duo Budget helps couples plan each pay cycle together, around when each of you actually gets paid, whether that's weekly, fortnightly or monthly.</p>
         <ul class="body">
-          <li>Plan bills, groceries and fun money together before payday hits.</li>
-          <li>Ours, yours and mine — shared and personal money side by side.</li>
-          <li>No bank logins. No spreadsheets. One plan you’ll both stick to.</li>
+          <li>Plan bills, groceries and fun money together before payday.</li>
+          <li>Keep ours, yours and mine side by side in one budget.</li>
+          <li>No bank logins and no spreadsheets. You enter your own numbers.</li>
         </ul>
         <div class="form-card" id="waitlist">
           <form action="mailto:hello@duobudget.com.au" method="get" enctype="text/plain">
             <input type="hidden" name="subject" value="Duo Budget waitlist">
             <label for="email">Get early access</label>
             <div class="row">
-              <input id="email" name="body" type="email" required autocomplete="email" placeholder="your@email.com" inputmode="email">
+              <input id="email" name="body" type="email" required autocomplete="email" placeholder="you@example.com" inputmode="email">
               <button type="submit">Join waitlist</button>
             </div>
-            <p class="note">One email when we go live. No spam.</p>
+            <p class="note">This opens your email app with a ready-to-send message. We'll email you once when Duo Budget is ready, and nothing else.</p>
           </form>
-          <a class="try-demo" href="/demo/">Try the demo</a>
-          <div class="ok" id="thanks" role="status">You are on the list. We will let you know when Duo Budget lands.</div>
+          <a class="try-demo" href="/demo/">Try the demo, no sign-up needed</a>
+          <div class="ok" id="thanks" role="status" hidden>Thanks, you're on the list. We'll let you know when Duo Budget is ready.</div>
         </div>
 
         <div class="stores" aria-label="Coming soon on App Store and Google Play">
@@ -585,73 +589,73 @@
 
     <section class="features" id="features" aria-labelledby="features-title">
       <h2 id="features-title">A budget you plan together</h2>
-      <p class="features-intro">Duo Budget is a budget planning app for couples. Here is what you can try in the demo, and what is still on the way.</p>
+      <p class="features-intro">Here's what you can try in the demo today, and what's still on the way.</p>
       <h3 class="feature-group">In the demo now</h3>
       <div class="feature-grid">
         <article class="feature-card">
-          <h3>Drag to arrange Home</h3>
-          <p>Hold a Home card and drop it on another row or column.</p>
-        </article>
-        <article class="feature-card">
-          <h3>Reorder expenses</h3>
-          <p>Hold an expense, then drag it up or down within its group.</p>
-        </article>
-        <article class="feature-card">
-          <h3>Swipe to delete</h3>
-          <p>Swipe an expense left to delete it. Undo puts it back.</p>
-        </article>
-        <article class="feature-card">
-          <h3>Australian dollars</h3>
-          <p>AUD by default, with live currency conversion when you want another currency.</p>
-        </article>
-        <article class="feature-card">
-          <h3>Add by voice</h3>
-          <p>Say an expense and add it to the budget.</p>
+          <h3>Two paydays</h3>
+          <p>See your payday and your partner's together, so you can plan around both.</p>
         </article>
         <article class="feature-card">
           <h3>Pay-cycle views</h3>
-          <p>Week, fortnight, month or year, with your upcoming paydays listed.</p>
+          <p>Switch between week, fortnight, month and year, with your next paydays listed.</p>
         </article>
         <article class="feature-card">
           <h3>Shared goals</h3>
-          <p>A goal you both chip in towards, on the same plan.</p>
+          <p>Save towards a goal together, with both of you chipping in.</p>
         </article>
         <article class="feature-card">
-          <h3>Two paydays</h3>
-          <p>Your payday and your partner’s, shown together for the household.</p>
+          <h3>Add by voice</h3>
+          <p>Say an expense, confirm it, and add it to your budget.</p>
+        </article>
+        <article class="feature-card">
+          <h3>Arrange Home your way</h3>
+          <p>Hold a card on Home and drag it to a new spot.</p>
+        </article>
+        <article class="feature-card">
+          <h3>Reorder expenses</h3>
+          <p>Hold an expense and drag it up or down within its group.</p>
+        </article>
+        <article class="feature-card">
+          <h3>Swipe to delete</h3>
+          <p>Swipe an expense left to delete it. Tap Undo to bring it back.</p>
+        </article>
+        <article class="feature-card">
+          <h3>Australian dollars</h3>
+          <p>Set in AUD, with live conversion when you want to see another currency.</p>
         </article>
       </div>
       <h3 class="feature-group soon">Coming soon</h3>
       <div class="feature-grid">
         <article class="feature-card soon">
           <h3>Sign in and sync</h3>
-          <p>An email code to sign in, then the plan stays in step on both phones.</p>
+          <p>Sign in with an email code, then keep your plan in step on both phones.</p>
         </article>
         <article class="feature-card soon">
           <h3>Home and lock screen</h3>
-          <p>A home-screen widget and a lock-screen view.</p>
+          <p>See your plan at a glance with a home-screen widget and a lock-screen view.</p>
         </article>
         <article class="feature-card soon">
           <h3>iPhone app</h3>
-          <p>The native iPhone app.</p>
+          <p>A native app for iPhone.</p>
         </article>
         <article class="feature-card soon">
           <h3>Move between groups</h3>
-          <p>Drag an expense from one category into another.</p>
+          <p>Drag an expense from one group into another.</p>
         </article>
       </div>
     </section>
 
     <section class="ipad-section" aria-labelledby="ipad-title">
       <h2 id="ipad-title">Room to plan on iPad</h2>
-      <p class="features-intro">Landscape layout with a side menu and two-column screens — home, budget and goals without the phone squeeze.</p>
+      <p class="features-intro">A landscape layout with a side menu and two-column screens, so Home, Budget and Goals have room to breathe.</p>
       <figure class="ipad-frame">
         <img src="img/ipad-landscape-home.webp" width="1400" height="1050" alt="Duo Budget home grid on iPad in landscape" loading="lazy">
       </figure>
       <p class="ipad-cap">Home · iPad landscape</p>
     </section>
 
-    <p class="foot">Questions? <a href="mailto:support@duobudget.com.au">support@duobudget.com.au</a><br>Queensland, Australia · Duo Budget</p>
+    <p class="foot">Questions? Email <a href="mailto:support@duobudget.com.au">support@duobudget.com.au</a><br>Duo Budget is a budget planning tool and doesn't give financial advice.<br>Duo Budget · Queensland, Australia</p>
   </main>
 
   <script>
@@ -659,7 +663,6 @@
       var email = document.getElementById('email').value.trim();
       if (!email) return;
       this.querySelector('input[name="body"]').value = 'Please add me to the Duo Budget waitlist: ' + email;
-      document.getElementById('thanks').classList.add('show');
     });
   </script>
 </body>
