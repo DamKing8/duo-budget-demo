@@ -986,7 +986,7 @@ button.otp-resend:disabled{opacity:.55}
   #groups>.group{width:auto!important;display:block!important;break-inside:auto!important;-webkit-column-break-inside:auto!important}
   #v-cycle.on,#v-settings.on{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:var(--gap,18px);align-items:start}
   #v-trends .tr-l,#v-trends .tr-r{display:contents!important;grid-row:auto!important;grid-template-rows:none!important}
-  #trBody{display:grid!important;grid-template-columns:1fr 1fr;column-gap:var(--gap,18px);align-items:start}
+  #trBody{display:grid!important;grid-template-columns:1fr 1fr;column-gap:var(--gap,18px);align-items:stretch}
   #v-dash.on.layout-slotted .hero,
   #v-dash.on.layout-slotted .d-donut,
   #v-dash.on.layout-slotted #stats,
@@ -1003,6 +1003,14 @@ button.otp-resend:disabled{opacity:.55}
    Without a span, #trBody sits in column 1 only (~457px at 1280). Phone and <1080 stay as they are. */
 @media (min-width:1080px){
   #v-trends.on>#trBody{grid-column:1/-1;min-width:0}
+}
+/* iPad / tablet: cards in one grid row share a height, content stays at the top.
+   Phone (<768px), including landscape, is unchanged. Charts keep their own height. */
+@media (min-width:768px){
+  #v-settings.on{align-items:stretch}
+  #v-settings.on>.card:not([hidden]){align-self:stretch;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;min-width:0}
+  #v-trends .tr-l>.card,#v-trends .tr-r>.card,#trBody>.card{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;min-width:0}
+  #v-trends .tr-chart{flex:0 0 auto;width:100%;max-width:100%;height:auto;max-height:280px;min-width:0}
 }
 /* Tablet/iPad: goal detail and the partner invite fill the content column, same chrome as other screens.
    Phone (<=767px) keeps the bottom sheet and the full-screen flow. */
@@ -1463,9 +1471,9 @@ function demo(){
       I('Jack credit card',140,'N','expenses','card'),I('Chloe train fares',62,'D','expenses','transport')
     ],
     goals:[
+      {id:uid(),name:'Car deposit',emoji:'🚗',target:5000,saved:900,perF:128.13,targetDate:isoLocal(monthEndIn(14)),who:'both',split:'custom',customF:{D:64.07,N:64.06}},
       {id:uid(),name:'Japan trip',emoji:'🗾',target:7800,saved:2140,perF:130,targetDate:isoLocal(monthEndIn(10)),who:'both',split:'even',customF:{D:0,N:0}},
-      {id:uid(),name:'Rainy day buffer',emoji:'☔',target:12000,saved:4620,perF:130,targetDate:isoLocal(monthEndIn(20)),who:'both',split:'income',customF:{D:0,N:0}},
-      {id:uid(),name:'Car deposit',emoji:'🚗',target:5000,saved:900,perF:128.13,targetDate:isoLocal(monthEndIn(14)),who:'D',split:'even',customF:{D:0,N:0}}
+      {id:uid(),name:'Rainy day buffer',emoji:'☔',target:12000,saved:4620,perF:130,targetDate:isoLocal(monthEndIn(20)),who:'both',split:'income',customF:{D:0,N:0}}
     ],
     account:{userId:'u_demo_a',name:'Chloe',email:'chloe@example.com',provider:'email',createdAt:made},
     household:{id:'hh_demo',name:'Chloe & Jack',createdAt:made,prevPartnerName:'Partner',lastLeft:null,
@@ -2687,6 +2695,7 @@ function defaultOrder(tab,ids){
   var pref=null;
   if(tab==='dash')pref=wide?['hero','stats','donut','pay','trends','split']:['hero','donut','stats','pay','trends','split'];
   else if(tab==='trends')pref=wide?['tr-break','tr-bars','tr-insights','tr-left']:['tr-break','tr-insights','tr-bars','tr-left'];
+  else if(tab==='settings'&&wide)pref=['set-hh','set-names','set-fx','set-storage','set-theme','set-sync','set-store'];
   if(pref&&pref.length===ids.length&&pref.every(function(id){return ids.indexOf(id)>=0;}))return pref.slice();
   return ids.slice();
 }
@@ -2711,7 +2720,12 @@ function layoutApply(){
         if(slots[i]){el.style.gridColumn=slots[i].c;el.style.gridRow=slots[i].r;}else{el.style.gridColumn='';el.style.gridRow='';}});
     }else{
       root.classList.remove('layout-slotted');
-      order.forEach(function(id,i){var el=map[id];if(!el)return;el.style.gridColumn='';el.style.gridRow='';el.style.order=String(i+1);});
+      var shown=[];
+      order.forEach(function(id,i){var el=map[id];if(!el)return;el.style.gridColumn='';el.style.gridRow='';el.style.order=String(i+1);
+        if(el.hasAttribute('hidden')||el.style.display==='none')return;shown.push(el);});
+      /* Odd tablet rows: the last visible card spans both columns so it isn't left alone.
+         Any saved order still packs without a hole. Phone never sets this (wide is false). */
+      if(wide&&tab==='settings'&&shown.length%2===1)shown[shown.length-1].style.gridColumn='1 / -1';
     }
   });
 }
