@@ -233,6 +233,66 @@ async function personal(browser, url) {
   await opened.context.close();
 }
 
+function brandStops(img) {
+  var found = [];
+  var re = /rgba?\((\d+),\s*(\d+),\s*(\d+)/g;
+  var m;
+  while ((m = re.exec(img))) found.push([+m[1], +m[2], +m[3]]);
+  return found;
+}
+function relLum(rgb) {
+  function ch(c) { c = c / 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  return 0.2126 * ch(rgb[0]) + 0.7152 * ch(rgb[1]) + 0.0722 * ch(rgb[2]);
+}
+function contrastRatio(fg, bg) {
+  var L1 = relLum(fg), L2 = relLum(bg);
+  var hi = Math.max(L1, L2), lo = Math.min(L1, L2);
+  return (hi + 0.05) / (lo + 0.05);
+}
+async function brandPaint(page, sel) {
+  return page.locator(sel).evaluate(function (el) {
+    var s = getComputedStyle(el);
+    var r = el.getBoundingClientRect();
+    return { img: s.backgroundImage, color: s.color, top: r.top, bottom: r.bottom, h: r.height };
+  });
+}
+function assertBrand(paint, theme, label) {
+  var fg = paint.color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  var fgRgb = fg ? [+fg[1], +fg[2], +fg[3]] : [0, 0, 0];
+  var stops = brandStops(paint.img);
+  assert(paint.img.indexOf('gradient') >= 0, label + ' uses the brand gradient: ' + paint.img);
+  assert(paint.img.indexOf('31, 36, 48') < 0 && paint.img.indexOf('31,36,48') < 0, label + ' is not near-black: ' + paint.img);
+  var worst = 99;
+  stops.forEach(function (bg) {
+    var ratio = contrastRatio(fgRgb, bg);
+    if (ratio < worst) worst = ratio;
+    console.log(label + ' ' + theme + ' contrast ' + ratio.toFixed(2) + ':1 ' + paint.color + ' on rgb(' + bg.join(', ') + ')');
+  });
+  assert(worst >= 4.5, label + ' contrast ' + worst.toFixed(2) + ' is below 4.5');
+  if (theme === 'light') assert(fgRgb[0] > 240 && fgRgb[1] > 240 && fgRgb[2] > 240, label + ' light label ' + paint.color);
+  if (theme === 'dark') assert(fgRgb[0] < 40 && fgRgb[1] < 80 && fgRgb[2] < 80, label + ' dark label stays ' + paint.color);
+}
+
+async function frameBrandButtons(page) {
+  await page.evaluate(function () {
+    window.scrollTo(0, 0);
+    var pill = document.querySelector('#spentScope button.on');
+    var add = document.querySelector('#spentAdd');
+    var nav = document.querySelector('nav.tabs');
+    var wide = window.innerWidth >= 768;
+    var limit = wide ? window.innerHeight - 16 : (nav ? nav.getBoundingClientRect().top - 12 : window.innerHeight - 12);
+    if (!pill || !add) return;
+    var span = add.getBoundingClientRect().bottom - pill.getBoundingClientRect().top;
+    if (span > limit - 8) return;
+    if (add.getBoundingClientRect().bottom > limit) window.scrollBy(0, add.getBoundingClientRect().bottom - limit);
+    if (pill.getBoundingClientRect().top < 8) {
+      var need = 8 - pill.getBoundingClientRect().top;
+      var room = limit - add.getBoundingClientRect().bottom;
+      if (room > 0) window.scrollBy(0, -Math.min(need, room));
+    }
+  });
+}
+
 async function frameSpendingList(page) {
   await page.evaluate(function () {
     window.scrollTo(0, 0);
@@ -282,7 +342,11 @@ async function shots(browser, url, htmlFile) {
   var home = await page.locator('#spentCard').boundingBox();
   var navTop = await page.locator('nav.tabs').evaluate(function (el) { return el.getBoundingClientRect().top; });
   assert(home.y >= 0 && home.y + home.height <= navTop + 1, 'home card sits above the nav ' + JSON.stringify(home) + ' nav ' + navTop);
+  var homeAdd = await brandPaint(page, '#addSpend');
+  assertBrand(homeAdd, 'light', 'home add spending');
+  assert(homeAdd.top >= 0 && homeAdd.bottom <= navTop, 'home add spending is in view');
   await page.screenshot({ path: path.join(SHOTS, 'phone-home-spent.png') });
+  await page.screenshot({ path: path.join(SHOTS, 'phone-home-add-spending.png') });
 
   await page.click('[data-test="add-spending"]');
   await page.waitForSelector('[data-test="sp-date-show"]');
@@ -302,6 +366,16 @@ async function shots(browser, url, htmlFile) {
   await page.click('[data-test="sheet-close"]');
   await page.click('[data-test="spent-total"]');
   await page.waitForSelector('[data-test="spend-refund"]');
+  await frameBrandButtons(page);
+  await settle(page);
+  var lightPill = await brandPaint(page, '#spentScope button.on');
+  var lightAdd = await brandPaint(page, '#spentAdd');
+  assertBrand(lightPill, 'light', 'spending scope pill');
+  assertBrand(lightAdd, 'light', 'spending add button');
+  var lightNav = await page.locator('nav.tabs').evaluate(function (el) { return el.getBoundingClientRect().top; });
+  assert(lightPill.top >= 0 && lightPill.bottom <= lightNav, 'light spending shows the selected pill');
+  if (lightAdd.bottom - lightPill.top <= lightNav - 8) assert(lightAdd.top >= 0 && lightAdd.bottom <= lightNav, 'light spending shows Add spending');
+  await page.screenshot({ path: path.join(SHOTS, 'phone-spending-light.png') });
   await frameSpendingList(page);
   await settle(page);
   var listCheck = await page.evaluate(function () {
@@ -397,10 +471,25 @@ async function shots(browser, url, htmlFile) {
   assert(Math.abs(ipadStack.pillMid - ipadStack.secMid) < 28, 'iPad period row is centred');
   assert(ipadStack.head.y >= 0 && ipadStack.refund.bottom <= ipadStack.vh, 'iPad header and refund are in view');
   assert(ipadStack.g > ipadStack.r, 'iPad refund is not rose');
+  var ipadPill = await brandPaint(page, '#spentScope button.on');
+  var ipadAdd = await brandPaint(page, '#spentAdd');
+  assertBrand(ipadPill, 'light', 'iPad spending scope pill');
+  assertBrand(ipadAdd, 'light', 'iPad spending add button');
+  assert(ipadPill.top >= 0 && ipadPill.bottom <= ipadStack.vh && ipadAdd.top >= 0 && ipadAdd.bottom <= ipadStack.vh, 'iPad spending shows the pill and Add spending');
   await page.screenshot({ path: path.join(SHOTS, 'ipad-spending.png') });
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.evaluate(function () { window.__duoSetTheme('dark'); });
+  await frameBrandButtons(page);
+  await settle(page);
+  var darkPill = await brandPaint(page, '#spentScope button.on');
+  var darkAdd = await brandPaint(page, '#spentAdd');
+  assertBrand(darkPill, 'dark', 'spending scope pill');
+  assertBrand(darkAdd, 'dark', 'spending add button');
+  var darkNav = await page.locator('nav.tabs').evaluate(function (el) { return el.getBoundingClientRect().top; });
+  assert(darkPill.top >= 0 && darkPill.bottom <= darkNav, 'dark spending shows the selected pill');
+  if (darkAdd.bottom - darkPill.top <= darkNav - 8) assert(darkAdd.top >= 0 && darkAdd.bottom <= darkNav, 'dark spending shows Add spending');
+  await page.screenshot({ path: path.join(SHOTS, 'phone-spending-dark.png') });
   await frameSpendingList(page);
   await settle(page);
   var dark = await page.evaluate(function () {
@@ -421,7 +510,7 @@ async function shots(browser, url, htmlFile) {
   assert(dark.headTop >= 0 && dark.refundBottom <= dark.navTop, 'dark header and refund are in view');
   await page.screenshot({ path: path.join(SHOTS, 'phone-spending-list-dark.png') });
 
-  ['phone-home-spent.png', 'phone-add-spending.png', 'phone-spending-list.png', 'phone-budget-over.png', 'phone-spending-list-dark.png'].forEach(function (name) {
+  ['phone-home-spent.png', 'phone-home-add-spending.png', 'phone-add-spending.png', 'phone-spending-list.png', 'phone-spending-light.png', 'phone-budget-over.png', 'phone-spending-list-dark.png', 'phone-spending-dark.png'].forEach(function (name) {
     var sz = pngSize(path.join(SHOTS, name));
     assert(sz.w === 390 && sz.h === 844, name + ' viewport ' + sz.w + 'x' + sz.h);
   });
