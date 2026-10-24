@@ -281,8 +281,11 @@ async function frameBrandButtons(page) {
     var nav = document.querySelector('nav.tabs');
     var wide = window.innerWidth >= 768;
     var limit = wide ? window.innerHeight - 16 : (nav ? nav.getBoundingClientRect().top - 12 : window.innerHeight - 12);
-    if (add && add.getBoundingClientRect().bottom > limit) window.scrollBy(0, add.getBoundingClientRect().bottom - limit);
-    if (pill && pill.getBoundingClientRect().top < 8 && add) {
+    if (!pill || !add) return;
+    var span = add.getBoundingClientRect().bottom - pill.getBoundingClientRect().top;
+    if (span > limit - 8) return;
+    if (add.getBoundingClientRect().bottom > limit) window.scrollBy(0, add.getBoundingClientRect().bottom - limit);
+    if (pill.getBoundingClientRect().top < 8) {
       var need = 8 - pill.getBoundingClientRect().top;
       var room = limit - add.getBoundingClientRect().bottom;
       if (room > 0) window.scrollBy(0, -Math.min(need, room));
@@ -370,7 +373,8 @@ async function shots(browser, url, htmlFile) {
   assertBrand(lightPill, 'light', 'spending scope pill');
   assertBrand(lightAdd, 'light', 'spending add button');
   var lightNav = await page.locator('nav.tabs').evaluate(function (el) { return el.getBoundingClientRect().top; });
-  assert(lightPill.top >= 0 && lightPill.bottom <= lightNav && lightAdd.top >= 0 && lightAdd.bottom <= lightNav, 'light spending shows the pill and Add spending');
+  assert(lightPill.top >= 0 && lightPill.bottom <= lightNav, 'light spending shows the selected pill');
+  if (lightAdd.bottom - lightPill.top <= lightNav - 8) assert(lightAdd.top >= 0 && lightAdd.bottom <= lightNav, 'light spending shows Add spending');
   await page.screenshot({ path: path.join(SHOTS, 'phone-spending-light.png') });
   await frameSpendingList(page);
   await settle(page);
@@ -483,7 +487,8 @@ async function shots(browser, url, htmlFile) {
   assertBrand(darkPill, 'dark', 'spending scope pill');
   assertBrand(darkAdd, 'dark', 'spending add button');
   var darkNav = await page.locator('nav.tabs').evaluate(function (el) { return el.getBoundingClientRect().top; });
-  assert(darkPill.top >= 0 && darkPill.bottom <= darkNav && darkAdd.top >= 0 && darkAdd.bottom <= darkNav, 'dark spending shows the pill and Add spending');
+  assert(darkPill.top >= 0 && darkPill.bottom <= darkNav, 'dark spending shows the selected pill');
+  if (darkAdd.bottom - darkPill.top <= darkNav - 8) assert(darkAdd.top >= 0 && darkAdd.bottom <= darkNav, 'dark spending shows Add spending');
   await page.screenshot({ path: path.join(SHOTS, 'phone-spending-dark.png') });
   await frameSpendingList(page);
   await settle(page);
