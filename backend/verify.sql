@@ -46,12 +46,43 @@ begin
     raise exception 'budget_items unique (id, household_id) is missing';
   end if;
 
-  foreach grants in array array['spend_entries_sync_idx','spend_entries_day_idx','spend_entries_item_idx']
+  foreach grants in array array[
+    'spend_entries_sync_idx','spend_entries_day_idx','spend_entries_item_idx',
+    'spend_entries_budget_item_fk_idx','spend_entries_owner_member_fk_idx','spend_entries_paid_by_member_fk_idx'
+  ]
   loop
     if to_regclass('public.' || grants) is null then
       raise exception 'missing index %', grants;
     end if;
   end loop;
+
+  if (select string_agg(a.attname, ',' order by u.ord)
+      from pg_index i
+      join pg_class c on c.oid = i.indexrelid
+      join lateral unnest(i.indkey::smallint[]) with ordinality as u(attnum, ord) on true
+      join pg_attribute a on a.attrelid = i.indrelid and a.attnum = u.attnum
+      where c.relname = 'spend_entries_budget_item_fk_idx' and i.indpred is null and i.indisvalid
+     ) is distinct from 'budget_item_id,household_id' then
+    raise exception 'spend_entries_budget_item_fk_idx does not cover (budget_item_id, household_id)';
+  end if;
+  if (select string_agg(a.attname, ',' order by u.ord)
+      from pg_index i
+      join pg_class c on c.oid = i.indexrelid
+      join lateral unnest(i.indkey::smallint[]) with ordinality as u(attnum, ord) on true
+      join pg_attribute a on a.attrelid = i.indrelid and a.attnum = u.attnum
+      where c.relname = 'spend_entries_owner_member_fk_idx' and i.indpred is null and i.indisvalid
+     ) is distinct from 'owner_member_id,household_id' then
+    raise exception 'spend_entries_owner_member_fk_idx does not cover (owner_member_id, household_id)';
+  end if;
+  if (select string_agg(a.attname, ',' order by u.ord)
+      from pg_index i
+      join pg_class c on c.oid = i.indexrelid
+      join lateral unnest(i.indkey::smallint[]) with ordinality as u(attnum, ord) on true
+      join pg_attribute a on a.attrelid = i.indrelid and a.attnum = u.attnum
+      where c.relname = 'spend_entries_paid_by_member_fk_idx' and i.indpred is null and i.indisvalid
+     ) is distinct from 'paid_by_member_id,household_id' then
+    raise exception 'spend_entries_paid_by_member_fk_idx does not cover (paid_by_member_id, household_id)';
+  end if;
 
   if not exists (
     select 1 from pg_trigger
@@ -75,9 +106,29 @@ begin
   select count(*) into n
   from pg_proc p
   join pg_namespace ns on ns.oid = p.pronamespace
-  where ns.nspname = 'public' and p.proname = 'delete_my_data' and p.prosecdef;
+  where ns.nspname = 'public' and p.proname = 'delete_my_data' and p.prosecdef
+    and exists (select 1 from unnest(p.proconfig) cfg where cfg in ('search_path=', 'search_path=""'))
+    and p.prosrc like '%duo.skip_stamp%'
+    and p.prosrc !~* 'disable[[:space:]]+trigger'
+    and p.prosrc !~* 'enable[[:space:]]+trigger'
+    and p.prosrc !~* 'alter[[:space:]]+table';
   if n <> 1 then
-    raise exception 'delete_my_data is missing or is not security definer';
+    raise exception 'delete_my_data must be security definer, pin search_path, set duo.skip_stamp, and not alter triggers';
+  end if;
+
+  if not exists (
+    select 1 from pg_proc p
+    join pg_namespace ns on ns.oid = p.pronamespace
+    where ns.nspname = 'public' and p.proname = 'tg_sync_row'
+      and exists (select 1 from unnest(p.proconfig) cfg where cfg in ('search_path=', 'search_path=""'))
+      and p.prosrc like '%duo.skip_stamp%'
+      and position('new.updated_by := auth.uid();' in p.prosrc) > 0
+  ) then
+    raise exception 'tg_sync_row must keep the normal stamp and honour duo.skip_stamp';
+  end if;
+
+  if not has_function_privilege('authenticated', 'public.delete_my_data()', 'execute') then
+    raise exception 'authenticated cannot execute delete_my_data';
   end if;
 
   if exists (

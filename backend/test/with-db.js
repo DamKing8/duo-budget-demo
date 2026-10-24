@@ -25,6 +25,8 @@ async function withDb(fn) {
     var root = path.join(__dirname, '..');
     await c.query(fs.readFileSync(path.join(root, 'test', 'baseline.sql'), 'utf8'));
     await c.query(fs.readFileSync(path.join(root, 'migrations', '20261024_spend_entries.sql'), 'utf8'));
+    await c.query(fs.readFileSync(path.join(root, 'migrations', '20261025_delete_my_data_scoped.sql'), 'utf8'));
+    await c.query(fs.readFileSync(path.join(root, 'migrations', '20261025_spend_entries_fk_indexes.sql'), 'utf8'));
     if (process.env.DUO_STUB_EXPOSED === '1') {
       await c.query('grant usage on schema public to anon');
       await c.query('revoke all on table public.spend_entries from anon');
@@ -54,4 +56,9 @@ function fail(p) {
   return p.then(function () { throw new Error('expected the statement to fail'); }, function (e) { return e; });
 }
 
-module.exports = { withDb: withDb, asRole: asRole, fail: fail };
+function openClient(database) {
+  var c = new Client(config(database));
+  return c.connect().then(function () { return c; });
+}
+
+module.exports = { withDb: withDb, asRole: asRole, fail: fail, openClient: openClient };
