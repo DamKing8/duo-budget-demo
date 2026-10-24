@@ -130,7 +130,16 @@ async function personal(browser, url) {
   await page.click('.line-pick >> text=Groceries');
   await page.check('[data-test="sp-refund"]');
   await page.click('[data-test="sp-save"]');
-  await page.waitForTimeout(200);
+  await page.waitForSelector('[data-test="spend-refund"]');
+  var refundShown = await page.locator('[data-test="spend-refund"]').first().innerText();
+  assert(refundShown.indexOf('+$') >= 0 && refundShown.indexOf('Refund') >= 0 && refundShown.indexOf('-') < 0, 'refund shows as a positive amount: ' + refundShown);
+  var refundTone = await page.locator('[data-test="spend-refund"]').first().evaluate(function (el) {
+    var c = getComputedStyle(el).color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    var stored = window.__duo.state().spends.filter(function (s) { return s.amount < 0; })[0];
+    return { r: c ? +c[1] : -1, g: c ? +c[2] : -1, stored: stored ? stored.amount : null };
+  });
+  assert(refundTone.stored < 0, 'stored refund stays negative: ' + refundTone.stored);
+  assert(refundTone.g > refundTone.r && refundTone.g > 60, 'refund uses the positive colour ' + JSON.stringify(refundTone));
 
   await page.click('nav.tabs button[data-v="budget"]');
   var maths = await page.evaluate(function () {
@@ -224,6 +233,25 @@ async function personal(browser, url) {
   await opened.context.close();
 }
 
+async function frameSpendingList(page) {
+  await page.evaluate(function () {
+    window.scrollTo(0, 0);
+    if (window.innerWidth >= 768) return;
+    var row = document.querySelector('[data-test="spend-refund"]');
+    var head = document.querySelector('.sp-head');
+    var nav = document.querySelector('nav.tabs');
+    if (!row || !nav) return;
+    var limit = nav.getBoundingClientRect().top - 12;
+    var rect = row.getBoundingClientRect();
+    if (rect.bottom > limit) window.scrollBy(0, rect.bottom - limit);
+    if (head && head.getBoundingClientRect().top < 4) {
+      var overflow = 4 - head.getBoundingClientRect().top;
+      var room = limit - row.getBoundingClientRect().bottom;
+      if (room > 0) window.scrollBy(0, -Math.min(overflow, room));
+    }
+  });
+}
+
 async function pinAboveNav(page, selector) {
   await page.evaluate(function (sel) {
     var el = document.querySelector(sel);
@@ -273,11 +301,42 @@ async function shots(browser, url, htmlFile) {
 
   await page.click('[data-test="sheet-close"]');
   await page.click('[data-test="spent-total"]');
-  await page.waitForSelector('[data-test="spent-rows"]');
-  await page.evaluate(function () { window.scrollTo(0, 0); });
+  await page.waitForSelector('[data-test="spend-refund"]');
+  await frameSpendingList(page);
   await settle(page);
-  var listOp = await page.locator('#v-spent').evaluate(function (el) { return getComputedStyle(el).opacity; });
-  assert(listOp === '1', 'spending list opacity ' + listOp);
+  var listCheck = await page.evaluate(function () {
+    function box(sel) { var r = document.querySelector(sel).getBoundingClientRect(); return { top: r.top, bottom: r.bottom, h: r.height, left: r.left, right: r.right }; }
+    var navTop = document.querySelector('nav.tabs').getBoundingClientRect().top;
+    var back = box('#spentBack');
+    var prev = box('#spentPrev');
+    var next = box('#spentNext');
+    var title = box('#spentTitle');
+    var when = box('#spentWhen');
+    var pill = box('#spentNav');
+    var refund = box('[data-test="spend-refund"]');
+    var tone = getComputedStyle(document.querySelector('[data-test="spend-refund"]')).color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    var sec = document.querySelector('#v-spent').getBoundingClientRect();
+    return {
+      op: getComputedStyle(document.querySelector('#v-spent')).opacity,
+      xbtns: document.querySelectorAll('#v-spent .xbtn').length,
+      prevLabel: document.querySelector('#spentPrev').getAttribute('aria-label'),
+      nextLabel: document.querySelector('#spentNext').getAttribute('aria-label'),
+      back: back, prev: prev, next: next, title: title, when: when, pill: pill, refund: refund, navTop: navTop,
+      text: document.querySelector('[data-test="spend-refund"]').innerText,
+      g: tone ? +tone[2] : 0, r: tone ? +tone[1] : 0,
+      secMid: (sec.left + sec.right) / 2, pillMid: (pill.left + pill.right) / 2
+    };
+  });
+  assert(listCheck.op === '1', 'spending list opacity ' + listCheck.op);
+  assert(listCheck.xbtns === 1, 'one back button on spending, got ' + listCheck.xbtns);
+  assert(listCheck.prevLabel === 'Previous pay cycle' && listCheck.nextLabel === 'Next pay cycle', 'cycle aria labels');
+  assert(listCheck.prev.h < listCheck.back.h - 4, 'cycle chevrons are smaller than the back button');
+  assert(listCheck.back.top < listCheck.title.bottom && listCheck.prev.top >= listCheck.title.bottom - 4, 'period switcher sits below the title');
+  assert(listCheck.prev.right <= listCheck.when.left + 2 && listCheck.next.left >= listCheck.when.right - 2, 'chevrons flank the period');
+  assert(Math.abs(listCheck.pillMid - listCheck.secMid) < 28, 'period row is centred');
+  assert(listCheck.title.top >= 0 && listCheck.refund.bottom <= listCheck.navTop, 'header and refund row are in view');
+  assert(listCheck.text.indexOf('+$') >= 0 && listCheck.text.indexOf('Refund') >= 0 && listCheck.text.indexOf('-') < 0, 'demo refund text ' + listCheck.text);
+  assert(listCheck.g > listCheck.r, 'demo refund is not rose');
   await page.screenshot({ path: path.join(SHOTS, 'phone-spending-list.png') });
 
   await page.click('[data-test="spent-back"]');
@@ -314,25 +373,52 @@ async function shots(browser, url, htmlFile) {
   assert(ipadOp === '1', 'iPad home opacity ' + ipadOp);
   await page.screenshot({ path: path.join(SHOTS, 'ipad-home.png') });
   await page.click('[data-test="spent-total"]');
-  await page.waitForSelector('[data-test="spent-rows"]');
-  await page.evaluate(function () { window.scrollTo(0, 0); });
+  await page.waitForSelector('[data-test="spend-refund"]');
+  await frameSpendingList(page);
   await settle(page);
   var ipadStack = await page.evaluate(function () {
-    function box(sel) { var r = document.querySelector(sel).getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width }; }
-    return { op: getComputedStyle(document.querySelector('#v-spent')).opacity, head: box('.sp-head'), scope: box('#spentScope'), list: box('#spendList') };
+    function box(sel) { var r = document.querySelector(sel).getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, bottom: r.bottom, h: r.height }; }
+    var sec = document.querySelector('#v-spent').getBoundingClientRect();
+    var pill = document.querySelector('#spentNav').getBoundingClientRect();
+    var tone = getComputedStyle(document.querySelector('[data-test="spend-refund"]')).color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    return {
+      op: getComputedStyle(document.querySelector('#v-spent')).opacity,
+      head: box('.sp-head'), scope: box('#spentScope'), list: box('#spendList'),
+      refund: box('[data-test="spend-refund"]'), back: box('#spentBack'), prev: box('#spentPrev'),
+      xbtns: document.querySelectorAll('#v-spent .xbtn').length,
+      pillMid: (pill.left + pill.right) / 2, secMid: (sec.left + sec.right) / 2,
+      g: tone ? +tone[2] : 0, r: tone ? +tone[1] : 0, vh: window.innerHeight
+    };
   });
   assert(ipadStack.op === '1', 'iPad spending opacity');
   assert(ipadStack.head.y < ipadStack.scope.y && ipadStack.scope.y < ipadStack.list.y, 'iPad spending order');
   assert(Math.abs(ipadStack.list.x - ipadStack.head.x) < 24, 'iPad list is not floated to the side');
+  assert(ipadStack.xbtns === 1 && ipadStack.prev.h < ipadStack.back.h - 4, 'iPad has one back button and smaller cycle chevrons');
+  assert(Math.abs(ipadStack.pillMid - ipadStack.secMid) < 28, 'iPad period row is centred');
+  assert(ipadStack.head.y >= 0 && ipadStack.refund.bottom <= ipadStack.vh, 'iPad header and refund are in view');
+  assert(ipadStack.g > ipadStack.r, 'iPad refund is not rose');
   await page.screenshot({ path: path.join(SHOTS, 'ipad-spending.png') });
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.evaluate(function () { window.__duoSetTheme('dark'); window.scrollTo(0, 0); });
+  await page.evaluate(function () { window.__duoSetTheme('dark'); });
+  await frameSpendingList(page);
   await settle(page);
   var dark = await page.evaluate(function () {
-    return { theme: document.documentElement.getAttribute('data-theme'), op: getComputedStyle(document.querySelector('#v-spent')).opacity };
+    var tone = getComputedStyle(document.querySelector('[data-test="spend-refund"]')).color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    var navTop = document.querySelector('nav.tabs').getBoundingClientRect().top;
+    var head = document.querySelector('.sp-head').getBoundingClientRect();
+    var refund = document.querySelector('[data-test="spend-refund"]').getBoundingClientRect();
+    return {
+      theme: document.documentElement.getAttribute('data-theme'),
+      op: getComputedStyle(document.querySelector('#v-spent')).opacity,
+      g: tone ? +tone[2] : 0, r: tone ? +tone[1] : 0,
+      headTop: head.top, refundBottom: refund.bottom, navTop: navTop,
+      text: document.querySelector('[data-test="spend-refund"]').innerText
+    };
   });
   assert(dark.theme === 'dark' && dark.op === '1', 'dark spending list ' + JSON.stringify(dark));
+  assert(dark.g > dark.r && dark.text.indexOf('+$') >= 0 && dark.text.indexOf('-') < 0, 'dark refund is positive teal ' + JSON.stringify(dark));
+  assert(dark.headTop >= 0 && dark.refundBottom <= dark.navTop, 'dark header and refund are in view');
   await page.screenshot({ path: path.join(SHOTS, 'phone-spending-list-dark.png') });
 
   ['phone-home-spent.png', 'phone-add-spending.png', 'phone-spending-list.png', 'phone-budget-over.png', 'phone-spending-list-dark.png'].forEach(function (name) {

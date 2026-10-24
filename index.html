@@ -970,8 +970,14 @@ nav.tabs button.sb-add{display:none}
 .dayhead{font-size:13px;font-weight:700;color:var(--muted);padding:12px 4px 6px}
 .item[data-spend]{display:block;padding:0;position:relative;overflow:hidden;touch-action:pan-y;-webkit-touch-callout:none}
 .item[data-spend] .swipe-front{cursor:pointer}
-.amt-ro{min-width:92px;text-align:right;font-weight:800;font-variant-numeric:tabular-nums;font-size:15px}
-.amt-ro.neg{color:var(--rose)}
+.amt-ro{min-width:92px;text-align:right;font-weight:800;font-variant-numeric:tabular-nums;font-size:15px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center}
+.amt-ro.refund{color:var(--mint)}
+.amt-ro.refund small{display:block;margin-top:1px;font-size:11px;font-weight:700;letter-spacing:.02em;color:var(--mint)}
+.sp-period{display:flex;align-items:center;justify-content:center;gap:2px;align-self:center;width:max-content;max-width:100%;margin:2px auto 14px;padding:3px;background:color-mix(in srgb,var(--text) 6%,var(--card));border:1px solid var(--line);border-radius:999px}
+.sp-period b{font-size:14px;font-weight:700;text-align:center;color:var(--text);padding:0 8px;line-height:1.25}
+.sp-period .sp-chev{width:32px;height:32px;min-height:32px;flex:none;border:0;border-radius:999px;background:transparent;color:var(--cyan);padding:0;display:grid;place-items:center;cursor:pointer}
+.sp-period .sp-chev svg{width:16px;height:16px;display:block}
+.sp-period .sp-chev[disabled]{opacity:.35;cursor:default}
 .nm .was{color:var(--dim)}
 .sp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
 .sp-toggle{display:flex;align-items:center;gap:8px;font-weight:700;min-height:44px}
@@ -1152,7 +1158,7 @@ button.otp-resend:disabled{opacity:.55}
   <!-- SPENDING -->
   <section class="view" id="v-spent" data-layout-tab="spent" aria-labelledby="spentTitle">
     <div class="tr-head sp-head"><button class="xbtn" id="spentBack" type="button" aria-label="Back" data-test="spent-back">‹</button><h2 class="page" id="spentTitle">Spending</h2></div>
-    <div class="tr-pick" id="spentNav"><button class="xbtn" id="spentPrev" type="button" aria-label="Previous pay cycle" data-test="spent-prev">‹</button><b id="spentWhen" data-test="spent-when">This fortnight</b><button class="xbtn" id="spentNext" type="button" aria-label="Next pay cycle" data-test="spent-next">›</button></div>
+    <div class="sp-period" id="spentNav" role="group" aria-label="Pay cycle"><button type="button" class="sp-chev" id="spentPrev" aria-label="Previous pay cycle" data-test="spent-prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg></button><b id="spentWhen" data-test="spent-when">This fortnight</b><button type="button" class="sp-chev" id="spentNext" aria-label="Next pay cycle" data-test="spent-next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6l6 6-6 6"/></svg></button></div>
     <div class="card" id="spentSummary" data-test="spent-summary"></div>
     <div class="seg tr-scope" id="spentScope" role="group" aria-label="Whose spending"></div>
     <div id="spendList" data-test="spend-list"></div>
@@ -1963,8 +1969,10 @@ function spendRowHtml(e){
   var line=e.itemId?(S.items||[]).filter(function(i){return i.id===e.itemId;})[0]:null;
   var name=!e.itemId?'Something else':(line?line.name:(e.lineName||'Something else'));
   var was=!!(e.itemId&&!line);
-  var bits=[];if(e.amount<0)bits.push('Refund');if(e.note)bits.push(e.note);if(e.paidBy&&S.names[e.paidBy])bits.push('Added by '+S.names[e.paidBy]);
-  return '<div class="item" data-spend="1" data-id="'+esc(e.id)+'"><div class="swipe-actions"><button type="button" data-act="swipe-del">Delete</button></div><div class="swipe-front"><div class="nm"><b class="'+(was?'was':'')+'">'+esc(name)+'</b>'+(bits.length?'<small>'+esc(bits.join(' · '))+'</small>':'')+'</div><span class="owner '+esc(e.owner)+'">'+esc(whoseLabel(e.owner))+'</span><div class="amt-ro'+(e.amount<0?' neg':'')+'">'+money(e.amount)+'</div></div></div>';
+  var refund=e.amount<0;
+  var bits=[];if(e.note)bits.push(e.note);if(e.paidBy&&S.names[e.paidBy])bits.push('Added by '+S.names[e.paidBy]);
+  var amt=refund?'<div class="amt-ro refund" data-test="spend-refund"><span>+'+money(Math.abs(e.amount))+'</span><small>Refund</small></div>':'<div class="amt-ro" data-test="spend-amt">'+money(e.amount)+'</div>';
+  return '<div class="item" data-spend="1" data-id="'+esc(e.id)+'"><div class="swipe-actions"><button type="button" data-act="swipe-del">Delete</button></div><div class="swipe-front"><div class="nm"><b class="'+(was?'was':'')+'">'+esc(name)+'</b>'+(bits.length?'<small>'+esc(bits.join(' · '))+'</small>':'')+'</div><span class="owner '+esc(e.owner)+'">'+esc(whoseLabel(e.owner))+'</span>'+amt+'</div></div>';
 }
 function renderSpent(){
   var el=$('spendList');if(!el)return;
