@@ -46,17 +46,56 @@ async function watch(page, bag) {
   });
 }
 
+function openPage(browser, width, height) {
+  return browser.newContext({
+    locale: 'en-AU',
+    viewport: { width: width, height: height },
+    deviceScaleFactor: 1,
+    reducedMotion: 'reduce'
+  }).then(function (context) {
+    return context.newPage().then(function (page) {
+      page.setDefaultTimeout(15000);
+      return { context: context, page: page };
+    });
+  });
+}
+
+async function settle(page) {
+  await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' });
+  await page.evaluate(function () {
+    return new Promise(function (resolve) { requestAnimationFrame(function () { requestAnimationFrame(resolve); }); });
+  });
+}
+
+function pngSize(file) {
+  var buf = fs.readFileSync(file);
+  return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+}
+
 async function personal(browser, url) {
   var bag = { errors: [], external: [] };
-  var page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
-  page.setDefaultTimeout(15000);
+  var opened = await openPage(browser, 390, 844);
+  var page = opened.page;
   await watch(page, bag);
   await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await settle(page);
   await page.waitForSelector('[data-test="spent-card"]');
   assert((await page.locator('#spentCardLbl').innerText()).indexOf('Spent this') === 0, 'home card title');
+  var phoneTabs = await page.locator('nav.tabs .in > button').evaluateAll(function (els) {
+    return els.filter(function (el) { return getComputedStyle(el).display !== 'none'; }).length;
+  });
+  assert(phoneTabs === 5, 'phone keeps 5 tabs, got ' + phoneTabs);
+  assert((await page.locator('#sbAddSpend').evaluate(function (el) { return getComputedStyle(el).display; })) === 'none', 'add spending stays off the phone tab bar');
 
   await page.click('[data-test="add-spending"]');
   await page.waitForSelector('[data-test="sp-amt"]');
+  var dateShown = await page.locator('[data-test="sp-date-show"]').innerText();
+  var dateIso = await page.locator('[data-test="sp-date"]').inputValue();
+  var dp = dateIso.split('-');
+  var au = dp[2] + '/' + dp[1] + '/' + dp[0];
+  var us = dp[1] + '/' + dp[2] + '/' + dp[0];
+  assert(dateShown.indexOf(au) >= 0, 'date shows en-AU ' + au + ' got ' + dateShown);
+  if (dp[1] !== dp[2]) assert(dateShown.indexOf(us) < 0, 'date is not US ' + dateShown);
   await page.fill('[data-test="sp-amt"]', '45.20');
   await page.click('[data-test="more-lines"]');
   await page.click('.line-pick >> text=Groceries');
@@ -149,21 +188,32 @@ async function personal(browser, url) {
   });
   assert(migrated.same && migrated.v === 4 && migrated.n === 0, 'v3 migration in the page');
 
-  await page.setViewportSize({ width: 768, height: 1024 });
-  await page.click('nav.tabs button[data-v="dash"]');
-  var side = await page.locator('#sbAddSpend').evaluate(function (el) { return getComputedStyle(el).display; });
-  assert(side === 'flex', 'sidebar add spending at 768: ' + side);
-  await page.click('[data-test="spent-total"]');
-  var at768 = await page.locator('#v-spent').evaluate(function (el) { return getComputedStyle(el).display; });
-  assert(at768 === 'block', 'spending list is one column at 768: ' + at768);
-
-  await page.setViewportSize({ width: 1080, height: 810 });
-  var at1080 = await page.locator('#v-spent').evaluate(function (el) { return getComputedStyle(el).display; });
-  assert(at1080 === 'grid', 'spending list is two columns at 1080: ' + at1080);
-
-  await page.setViewportSize({ width: 1376, height: 1032 });
-  var atIpad = await page.locator('#v-spent').evaluate(function (el) { return getComputedStyle(el).display; });
-  assert(atIpad === 'grid', 'spending list is two columns on iPad landscape: ' + atIpad);
+  var widths = [{ w: 768, h: 1024, name: '768' }, { w: 1080, h: 810, name: '1080' }, { w: 1376, h: 1032, name: '1376' }];
+  for (var i = 0; i < widths.length; i++) {
+    var sz = widths[i];
+    await page.setViewportSize({ width: sz.w, height: sz.h });
+    await page.click('nav.tabs button[data-v="dash"]');
+    var cardBox = await page.locator('#spentCard').boundingBox();
+    assert(cardBox && cardBox.y >= 0 && cardBox.y + cardBox.height <= sz.h + 1, sz.name + ' home spent card in the grid ' + JSON.stringify(cardBox));
+    if (sz.w === 768) {
+      var side = await page.locator('#sbAddSpend').evaluate(function (el) {
+        var s = getComputedStyle(el);
+        return { display: s.display, bg: s.backgroundImage, icon: !!el.querySelector('svg') };
+      });
+      assert(side.display === 'flex' && side.icon && side.bg.indexOf('gradient') >= 0, 'sidebar add spending is a button at 768: ' + JSON.stringify(side));
+    }
+    await page.click('[data-test="spent-total"]');
+    await page.waitForSelector('[data-test="spend-list"]');
+    var stack = await page.evaluate(function () {
+      function box(sel) { var r = document.querySelector(sel).getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; }
+      var display = getComputedStyle(document.querySelector('#v-spent')).display;
+      return { display: display, head: box('.sp-head'), sum: box('#spentSummary'), scope: box('#spentScope'), list: box('#spendList'), vw: window.innerWidth };
+    });
+    assert(stack.display === 'flex', sz.name + ' spending display ' + stack.display);
+    assert(stack.head.y < stack.sum.y && stack.sum.y < stack.scope.y && stack.scope.y < stack.list.y, sz.name + ' spending stacks header, summary, scope, list');
+    assert(Math.abs(stack.list.x - stack.head.x) < 24, sz.name + ' list shares the header edge');
+    assert(stack.list.w > stack.vw * 0.45, sz.name + ' list is not a narrow side column ' + stack.list.w);
+  }
   await page.evaluate(function () { window.__duoSetTheme('dark'); });
   assert((await page.evaluate(function () { return document.documentElement.getAttribute('data-theme'); })) === 'dark', 'dark theme');
   await page.evaluate(function () { window.__duoSetTheme('light'); });
@@ -171,44 +221,130 @@ async function personal(browser, url) {
 
   assert(bag.external.length === 0, 'personal build made a network call: ' + bag.external.join(' '));
   assert(bag.errors.length === 0, 'console errors: ' + bag.errors.join(' | '));
-  await page.close();
+  await opened.context.close();
+}
+
+async function pinAboveNav(page, selector) {
+  await page.evaluate(function (sel) {
+    var el = document.querySelector(sel);
+    var nav = document.querySelector('nav.tabs');
+    var navTop = nav.getBoundingClientRect().top;
+    var rect = el.getBoundingClientRect();
+    if (rect.bottom > navTop - 12) window.scrollBy(0, rect.bottom - (navTop - 12));
+    rect = el.getBoundingClientRect();
+    if (rect.top < 8) window.scrollBy(0, rect.top - 8);
+  }, selector);
 }
 
 async function shots(browser, url, htmlFile) {
   shotGuard.assertDemoHtml(htmlFile);
   var bag = { errors: [], external: [] };
-  var page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
-  page.setDefaultTimeout(15000);
+  var opened = await openPage(browser, 390, 844);
+  var page = opened.page;
   await watch(page, bag);
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await page.evaluate(function () { window.__duoSetTheme('light'); });
+  await settle(page);
   await page.waitForSelector('[data-test="spent-over-line"]');
   fs.mkdirSync(SHOTS, { recursive: true });
-  await page.locator('#spentCard').scrollIntoViewIfNeeded();
   shotGuard.assertDemoHtml(htmlFile);
-  await page.locator('#spentCard').screenshot({ path: path.join(SHOTS, 'phone-home-spent.png') });
+
+  await pinAboveNav(page, '#spentCard');
+  await settle(page);
+  var home = await page.locator('#spentCard').boundingBox();
+  var navTop = await page.locator('nav.tabs').evaluate(function (el) { return el.getBoundingClientRect().top; });
+  assert(home.y >= 0 && home.y + home.height <= navTop + 1, 'home card sits above the nav ' + JSON.stringify(home) + ' nav ' + navTop);
+  await page.screenshot({ path: path.join(SHOTS, 'phone-home-spent.png') });
+
   await page.click('[data-test="add-spending"]');
-  await page.waitForSelector('[data-test="sp-amt"]');
+  await page.waitForSelector('[data-test="sp-date-show"]');
+  await settle(page);
+  var sheet = await page.locator('#sheet').evaluate(function (el) {
+    var s = getComputedStyle(el);
+    var save = document.querySelector('[data-test="sp-save"]').getBoundingClientRect();
+    return { op: s.opacity, bg: s.backgroundColor, saveTop: save.top, saveBottom: save.bottom, vh: window.innerHeight, date: document.querySelector('[data-test="sp-date-show"]').textContent, iso: document.querySelector('[data-test="sp-date"]').value };
+  });
+  var parts = sheet.iso.split('-');
+  assert(sheet.op === '1', 'sheet opacity ' + sheet.op);
+  assert(sheet.bg.indexOf('rgba') !== 0 || /, ?1\)$/.test(sheet.bg), 'sheet background ' + sheet.bg);
+  assert(sheet.date.indexOf(parts[2] + '/' + parts[1] + '/' + parts[0]) >= 0, 'shot date en-AU ' + sheet.date);
+  assert(sheet.saveTop >= 0 && sheet.saveBottom <= sheet.vh + 1, 'save button in the viewport ' + JSON.stringify(sheet));
   await page.screenshot({ path: path.join(SHOTS, 'phone-add-spending.png') });
+
   await page.click('[data-test="sheet-close"]');
   await page.click('[data-test="spent-total"]');
   await page.waitForSelector('[data-test="spent-rows"]');
+  await page.evaluate(function () { window.scrollTo(0, 0); });
+  await settle(page);
+  var listOp = await page.locator('#v-spent').evaluate(function (el) { return getComputedStyle(el).opacity; });
+  assert(listOp === '1', 'spending list opacity ' + listOp);
   await page.screenshot({ path: path.join(SHOTS, 'phone-spending-list.png') });
+
   await page.click('[data-test="spent-back"]');
   await page.click('nav.tabs button[data-v="budget"]');
-  var over = await page.locator('[data-cat="expenses"] [data-test="line-spent"].over').first().innerText();
+  await page.waitForSelector('#groups .group[data-cat="expenses"] .ghead');
+  var over = await page.locator('#groups .group[data-cat="expenses"] [data-test="line-spent"].over').first().innerText();
   assert(over.indexOf('Running over by') >= 0, 'budget running over: ' + over);
-  await page.locator('#groups .group[data-cat="expenses"]').screenshot({ path: path.join(SHOTS, 'phone-budget-over.png') });
+  await page.evaluate(function () {
+    var head = document.querySelector('#groups .group[data-cat="expenses"] .ghead');
+    var strip = document.querySelector('#v-budget .summary-strip');
+    var stripH = strip ? strip.getBoundingClientRect().height : 0;
+    var top = head.getBoundingClientRect().top + window.scrollY - stripH - 8;
+    window.scrollTo(0, Math.max(0, top));
+  });
+  await settle(page);
+  var budgetFrame = await page.evaluate(function () {
+    function box(sel) { var r = document.querySelector(sel).getBoundingClientRect(); return { top: r.top, bottom: r.bottom }; }
+    var navTop = document.querySelector('nav.tabs').getBoundingClientRect().top;
+    var head = box('#groups .group[data-cat="expenses"] .ghead');
+    var line = box('#groups .group[data-cat="expenses"] [data-test="line-spent"].over');
+    return { navTop: navTop, head: head, line: line, vh: window.innerHeight };
+  });
+  assert(budgetFrame.head.top >= 0 && budgetFrame.head.bottom < budgetFrame.navTop, 'expenses header in the viewport');
+  assert(budgetFrame.line.top >= 0 && budgetFrame.line.bottom < budgetFrame.navTop, 'running over line in the viewport');
+  await page.screenshot({ path: path.join(SHOTS, 'phone-budget-over.png') });
 
   await page.setViewportSize({ width: 1376, height: 1032 });
   await page.click('nav.tabs button[data-v="dash"]');
-  await page.locator('#spentCard').scrollIntoViewIfNeeded();
+  await page.evaluate(function () { window.scrollTo(0, 0); });
+  await settle(page);
+  var ipadCard = await page.locator('#spentCard').boundingBox();
+  assert(ipadCard && ipadCard.y >= 0 && ipadCard.y + ipadCard.height <= 1032, 'iPad home shows the spent card ' + JSON.stringify(ipadCard));
+  var ipadOp = await page.locator('#v-dash').evaluate(function (el) { return getComputedStyle(el).opacity; });
+  assert(ipadOp === '1', 'iPad home opacity ' + ipadOp);
   await page.screenshot({ path: path.join(SHOTS, 'ipad-home.png') });
   await page.click('[data-test="spent-total"]');
   await page.waitForSelector('[data-test="spent-rows"]');
+  await page.evaluate(function () { window.scrollTo(0, 0); });
+  await settle(page);
+  var ipadStack = await page.evaluate(function () {
+    function box(sel) { var r = document.querySelector(sel).getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width }; }
+    return { op: getComputedStyle(document.querySelector('#v-spent')).opacity, head: box('.sp-head'), scope: box('#spentScope'), list: box('#spendList') };
+  });
+  assert(ipadStack.op === '1', 'iPad spending opacity');
+  assert(ipadStack.head.y < ipadStack.scope.y && ipadStack.scope.y < ipadStack.list.y, 'iPad spending order');
+  assert(Math.abs(ipadStack.list.x - ipadStack.head.x) < 24, 'iPad list is not floated to the side');
   await page.screenshot({ path: path.join(SHOTS, 'ipad-spending.png') });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(function () { window.__duoSetTheme('dark'); window.scrollTo(0, 0); });
+  await settle(page);
+  var dark = await page.evaluate(function () {
+    return { theme: document.documentElement.getAttribute('data-theme'), op: getComputedStyle(document.querySelector('#v-spent')).opacity };
+  });
+  assert(dark.theme === 'dark' && dark.op === '1', 'dark spending list ' + JSON.stringify(dark));
+  await page.screenshot({ path: path.join(SHOTS, 'phone-spending-list-dark.png') });
+
+  ['phone-home-spent.png', 'phone-add-spending.png', 'phone-spending-list.png', 'phone-budget-over.png', 'phone-spending-list-dark.png'].forEach(function (name) {
+    var sz = pngSize(path.join(SHOTS, name));
+    assert(sz.w === 390 && sz.h === 844, name + ' viewport ' + sz.w + 'x' + sz.h);
+  });
+  ['ipad-home.png', 'ipad-spending.png'].forEach(function (name) {
+    var sz = pngSize(path.join(SHOTS, name));
+    assert(sz.w === 1376 && sz.h === 1032, name + ' viewport ' + sz.w + 'x' + sz.h);
+  });
   assert(bag.errors.length === 0, 'demo-data console errors: ' + bag.errors.join(' | '));
-  await page.close();
+  await opened.context.close();
 }
 
 async function main() {
