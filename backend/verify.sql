@@ -107,7 +107,7 @@ begin
   from pg_proc p
   join pg_namespace ns on ns.oid = p.pronamespace
   where ns.nspname = 'public' and p.proname = 'delete_my_data' and p.prosecdef
-    and exists (select 1 from unnest(p.proconfig) cfg where cfg = 'search_path=')
+    and exists (select 1 from unnest(p.proconfig) cfg where cfg in ('search_path=', 'search_path=""'))
     and p.prosrc like '%duo.skip_stamp%'
     and p.prosrc !~* 'disable[[:space:]]+trigger'
     and p.prosrc !~* 'enable[[:space:]]+trigger'
@@ -120,7 +120,7 @@ begin
     select 1 from pg_proc p
     join pg_namespace ns on ns.oid = p.pronamespace
     where ns.nspname = 'public' and p.proname = 'tg_sync_row'
-      and exists (select 1 from unnest(p.proconfig) cfg where cfg = 'search_path=')
+      and exists (select 1 from unnest(p.proconfig) cfg where cfg in ('search_path=', 'search_path=""'))
       and p.prosrc like '%duo.skip_stamp%'
       and position('new.updated_by := auth.uid();' in p.prosrc) > 0
   ) then
