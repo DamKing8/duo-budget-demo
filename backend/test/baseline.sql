@@ -23,6 +23,9 @@ do $$ begin
 end $$;
 
 grant usage on schema public to authenticated;
+-- Supabase lets authenticated call auth.uid(). Without this, only the session that
+-- first planned tg_sync_row (as the table owner) can stamp updated_by.
+grant usage on schema auth to authenticated;
 
 create or replace function public.tg_sync_row()
 returns trigger
