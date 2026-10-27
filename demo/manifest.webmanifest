@@ -47,7 +47,7 @@
     {
       "name": "Add expense",
       "short_name": "Add",
-      "description": "Add an expense by voice or by hand",
+      "description": "Add an expense",
       "url": "/demo/#add-expense",
       "icons": [
         {
