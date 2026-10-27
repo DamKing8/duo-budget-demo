@@ -963,6 +963,7 @@ input[type="date"].field{width:100%;max-width:100%;min-width:0;box-sizing:border
 .email-note{color:var(--muted);font-size:14px;line-height:1.45}
 button.otp-resend:disabled{opacity:.55}
 .fx-result{margin-top:12px;font-size:22px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+.fx-result.demo-aud{font-size:14px;font-weight:650;letter-spacing:0;line-height:1.4}
 .fx-result small{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-top:4px}
 .voice-parsed{background:rgba(14,116,144,.08);border:1px solid rgba(14,116,144,.28);border-radius:14px;padding:12px 14px;margin-top:12px;font-size:14px;line-height:1.45}
 .mic-btn{display:flex;align-items:center;justify-content:center;gap:8px}
@@ -1010,6 +1011,65 @@ button.otp-resend:disabled{opacity:.55}
 .seg>.demo-wrap{display:flex;min-width:0}
 .seg>.demo-wrap>button{flex:1;width:100%}
 .demo-off{opacity:.45;cursor:not-allowed}
+/* Locked fields: explicit neutral grey. WebKit ignores color on disabled controls and keeps the cream field fill unless -webkit-text-fill-color, opacity and background are set. */
+html[data-theme="light"] input.demo-off,
+html[data-theme="light"] select.demo-off,
+html[data-theme="light"] textarea.demo-off,
+html[data-theme="light"] input.demo-off:focus,
+html[data-theme="light"] select.demo-off:focus,
+html[data-theme="light"] textarea.demo-off:focus,
+html[data-theme="light"] #syncCard input.field.demo-off,
+html[data-theme="light"] #syncCard input.field.demo-off:focus,
+html[data-theme="light"] #syncCard input.field.demo-off:-webkit-autofill,
+html[data-theme="light"] #syncCard input.field.demo-off:-webkit-autofill:focus{
+  opacity:1 !important;
+  background-color:#E4E4E7 !important;
+  background-image:none !important;
+  color:#71717A !important;
+  -webkit-text-fill-color:#71717A !important;
+  -webkit-box-shadow:0 0 0 1000px #E4E4E7 inset !important;
+  box-shadow:none !important;
+  border-color:#D4D4D8 !important;
+  caret-color:#71717A;
+  -webkit-appearance:none;
+  appearance:none;
+}
+html[data-theme="light"] input.demo-off::placeholder,
+html[data-theme="light"] textarea.demo-off::placeholder,
+html[data-theme="light"] #syncCard input.field.demo-off::placeholder{
+  color:#A1A1AA !important;
+  -webkit-text-fill-color:#A1A1AA !important;
+  opacity:1 !important;
+}
+html[data-theme="dark"] input.demo-off,
+html[data-theme="dark"] select.demo-off,
+html[data-theme="dark"] textarea.demo-off,
+html[data-theme="dark"] input.demo-off:focus,
+html[data-theme="dark"] select.demo-off:focus,
+html[data-theme="dark"] textarea.demo-off:focus,
+html[data-theme="dark"] #syncCard input.field.demo-off,
+html[data-theme="dark"] #syncCard input.field.demo-off:focus,
+html[data-theme="dark"] #syncCard input.field.demo-off:-webkit-autofill,
+html[data-theme="dark"] #syncCard input.field.demo-off:-webkit-autofill:focus{
+  opacity:1 !important;
+  background-color:#3F3F46 !important;
+  background-image:none !important;
+  color:#A1A1AA !important;
+  -webkit-text-fill-color:#A1A1AA !important;
+  -webkit-box-shadow:0 0 0 1000px #3F3F46 inset !important;
+  box-shadow:none !important;
+  border-color:#52525B !important;
+  caret-color:#A1A1AA;
+  -webkit-appearance:none;
+  appearance:none;
+}
+html[data-theme="dark"] input.demo-off::placeholder,
+html[data-theme="dark"] textarea.demo-off::placeholder,
+html[data-theme="dark"] #syncCard input.field.demo-off::placeholder{
+  color:#71717A !important;
+  -webkit-text-fill-color:#71717A !important;
+  opacity:1 !important;
+}
 .demo-wrap button,.demo-wrap input,.demo-wrap select,.demo-wrap textarea,.demo-wrap a{pointer-events:none}
 .demo-note{display:block;color:var(--cyan);font-size:13px;font-weight:700;margin:6px 2px 0;line-height:1.35}
 @media (min-width:768px){
@@ -2632,7 +2692,7 @@ function revealSyncAfterReturn(st){
   setTimeout(function(){var c=document.getElementById('syncCard');if(c&&c.scrollIntoView)c.scrollIntoView({block:'center'});},60);
 }
 var DEMO_NOTICE='Not available in demo mode';
-var DEMO_LOCK_SEL=['#syncSignIn','#syncEmail','#syncEmailSend','#syncJoin','#syncCreate','#syncCode','#syncOut','#email-code','#email-verify','#email-resend','#ob-apple','#ob-google','#ob-name','#ob-email','#ob-pw','#ob-create','#ob-join','#ja-apple','#ja-google','#ja-name','#ja-email','#ja-pw','#ja-next','#inv-pack','#inv-copy','#inv-share','#inv-to','#inv-ch .chip','#m-resend','#m-show','#m-revoke','#m-new','#m-expire','#hhSetup','#hhJoin','#hhLeave','#hh-create','#hh-name','#hh-pay','#hh-cyc button','#m-remove','#m-leave','#m-del','#m-sim','#m-simname','#m-pview','#j-code','#j-next','#j-accept','#jc-join','#jc-pay','#lf-own','#lf-join','#x-yes','#v-mic','#currency','#fxAmt','#fxFrom','#fxTo'].join(',');
+var DEMO_LOCK_SEL=['#syncSignIn','#syncEmail','#syncEmailSend','#syncJoin','#syncCreate','#syncCode','#syncOut','#email-code','#email-verify','#email-resend','#ob-apple','#ob-google','#ob-name','#ob-email','#ob-pw','#ob-create','#ob-join','#ja-apple','#ja-google','#ja-name','#ja-email','#ja-pw','#ja-next','#inv-pack','#inv-copy','#inv-share','#inv-to','#inv-ch .chip','#m-resend','#m-show','#m-revoke','#m-new','#hhSetup','#hhJoin','#hhLeave','#hh-create','#hh-name','#hh-pay','#hh-cyc button','#m-remove','#m-leave','#m-del','#m-pview','#j-code','#j-next','#j-accept','#jc-join','#jc-pay','#lf-own','#lf-join','#x-yes','#v-mic','#currency','#fxAmt','#fxFrom','#fxTo'].join(',');
 function demoNotice(){toast(DEMO_NOTICE);}
 function applyDemoLocks(root){
   if(!window.DUO_DEMO_MODE)return;
@@ -2775,6 +2835,12 @@ function buildCurrencySelects(){
 }
 function updateConverter(){
   var out=$('fxResult');if(!out||!$('fxAmt'))return;
+  if(window.DUO_DEMO_MODE){
+    out.classList.add('demo-aud');
+    out.textContent='Australian dollars only. Conversion is off in demo mode.';
+    return;
+  }
+  out.classList.remove('demo-aud');
   var amt=parseFloat($('fxAmt').value),from=$('fxFrom').value,to=$('fxTo').value;
   if(!isFinite(amt)){out.textContent='';return;}
   var v=convertFX(amt,from,to);
@@ -3272,6 +3338,8 @@ startSync();
 if(window.DUO_DEMO_MODE){
   var storageNote=document.getElementById('storageNote');
   if(storageNote)storageNote.textContent='Saved in this browser only. Cloud sync is off in demo mode.';
+  var fxTitle=document.querySelector('#fxCard h3 span');
+  if(fxTitle)fxTitle.textContent='Australian dollars (AUD)';
   applyDemoLocks(document);
 }
 fetchFX();
