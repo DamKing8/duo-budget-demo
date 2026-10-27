@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex">
-<script>window.DUO_DEMO_MODE=true;</script>
+<script>window.DUO_DEMO_MODE=true;try{localStorage.removeItem('duoBudget.demo.syncReturn');}catch(e){}try{sessionStorage.removeItem('duoBudget.demo.syncReturn');}catch(e){}</script>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://ksrffninlyioqobvdvhu.supabase.co wss://ksrffninlyioqobvdvhu.supabase.co https://api.frankfurter.dev https://api.frankfurter.app; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="manifest" href="/demo/manifest.webmanifest">
 <!-- @@ICONS_START@@ shared icons (tools/make-brand-assets.py) -->
@@ -996,6 +996,24 @@ button.otp-resend:disabled{opacity:.55}
 }
 #v-settings>h2.page,#v-settings>p.sub,#v-cycle>h2.page,#v-cycle>p.sub,#v-goals>h2.page,#v-goals>p.sub,#v-trends>.tr-head,#v-trends>p.sub,#v-trends>.tr-scope,#v-dash .dash-title{order:-1}
 #v-settings>p.muted,#v-goals>#addGoal,#addGoal{order:80}
+/* Public demo banner. Fixed so it stays on every tab, the iPad sidebar layout, and full-screen flows. */
+:root{--demo-banner-h:64px}
+.demo-banner{position:fixed;z-index:55;top:0;left:0;right:0;margin:0;padding:calc(8px + var(--safe-t)) 14px 8px;background:color-mix(in srgb, var(--cyan) 14%, var(--bg));color:var(--text);border-bottom:1px solid color-mix(in srgb, var(--cyan) 42%, transparent);font-size:13px;font-weight:650;line-height:1.35;text-align:center;box-shadow:0 8px 24px color-mix(in srgb, var(--cyan) 12%, transparent)}
+.app{padding-top:calc(14px + var(--safe-t) + var(--demo-banner-h))}
+.flow.on{box-sizing:border-box;padding-top:var(--demo-banner-h)}
+.demo-wrap{display:block;max-width:100%;min-width:0}
+.demo-wrap.inline{display:inline-block;vertical-align:middle}
+.demo-wrap>.btn.block,.demo-wrap>.linkbtn,.demo-wrap>.field,.card>.demo-wrap>.field{width:100%}
+.btns>.demo-wrap,.mbtns>.demo-wrap{flex:1;display:flex;min-width:0}
+.btns>.demo-wrap>.btn,.mbtns>.demo-wrap>.btn{flex:1;width:100%}
+.demo-off{opacity:.45;cursor:not-allowed}
+.demo-wrap button,.demo-wrap input,.demo-wrap select,.demo-wrap textarea,.demo-wrap a{pointer-events:none}
+.demo-note{display:block;color:var(--cyan);font-size:13px;font-weight:700;margin:6px 2px 0;line-height:1.35}
+@media (min-width:768px){
+  .demo-banner{left:calc(var(--side, 100px) + var(--safe-l, 0px))}
+  .app{padding-top:calc(26px + var(--safe-t) + var(--demo-banner-h))}
+  .flow.on[data-step="invite"]{padding-top:calc(26px + var(--safe-t) + var(--demo-banner-h))}
+}
 @media (min-width:768px){
   #v-settings>h2.page,#v-settings>p.sub,#v-settings>p.muted,#v-cycle>h2.page,#v-cycle>p.sub,#v-trends>.tr-head,#v-trends>p.sub,#v-trends>.tr-scope{grid-column:1/-1}
 }
@@ -1053,9 +1071,14 @@ button.otp-resend:disabled{opacity:.55}
   .scrim.panel.on,
   .flow.on[data-step="invite"]{padding-left:32px;padding-right:calc(32px + var(--safe-r))}
 }
+@media (min-width:768px){
+  .flow.on[data-step="invite"]{padding-top:calc(26px + var(--safe-t) + var(--demo-banner-h))}
+}
 </style>
 </head>
 <body>
+<div class="demo-banner" id="demoBanner" data-test="demo-banner" role="status">Demo mode: practice with sample data. Sign-in, invites and account features are switched off.</div>
+<script>(function(){var b=document.getElementById('demoBanner');if(!b)return;function fit(){document.documentElement.style.setProperty('--demo-banner-h',b.offsetHeight+'px')}fit();window.addEventListener('resize',fit);})();</script>
 <div class="app">
   <header class="top">
     <div class="brand">
@@ -1178,6 +1201,7 @@ button.otp-resend:disabled{opacity:.55}
       <div class="seg" id="themeSeg" role="radiogroup" aria-labelledby="themeLbl"><button type="button" role="radio" data-t="light">Light</button><button type="button" role="radio" data-t="dark">Dark</button><button type="button" role="radio" data-t="system">System</button></div>
     </div>
     <div class="card" data-layout="set-storage">
+      <div class="setrow"><div class="l">Export goals<small>CSV of the goals saved on this device</small></div><button class="btn ghost sm" id="exportGoals" type="button" data-test="export-goals">Export CSV</button></div>
       <div class="setrow"><div class="l">Reset demo data<small>Restores the sample household (Chloe & Jack)</small></div><button class="btn danger sm" id="resetBtn" type="button">Reset</button></div>
       <div class="setrow"><div class="l">Reset layout<small>Puts every tab’s cards back in the original order</small></div><button class="btn ghost sm" id="resetLayout" type="button" data-test="reset-layout">Reset layout</button></div>
       <div class="setrow"><div class="l">Storage<small>Budget on this device. Layout too. Cloud sync covers lines, goals and pay cycles.</small></div><span class="muted" style="font-size:13px">localStorage</span></div>
@@ -1203,8 +1227,19 @@ button.otp-resend:disabled{opacity:.55}
 <div class="toast" id="toast"></div>
 
 <!-- @@DEPLOY_START@@ supabase-js 2.117.3 (pinned, vendored) + runtime sync config. Public key only (RLS-protected). -->
-<script src="/demo/supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R"></script>
-<script>window.DUO_SYNC_CONFIG={"enabled":true,"supabaseUrl":"https://ksrffninlyioqobvdvhu.supabase.co","supabaseAnonKey":"sb_publishable_kYFCNsoHhW537_RtxtOxKg_4agyXKDI"};</script>
+<script>
+/* Public /demo/ keeps the vendored bundle and config in place, but does not load supabase-js or create a client. */
+if(!window.DUO_DEMO_MODE){
+  var duoSb=document.createElement('script');
+  duoSb.src='/demo/supabase.js';
+  duoSb.integrity='sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R';
+  duoSb.crossOrigin='anonymous';
+  document.head.appendChild(duoSb);
+  window.DUO_SYNC_CONFIG={"enabled":true,"supabaseUrl":"https://ksrffninlyioqobvdvhu.supabase.co","supabaseAnonKey":"sb_publishable_kYFCNsoHhW537_RtxtOxKg_4agyXKDI"};
+}else{
+  window.DUO_SYNC_CONFIG={"enabled":false,"supabaseUrl":"","supabaseAnonKey":"","supabaseJsUrl":""};
+}
+</script>
 <!-- @@DEPLOY_END@@ -->
 <script id="duo-sync-lib">/*@@SYNC_START@@*/
 /* Duo Budget cloud sync (phase 1: built and tested offline; OFF by default).
@@ -1226,6 +1261,13 @@ function num(v){return v===null||v===undefined?0:Math.round(Number(v)*100)/100;}
 /* opts: {config, storageKey, app:{getState, commit(reason), localId(), setPay(slot,{cycle,next}), getPay(slot)},
           createClient (supabase-js createClient), storage (localStorage-like), now(), onStatus(status), online() } */
 function create(opts){
+  opts=opts||{};
+  /* Demo mode: never construct a Supabase client, and never sign in, push, or pull. */
+  if((typeof window!=='undefined'&&window.DUO_DEMO_MODE)||opts.demoMode||(opts.config&&opts.config.demoMode)){
+    var idle={state:'signed-out',pending:0,msg:'',household:null,user:null};
+    var skip=function(){return Promise.resolve({error:{message:'Not available in demo mode'}});};
+    return {start:function(){if(opts.onStatus)opts.onStatus(idle);return Promise.resolve(this);},onLocalSave:function(){},flush:function(){return Promise.resolve();},pull:function(){return Promise.resolve(0);},status:function(){return idle;},meta:function(){return {v:1,queue:[]};},debug:function(){return {};},signIn:skip,signInWithEmail:skip,verifyEmailCode:skip,signOut:function(){return Promise.resolve(null);},createHousehold:skip,createInvite:skip,joinHousehold:skip,leaveHousehold:skip,online:function(){}};
+  }
   var cfg=opts.config||{},store=opts.storage,app=opts.app,now=opts.now||function(){return Date.now();};
   var MK=opts.storageKey+'.sync';
   var meta=load();var client=null,session=null,ctx=null,channel=null,applying=false,timer=null,flushing=null,status={state:'starting',pending:0};
@@ -1422,6 +1464,7 @@ return {create:create,TABLES:TABLES,_stable:stable};
 <script>
 (function(){
 'use strict';
+const DEMO_MODE = true;
 var KEY='duoBudget.demo.v1'; // separate key so the demo never reads a personal budget saved in the same browser
 /* Cloud sync (Supabase). OFF by default: with enabled:false nothing below loads, connects or changes.
    No key lives in this file. Phase 2 injects {enabled, supabaseAnonKey} at runtime via window.DUO_SYNC_CONFIG
@@ -1734,7 +1777,7 @@ function renderHHCard(){
   if(!h){
     el.innerHTML='<h3><span>Household</span><span class="tag">PROTOTYPE</span></h3><div class="muted" style="font-size:14px;line-height:1.45">Set up a shared household and invite '+(S.names.N&&S.names.N!=='Partner'?esc(S.names.N):'your partner')+' so you both see and edit the same budget.</div>'+
       '<button class="btn pri block" style="margin-top:14px" id="hhSetup">Set up household</button><button class="linkbtn" id="hhJoin">Have an invite code? <b>Join instead</b></button>';
-    return;
+    applyDemoLocks(el);return;
   }
   var pr,sid=starterId();
   if(pm)pr='<div class="mrow"><div class="av b">'+esc(pm.name.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(pm.name)+(viewer()==='B'?'<span class="you">You</span>':'')+'</b><small>'+CYCLES[pm.payCycle].adj+' pay</small>'+(sid&&pm.userId===sid?'<small class="started">Started the household</small>':'')+'</div><span class="gstat ok">Joined</span></div>';
@@ -1745,6 +1788,7 @@ function renderHHCard(){
   el.innerHTML='<h3><span>'+esc(h.name)+'</span><span class="tag">PROTOTYPE</span></h3><div class="mlist" data-test="hh-card"><div class="mrow"><div class="av a">'+esc(S.names.D.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(S.names.D)+(viewer()==='A'?'<span class="you">You</span>':'')+'</b><small>'+CYCLES[S.cycle].adj+' pay</small>'+(sid&&(ow.userId===sid||(!pm&&sid))?'<small class="started">Started the household</small>':'')+'</div></div>'+pr+'</div>'+
     '<button class="btn ghost block" style="margin-top:12px" id="hhManage">Manage household</button>'+
     (pm?'<button class="btn danger block" style="margin-top:8px" id="hhLeave">Leave household</button>':'');
+  applyDemoLocks(el);
 }
 function renderSettings(){renderHHCard();
   var pm=memberBy('partner');$('nameB').readOnly=!!pm;$('nameBHint').style.display=pm?'':'none';
@@ -1907,7 +1951,7 @@ var FINE_POINTER=!!(window.matchMedia&&matchMedia('(hover:hover) and (pointer:fi
 var SHEET_X='<button class="sh-x" type="button" aria-label="Close" data-test="sheet-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
 function openSheet(html,bind){$('scrim').classList.remove('panel');var sh=$('sheet');sh.style.transform='';sh.classList.remove('dragging','snap');$('scrim').style.background='';
   // sheets that already carry their own 44px X (.xbtn) keep it; everything else gets the standard one
-  document.documentElement.classList.add('sheet-open');sh.innerHTML='<div class="sh-top" data-test="sheet-handle"><div class="grab"></div>'+(/class="xbtn"/.test(html)?'':SHEET_X)+'</div>'+html;sh.scrollTop=0;$('scrim').classList.add('on');if(bind)bind($('sheet'));}
+  document.documentElement.classList.add('sheet-open');sh.innerHTML='<div class="sh-top" data-test="sheet-handle"><div class="grab"></div>'+(/class="xbtn"/.test(html)?'':SHEET_X)+'</div>'+html;sh.scrollTop=0;$('scrim').classList.add('on');if(bind)bind($('sheet'));applyDemoLocks(sh);}
 function closeSheet(){$('scrim').classList.remove('on');document.documentElement.classList.remove('sheet-open');var sh=$('sheet');sh.style.transform='';sh.classList.remove('dragging','snap');$('scrim').style.background='';}
 $('sheet').addEventListener('click',function(e){if(e.target.closest('.sh-x'))closeSheet();});
 // swipe-down to close (phone bottom sheet only). Never preventDefault on touchstart (iOS needs it to focus fields and open
@@ -2381,6 +2425,7 @@ function renderFlow(){
   $('flowBack').style.visibility=F.hist.length?'visible':'hidden';
   $('flowBody').innerHTML=(partner?'<div class="pview"><span class="pill violet">Partner\'s phone · simulated</span></div>':'')+v.h;
   var body=$('flowBody');v.bind(function(id){return body.querySelector('#'+id);});
+  applyDemoLocks($('flow'));
 }
 $('flowBack').addEventListener('click',flowBack);
 $('flowClose').addEventListener('click',closeFlow);
@@ -2452,6 +2497,7 @@ $('resetLayout').addEventListener('click',function(){
   document.querySelectorAll('.layout-slotted').forEach(function(el){el.classList.remove('layout-slotted');});
   renderAll();toast('Layout reset');
 });
+$('exportGoals').addEventListener('click',function(){exportGoalsCSV();});
 $('resetBtn').addEventListener('click',function(){
   openSheet('<h4>Reset demo data?</h4><div class="muted" style="font-size:14px">This replaces your edits with the sample budget and goals.</div><div class="btns"><button class="btn ghost" id="r-no">Cancel</button><button class="btn danger" id="r-yes">Reset</button></div>',function(sh){
     sh.querySelector('#r-no').addEventListener('click',closeSheet);
@@ -2505,6 +2551,7 @@ function openEmailCode(email){
     function submit(){
       if(busy)return;var code=digits(input.value);
       if(code.length!==6){err.textContent='Enter all 6 digits.';return;}
+      if(DEMO_MODE||!__sync){demoNotice();return;}
       busy=true;verifyBtn.disabled=true;err.textContent='';
       __sync.verifyEmailCode(email,code).then(function(r){
         busy=false;verifyBtn.disabled=false;
@@ -2518,7 +2565,9 @@ function openEmailCode(email){
     input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();submit();}});
     verifyBtn.addEventListener('click',submit);
     resend.addEventListener('click',function(){
-      if(resend.disabled)return;resend.disabled=true;resend.textContent='Sending…';err.textContent='';
+      if(resend.disabled)return;
+      if(DEMO_MODE||!__sync){demoNotice();return;}
+      resend.disabled=true;resend.textContent='Sending…';err.textContent='';
       __sync.signInWithEmail(email).then(function(r){
         if(r&&r.error){err.textContent=otpProblem(r.error,'send');tick();return;}
         emailSign.sentAt=Date.now();input.value='';paint();err.textContent='';tick();
@@ -2531,7 +2580,7 @@ function openEmailCode(email){
 }
 function renderDemoSyncNote(){var el=document.getElementById('syncCard');if(!el)return;el.hidden=false;
   el.innerHTML='<div class="row"><b>Cloud sync</b><span class="gstat none" data-test="sync-state">Off</span></div><div class="hint" data-test="sync-demo-note">Cloud sync is off in the demo. Your changes stay on this device.</div>';}
-function renderSync(st){if(window.DUO_DEMO_MODE){renderDemoSyncNote();return;}var el=document.getElementById('syncCard');if(!el)return;el.hidden=false;
+function renderSync(st){var el=document.getElementById('syncCard');if(!el)return;el.hidden=false;
   var lbl={blocked:'Off on this build',starting:'Starting…','signed-out':'Not signed in','no-household':'Signed in, no household yet',pending:'Changes waiting to sync',synced:'Synced',offline:'Offline, saved on this phone',error:'Sync problem'}[st.state]||st.state;
   var h='<div class="row"><b>Cloud sync</b><span class="gstat '+(st.state==='synced'?'ok':st.state==='error'?'bad':st.state==='pending'||st.state==='offline'?'warn':'none')+'" data-test="sync-state">'+esc(lbl)+'</span></div>'+
     '<div class="hint" data-test="sync-msg">'+esc(st.msg||(st.user?'Signed in as '+st.user+(st.pending?' · '+st.pending+' waiting':''):'Beta. Synced data: budget lines, goals and pay cycles.'))+'</div>';
@@ -2544,11 +2593,12 @@ function renderSync(st){if(window.DUO_DEMO_MODE){renderDemoSyncNote();return;}va
   var d=st.debug;if(d)h+='<div class="hint" style="font-size:11px;opacity:.75;margin-top:10px;word-break:break-word" data-test="sync-debug">Sync status: '+esc([d.state,'app '+d.mode,'storage '+d.storage,'session '+d.session,'household '+d.household,'queue '+d.pending,'online '+d.online,'last event '+d.lastEvent,'return '+d.urlReturn,'error '+d.lastError].join(' · '))+'</div>';
   el.innerHTML=h;
   var on=function(id,f){var b=document.getElementById(id);if(b)b.addEventListener('click',f);};
-  on('syncSignIn',function(){try{sessionStorage.setItem('duoBudget.demo.syncReturn','1');}catch(e){}__sync.signIn();});
+  on('syncSignIn',function(){if(DEMO_MODE||!__sync){demoNotice();return;}try{sessionStorage.setItem('duoBudget.demo.syncReturn','1');}catch(e){}__sync.signIn();});
   var emailInput=document.getElementById('syncEmail');
   if(emailInput)emailInput.addEventListener('input',function(){emailSign.email=this.value;emailSign.error='';var er=document.getElementById('syncEmailErr');if(er)er.textContent='';});
   on('syncEmailSend',function(){
     var field=document.getElementById('syncEmail'),addr=(field&&field.value||'').trim();emailSign.email=addr;
+    if(DEMO_MODE||!__sync){demoNotice();return;}
     if(!validEmail(addr)){emailSign.error='Enter a valid email address.';var er=document.getElementById('syncEmailErr');if(er)er.textContent=emailSign.error;return;}
     emailSign.error='';var btn=document.getElementById('syncEmailSend');if(btn){btn.disabled=true;btn.textContent='Sending…';}
     __sync.signInWithEmail(addr).then(function(r){
@@ -2557,13 +2607,19 @@ function renderSync(st){if(window.DUO_DEMO_MODE){renderDemoSyncNote();return;}va
       if(btn){btn.disabled=false;btn.textContent='Email me a code';}
     });
   });
-  revealSyncAfterReturn(st);on('syncOut',function(){__sync.signOut();});
-  on('syncCreate',function(){__sync.createHousehold(S.names.D+(S.names.N&&S.names.N!=='Partner'?' & '+S.names.N:''),S.names.D).catch(function(e){toast(e.message);});});
-  on('syncJoin',function(){__sync.joinHousehold(document.getElementById('syncCode').value,S.names.D).then(function(r){if(r&&r.ok===false)toast(r.reason==='too_many_attempts'?'Too many tries. Try again in an hour.':'That code didn\'t work. Check it with your partner.');}).catch(function(e){toast(e.message);});});}
+  revealSyncAfterReturn(st);on('syncOut',function(){if(DEMO_MODE||!__sync){demoNotice();return;}__sync.signOut();});
+  on('syncCreate',function(){if(DEMO_MODE||!__sync){demoNotice();return;}__sync.createHousehold(S.names.D+(S.names.N&&S.names.N!=='Partner'?' & '+S.names.N:''),S.names.D).catch(function(e){toast(e.message);});});
+  on('syncJoin',function(){if(DEMO_MODE||!__sync){demoNotice();return;}__sync.joinHousehold(document.getElementById('syncCode').value,S.names.D).then(function(r){if(r&&r.ok===false)toast(r.reason==='too_many_attempts'?'Too many tries. Try again in an hour.':'That code didn\'t work. Check it with your partner.');}).catch(function(e){toast(e.message);});});
+  applyDemoLocks(el);}
 // Coming back from Google: the page reloads on Home, but the result (claim box or error) lives on the
 // Partner tab. Open it and bring the card into view, so no extra tap or tab switch is needed.
 var __syncRevealed=false;
 function revealSyncAfterReturn(st){
+  if(DEMO_MODE||window.DUO_DEMO_MODE){
+    try{localStorage.removeItem('duoBudget.demo.syncReturn');}catch(e){}
+    try{sessionStorage.removeItem('duoBudget.demo.syncReturn');}catch(e){}
+    return;
+  }
   if(__syncRevealed||st.state==='starting')return;
   var back=false;try{back=sessionStorage.getItem('duoBudget.demo.syncReturn')==='1';}catch(e){}
   if(st.debug&&st.debug.urlReturn&&st.debug.urlReturn!=='-')back=true;
@@ -2571,8 +2627,48 @@ function revealSyncAfterReturn(st){
   var b=document.querySelector('nav.tabs button[data-v="settings"]');if(b&&!b.classList.contains('on'))b.click();
   setTimeout(function(){var c=document.getElementById('syncCard');if(c&&c.scrollIntoView)c.scrollIntoView({block:'center'});},60);
 }
+var DEMO_NOTICE='Not available in demo mode';
+var DEMO_LOCK_SEL=['#syncSignIn','#syncEmail','#syncEmailSend','#syncJoin','#syncCreate','#syncCode','#syncOut','#email-code','#email-verify','#email-resend','#ob-apple','#ob-google','#ob-name','#ob-email','#ob-pw','#ob-create','#ob-join','#ja-apple','#ja-google','#ja-name','#ja-email','#ja-pw','#ja-next','#inv-copy','#inv-share','#inv-to','#inv-ch .chip','#m-resend','#m-show','#m-revoke','#m-new','#m-expire','#hhSetup','#hhJoin','#hhLeave','#hh-create','#hh-name','#hh-pay','#hh-cyc button','#m-remove','#m-leave','#m-del','#m-sim','#m-simname','#m-pview','#j-code','#j-next','#j-accept','#jc-join','#jc-pay','#lf-own','#lf-join','#x-yes'].join(',');
+function demoNotice(){toast(DEMO_NOTICE);}
+function applyDemoLocks(root){
+  if(!DEMO_MODE)return;
+  var scope=root&&root.querySelectorAll?root:document;
+  [].slice.call(scope.querySelectorAll(DEMO_LOCK_SEL)).forEach(function(el){
+    if(el.closest('[data-demo-wrap]'))return;
+    var row=el.closest('.setrow');
+    var host=row&&!row.querySelector('#exportGoals,#r-yes,#lf-export,#lv-export')?row:el;
+    if(host.closest('[data-demo-wrap]'))return;
+    var chip=host.classList&&host.classList.contains('chip');
+    var wrap=document.createElement(chip?'span':'div');
+    wrap.className='demo-wrap'+(chip?' inline':'');
+    wrap.dataset.demoWrap='1';
+    if(el.id)wrap.dataset.lockId=el.id;else if(el.getAttribute('data-ch'))wrap.dataset.lockId='inv-'+el.getAttribute('data-ch');
+    host.parentNode.insertBefore(wrap,host);wrap.appendChild(host);
+    var controls=host.matches('button,input,select,textarea,a')?[host]:[].slice.call(host.querySelectorAll('button,input,select,textarea,a'));
+    controls.forEach(function(c){
+      if(c.id==='exportGoals'||c.id==='r-yes'||c.id==='r-no'||c.id==='lf-export'||c.id==='lv-export')return;
+      c.classList.add('demo-off');c.setAttribute('aria-disabled','true');c.setAttribute('disabled','');try{c.disabled=true;}catch(err){}
+    });
+  });
+}
+document.addEventListener('click',function(e){
+  if(!DEMO_MODE)return;
+  var wrap=e.target.closest&&e.target.closest('[data-demo-wrap]');
+  if(!wrap)return;
+  e.preventDefault();e.stopPropagation();
+  if(e.stopImmediatePropagation)e.stopImmediatePropagation();
+  var note=wrap.querySelector('.demo-note');
+  if(!note){note=document.createElement('div');note.className='demo-note';note.setAttribute('data-test','demo-notice');note.textContent=DEMO_NOTICE;wrap.appendChild(note);}
+  demoNotice();
+},true);
 function startSync(){
-  if(window.DUO_DEMO_MODE){renderDemoSyncNote();return;}
+  try{localStorage.removeItem('duoBudget.demo.syncReturn');}catch(e){}
+  try{sessionStorage.removeItem('duoBudget.demo.syncReturn');}catch(e){}
+  if(DEMO_MODE||window.DUO_DEMO_MODE){
+    renderSync({state:'signed-out',pending:0,msg:'',user:null});
+    layoutApply();
+    return;
+  }
   var inj=window.DUO_SYNC_CONFIG||{},test=window.__DUO_SYNC_TEST__||null;
   var cfg=Object.assign({},SYNC_CONFIG,{enabled:!!inj.enabled,supabaseAnonKey:inj.supabaseAnonKey||'',supabaseUrl:inj.supabaseUrl||SYNC_CONFIG.supabaseUrl,supabaseJsUrl:inj.supabaseJsUrl||SYNC_CONFIG.supabaseJsUrl});
   cfg.allowPersonalData=SYNC_CONFIG.allowPersonalData;          // cannot be switched on from outside the file
