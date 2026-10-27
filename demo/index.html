@@ -199,7 +199,7 @@ nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,2
 nav.tabs .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
 nav.tabs button{border:0;background:transparent;color:var(--dim);display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px;font-size:11px;font-weight:600;cursor:pointer;min-height:56px;border-radius:14px}
 nav.tabs button svg{width:24px;height:24px}
-nav.tabs button.on{color:var(--cyan)}
+nav.tabs button.on{color:var(--cyan);background:rgba(14,116,144,.10)}
 nav.tabs button.on svg{filter:drop-shadow(0 0 8px rgba(14,116,144,.6))}
 section.view{display:none;animation:fade .25s ease}
 section.view.on{display:block}
@@ -427,7 +427,8 @@ body{background:radial-gradient(110% 55% at 100% 0%,rgba(14,116,144,.07),transpa
 .pill{background:rgba(14,116,144,.08);border-color:rgba(14,116,144,.25)}
 nav.tabs{background:rgba(255,253,249,.92)!important;border-color:#E6DDCC!important}
 nav.tabs button.on{color:#0E7490}
-.btn.pri,.seg button.on{background:#1F2430;color:#FFFFFF;box-shadow:0 6px 16px rgba(31,36,48,.18)}
+.btn.pri,.seg button.on{background:linear-gradient(135deg,#0E7490,#0F766E);color:#FFFFFF;box-shadow:0 6px 16px rgba(14,116,144,.25)}
+.btn.pri:disabled,.btn.pri.demo-off,.seg button.on:disabled,.seg button.on.demo-off{background:#1F2430;color:#FFFFFF;box-shadow:0 6px 16px rgba(31,36,48,.18)}
 .cd-num{background:linear-gradient(135deg,#0F766E,#0E7490);color:#FFFFFF}
 .toast{background:#1F2430;color:#FFFFFF}
 .owner.D{color:#0B5E75}.owner.N{color:#5536B8}.owner.J{color:#04664A}.gstat.warn,.tag{color:#92400E}.gstat.ok{color:#04664A}.gstat.bad{color:#9F1239}.gstat.done{color:#0B5E75}
