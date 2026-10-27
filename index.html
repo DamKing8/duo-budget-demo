@@ -46,10 +46,8 @@
       background: linear-gradient(to bottom, transparent, rgba(8,51,68,.25));
       pointer-events: none;
     }
-    .nav { max-width: 1120px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; z-index: 2; }
-    .brand { display: flex; align-items: center; text-decoration: none; }
-    .brand img { width: 42px; height: 42px; border-radius: 13px; background: #fff; padding: 3px; object-fit: contain; display: block; box-shadow: 0 6px 16px rgba(4,20,28,.22); }
-    .nav-links { display: flex; align-items: center; gap: 4px 16px; }
+    .nav { max-width: 1120px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; justify-content: flex-end; position: relative; z-index: 2; }
+    .nav-links { display: flex; align-items: center; justify-content: flex-end; gap: 4px 16px; }
     .nav-links a { font-size: 14px; font-weight: 600; text-decoration: none; color: rgba(255,255,255,.92); min-height: 44px; display: inline-flex; align-items: center; }
     .nav-links a:hover { color: #fff; text-decoration: underline; }
     .nav-links a.cta { padding: 0 16px; border-radius: 999px; background: #fff; color: var(--deep); text-decoration: none; }
@@ -57,7 +55,7 @@
 
     .hero { max-width: 1120px; margin: 0 auto; padding: 6px 20px 0; display: grid; gap: 36px; position: relative; z-index: 1; }
     @media (min-width: 900px) { .hero { grid-template-columns: 1.1fr .9fr; align-items: center; padding-top: 8px; gap: 40px; } }
-    .hero-brand { display: flex; align-items: center; gap: 14px; margin: 0 0 16px; }
+    .hero-brand { display: flex; align-items: center; gap: 14px; width: fit-content; max-width: 100%; margin: 0 0 16px; color: #fff; text-decoration: none; }
     .hero-mark {
       position: relative; flex: 0 0 auto; display: grid; place-items: center;
       width: 80px; height: 80px; border-radius: 22px;
@@ -76,6 +74,7 @@
       margin: 0; color: #fff; font-weight: 800; font-size: 34px; letter-spacing: -0.045em; line-height: .95;
       text-shadow: 0 2px 18px rgba(4,20,28,.32);
     }
+    .hero-brand:hover .hero-wordmark { color: #E6FBFF; }
     @media (min-width: 700px) {
       .hero-brand { gap: 18px; margin-bottom: 20px; }
       .hero-mark {
@@ -177,7 +176,7 @@
     .foot a:hover { text-decoration: underline; }
 
     @media (max-width: 520px) {
-      .nav { padding: 10px 14px; }
+      .nav { padding: 8px 16px; }
       .nav-links a.hide-sm { display: none; }
       .hero { padding: 2px 16px 0; }
       .hits, .ipad, .join { padding-left: 16px; padding-right: 16px; }
@@ -192,7 +191,6 @@
   <a class="skip" href="#waitlist">Skip to the waitlist</a>
   <div class="band">
     <header class="nav">
-      <a class="brand" href="/" aria-label="Duo Budget"><img src="img/logo.webp" width="42" height="42" alt=""></a>
       <nav class="nav-links" aria-label="Primary">
         <a class="hide-sm" href="/demo/">Try the demo</a>
         <a class="hide-sm" href="/privacy.html">Privacy</a>
@@ -202,10 +200,10 @@
 
     <section class="hero" aria-labelledby="hero-title">
       <div class="copy">
-        <div class="hero-brand">
+        <a class="hero-brand" href="/">
           <span class="hero-mark"><img src="icons/logo-mark.webp" width="192" height="192" alt=""></span>
-          <p class="hero-wordmark">Duo Budget</p>
-        </div>
+          <span class="hero-wordmark">Duo Budget</span>
+        </a>
         <p class="eyebrow"><span class="dot" aria-hidden="true"></span><span class="eyebrow-copy">Coming soon ·<br class="eyebrow-br"> Made in Australia, for Australians</span></p>
         <h1 id="hero-title">Two paydays.<br><span class="glow">One plan.</span></h1>
         <p class="pitch">The budget app for couples. Duo Budget splits <strong>shared and personal money</strong> around <strong>both your paydays</strong>, so you each know what's yours, what's ours, and what's left this fortnight.</p>
