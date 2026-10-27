@@ -1007,6 +1007,8 @@ button.otp-resend:disabled{opacity:.55}
 .demo-wrap>.btn.block,.demo-wrap>.linkbtn,.demo-wrap>.field,.card>.demo-wrap>.field{width:100%}
 .btns>.demo-wrap,.mbtns>.demo-wrap{flex:1;display:flex;min-width:0}
 .btns>.demo-wrap>.btn,.mbtns>.demo-wrap>.btn{flex:1;width:100%}
+.seg>.demo-wrap{display:flex;min-width:0}
+.seg>.demo-wrap>button{flex:1;width:100%}
 .demo-off{opacity:.45;cursor:not-allowed}
 .demo-wrap button,.demo-wrap input,.demo-wrap select,.demo-wrap textarea,.demo-wrap a{pointer-events:none}
 .demo-note{display:block;color:var(--cyan);font-size:13px;font-weight:700;margin:6px 2px 0;line-height:1.35}
@@ -2644,7 +2646,7 @@ function applyDemoLocks(root){
     var wrap=document.createElement(chip?'span':'div');
     wrap.className='demo-wrap'+(chip?' inline':'');
     wrap.dataset.demoWrap='1';
-    if(el.id)wrap.dataset.lockId=el.id;else if(el.getAttribute('data-ch'))wrap.dataset.lockId='inv-'+el.getAttribute('data-ch');
+    if(el.id)wrap.dataset.lockId=el.id;else if(el.getAttribute('data-ch'))wrap.dataset.lockId='inv-'+el.getAttribute('data-ch');else if(el.getAttribute('data-c'))wrap.dataset.lockId=(el.parentElement&&el.parentElement.id?el.parentElement.id+'-':'cyc-')+el.getAttribute('data-c');
     host.parentNode.insertBefore(wrap,host);wrap.appendChild(host);
     var controls=host.matches('button,input,select,textarea,a')?[host]:[].slice.call(host.querySelectorAll('button,input,select,textarea,a'));
     controls.forEach(function(c){
