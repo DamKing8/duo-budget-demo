@@ -12,6 +12,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preload" as="image" href="img/iphone-home.webp">
   <link rel="preload" as="image" href="icons/logo-mark.webp">
+  <script>try{if(localStorage.getItem('duo_demo_unlocked')==='1')document.documentElement.classList.add('demo-unlocked')}catch(e){}</script>
   <style>
     :root {
       --bg: #FBF7EF; --card: #FFFFFF; --line: #E6DDCC; --text: #1F2430; --muted: #5B6170;
@@ -224,6 +225,15 @@
     .note { margin: 12px 0 0; font-size: 12px; color: var(--muted); line-height: 1.4; }
     .ok { display: none; margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #E3F2EE; color: var(--teal); font-size: 14px; font-weight: 600; }
     .ok.show { display: block; }
+    .ok-title { margin: 0; font-size: 17px; font-weight: 800; color: var(--deep); }
+    .ok-sub { margin: 6px 0 0; font-size: 14px; font-weight: 500; color: var(--teal); line-height: 1.45; }
+    .ok .demo-go { display: flex; align-items: center; justify-content: center; width: 100%; margin-top: 12px; min-height: 50px; padding: 0 18px; border-radius: 14px; background: var(--grad); color: #fff; font-size: 16px; font-weight: 750; text-decoration: none; box-shadow: 0 8px 20px rgba(14,116,144,.28); }
+    .ok .demo-go:hover { filter: brightness(1.06); }
+    .ok.show ~ .try-demo { display: none; }
+    /* Demo gate: before sign-up, "Try the demo" scrolls here and nudges the form */
+    .form-card { transition: box-shadow .35s ease; }
+    .form-card.nudge { box-shadow: 0 0 0 4px rgba(34,211,238,.55), 0 18px 44px rgba(14,116,144,.25); }
+    .unlock-note { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; background: #E6F6FA; color: var(--deep); font-size: 14px; font-weight: 700; line-height: 1.4; }
     .try-demo { display: flex; align-items: center; justify-content: center; width: 100%; margin-top: 14px; padding: 12px 18px; min-height: 46px; border-radius: 12px; border: 1.5px solid var(--cyan); background: #fff; color: var(--cyan); font-size: 15px; font-weight: 700; text-decoration: none; }
     .try-demo:hover { background: rgba(14,116,144,.08); }
 
@@ -354,6 +364,7 @@
         <p class="lead">Join the waitlist and we'll email you once, when Duo Budget is ready.</p>
       </div>
       <div class="form-card" id="waitlist">
+          <p class="unlock-note" id="unlock-note" role="status" hidden>Join the waitlist to unlock the demo</p>
           <form id="waitlist-form" novalidate>
             <label for="email">Get early access</label>
             <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" inputmode="email" maxlength="254" aria-describedby="email-error">
@@ -399,8 +410,8 @@
             <p class="form-error" id="form-error" role="alert" hidden></p>
             <p class="note">We'll email you once when Duo Budget is ready, and nothing else.</p>
           </form>
-          <div class="ok" id="thanks" role="status">Thanks, you're on the list. We'll let you know when Duo Budget is ready.</div>
-          <a class="try-demo" href="/demo/">Try the demo, no sign-up needed</a>
+          <div class="ok" id="thanks" role="status"><p class="ok-title">You're on the list! Your demo's ready.</p><p class="ok-sub" id="thanks-sub">We'll let you know when Duo Budget is ready.</p><a class="demo-go" href="/demo/">Try the demo</a></div>
+          <a class="try-demo" href="/demo/">Try the demo</a>
         </div>
     </section>
   </main>
@@ -416,7 +427,7 @@
       var ENDPOINT = 'https://ksrffninlyioqobvdvhu.supabase.co/rest/v1/rpc/join_waitlist';
       var KEY = 'sb_publishable_kYFCNsoHhW537_RtxtOxKg_4agyXKDI';
       var CONSENT_VERSION = 'waitlist-v2-2026-10';
-      var THANKS = 'Thanks, you\'re on the list. We\'ll let you know when Duo Budget is ready.';
+      var THANKS = 'We\'ll email you when Duo Budget is ready. Until then, try it with example couple Chloe and Jack.';
       var RATE_LIMIT = 'Too many sign-ups right now. Please try again in a minute.';
       /* RPC argument names. Change these here if the function signature changes. */
       var COL = {
@@ -439,6 +450,37 @@
       var partnerEl = document.getElementById('partner-pay-cycle');
       var btn = form.querySelector('button[type="submit"]');
       var thanks = document.getElementById('thanks');
+      var thanksSub = document.getElementById('thanks-sub');
+      var card = document.getElementById('waitlist');
+      var unlockNote = document.getElementById('unlock-note');
+      var root = document.documentElement;
+      var nudgeTimer;
+
+      /* Demo gate (UI only): until this browser has joined, "Try the demo" links go to the form */
+      function nudgeToForm() {
+        var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+        card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+        try { emailEl.focus({ preventScroll: true }); } catch (err) { emailEl.focus(); }
+        unlockNote.hidden = false;
+        card.classList.add('nudge');
+        clearTimeout(nudgeTimer);
+        nudgeTimer = setTimeout(function () { card.classList.remove('nudge'); }, 2400);
+      }
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest ? e.target.closest('a[href="/demo/"]') : null;
+        if (!a || root.classList.contains('demo-unlocked') || thanks.contains(a)) return;
+        e.preventDefault();
+        nudgeToForm();
+      });
+      /* Shared links ending in #demo (e.g. /?src=ig#demo) act like tapping "Try the demo" */
+      function handleDemoHash() {
+        if (location.hash !== '#demo') return;
+        if (root.classList.contains('demo-unlocked')) location.replace('/demo/');
+        else nudgeToForm();
+      }
+      if (document.readyState === 'complete') handleDemoHash();
+      else window.addEventListener('load', handleDemoHash);
+      window.addEventListener('hashchange', handleDemoHash);
       var emailErr = document.getElementById('email-error');
       var consentErr = document.getElementById('consent-error');
       var cycleErr = document.getElementById('cycle-error');
@@ -473,9 +515,13 @@
         return body;
       }
       function done(text) {
-        thanks.textContent = text;
+        thanksSub.textContent = text;
         thanks.classList.add('show');
         form.hidden = true;
+        unlockNote.hidden = true;
+        card.classList.remove('nudge');
+        try { localStorage.setItem('duo_demo_unlocked', '1'); } catch (err) {}
+        root.classList.add('demo-unlocked');
       }
       function showFail() {
         formErr.hidden = false;
@@ -548,7 +594,7 @@
             var message = String(payload.message || '');
             var code = String(payload.code || '');
             if (res.status === 409) {
-              done('You\'re already on the list. We\'ll let you know when Duo Budget is ready.');
+              done('You were already signed up. We\'ll let you know when Duo Budget is ready.');
               return;
             }
             if (res.status === 429 || code === 'PT429') {
