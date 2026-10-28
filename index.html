@@ -59,30 +59,43 @@
     .hero-mark {
       position: relative; flex: 0 0 auto; display: grid; place-items: center;
       width: 80px; height: 80px; border-radius: 22px;
-      background: linear-gradient(180deg, #ffffff 0%, #f3fbfb 100%);
+      /* navy tile = app dark-theme --bg #0a1328, with a faint top-lit sheen */
+      background: radial-gradient(120% 90% at 30% 0%, #1a2747 0%, #0a1328 62%), #0a1328;
+      transform: perspective(700px) rotateX(5deg) translateY(-3px);
+      transform-origin: 50% 100%;
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.75),
-        0 12px 28px rgba(4,20,28,.30),
-        0 0 34px rgba(94,234,212,.46);
+        0 0 0 1px rgba(255,255,255,.14),
+        0 2px 3px rgba(2,10,20,.38),
+        0 7px 10px -2px rgba(2,10,20,.36),
+        0 18px 30px -6px rgba(2,10,20,.40);
     }
-    .hero-mark::after {
+    .hero-mark::after { /* rim light + bevel */
       content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.95);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.30), inset 0 -2px 3px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.05);
     }
-    .hero-mark img { width: 64px; height: 64px; display: block; }
+    .hero-mark img { width: 64px; height: 64px; display: block; filter: saturate(.92) brightness(.97) drop-shadow(0 2px 2px rgba(0,0,0,.35)); }
     .hero-wordmark {
       margin: 0; color: #fff; font-weight: 800; font-size: 34px; letter-spacing: -0.045em; line-height: .95;
-      text-shadow: 0 2px 18px rgba(4,20,28,.32);
+      text-shadow: 0 1px 0 rgba(4,20,28,.28), 0 3px 6px rgba(4,20,28,.28);
+      padding-bottom: .06em;
     }
     .hero-brand:hover .hero-wordmark { color: #E6FBFF; }
+    @media (prefers-reduced-motion: no-preference) {
+      .hero-mark { transition: transform .35s ease, box-shadow .35s ease; }
+      .hero-brand:hover .hero-mark {
+        transform: perspective(700px) rotateX(5deg) translateY(-6px);
+        box-shadow: 0 0 0 1px rgba(255,255,255,.16), 0 3px 4px rgba(2,10,20,.34), 0 10px 14px -2px rgba(2,10,20,.34), 0 24px 36px -6px rgba(2,10,20,.38);
+      }
+    }
     @media (min-width: 700px) {
       .hero-brand { gap: 18px; margin-bottom: 20px; }
       .hero-mark {
         width: 116px; height: 116px; border-radius: 32px;
         box-shadow:
-          0 0 0 1px rgba(255,255,255,.78),
-          0 18px 40px rgba(4,20,28,.32),
-          0 0 52px rgba(94,234,212,.50);
+          0 0 0 1px rgba(255,255,255,.14),
+          0 3px 4px rgba(2,10,20,.38),
+          0 10px 14px -3px rgba(2,10,20,.36),
+          0 26px 42px -8px rgba(2,10,20,.42);
       }
       .hero-mark img { width: 92px; height: 92px; }
       .hero-wordmark { font-size: 54px; }
@@ -97,8 +110,17 @@
     .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: #5EEAD4; box-shadow: 0 0 0 4px rgba(94,234,212,.25); }
     h1 { margin: 0 0 18px; font-size: clamp(44px, 11vw, 84px); line-height: .98; letter-spacing: -0.045em; font-weight: 850; }
     h1 .glow { background: linear-gradient(135deg, #A5F3FC, #5EEAD4); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .pitch { margin: 0 0 22px; font-size: clamp(18px, 2.4vw, 21px); line-height: 1.5; color: rgba(255,255,255,.92); max-width: 30em; }
+    .pitch {
+      margin: 0 -16px 16px; padding: 8px 16px; font-size: clamp(18px, 2.4vw, 21px); line-height: 1.5; color: rgba(255,255,255,.97); max-width: calc(30em + 32px);
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); border-radius: 18px;
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+      box-shadow: 0 14px 34px rgba(4,20,28,.18), inset 0 1px 0 rgba(255,255,255,.14);
+      text-shadow: 0 1px 2px rgba(4,20,28,.22);
+    }
+    @media (max-width: 520px) { .pitch { margin-left: -8px; margin-right: -8px; padding: 12px 14px; } }
     .pitch strong { color: #fff; }
+    /* win back the glass panel's height so the hero still fits a 1024x768 first screen */
+    .hero .eyebrow { margin-bottom: 14px; } .hero h1 { margin-bottom: 14px; } .hero .ctas { margin-bottom: 20px; }
     .ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 26px; }
     .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 22px; border-radius: 14px; font-size: 16px; font-weight: 750; text-decoration: none; }
     .btn.main { background: #fff; color: var(--deep); box-shadow: 0 10px 24px rgba(8,51,68,.35); }
@@ -124,9 +146,43 @@
     .bezel img { display: block; width: 100%; height: auto; border-radius: 34px; }
     .tag { position: absolute; background: #fff; color: var(--deep); font-size: 13px; font-weight: 750; padding: 9px 12px; border-radius: 12px; box-shadow: 0 12px 28px rgba(4,20,28,.3); transform: rotate(3deg); white-space: nowrap; }
     .tag.t1 { left: -14%; top: 70%; }
-    .tag.t2 { right: -12%; top: 36%; }
     .tag b { color: var(--teal); }
-    @media (max-width: 420px) { .tag.t1 { left: -6%; } .tag.t2 { right: -4%; } }
+    @media (max-width: 420px) { .tag.t1 { left: -6%; } }
+    /* Pop-out callouts: pixel-exact crops of img/iphone-home.webp (640x1387), placed over their source spot.
+       Screen = figure minus 10px bezel padding each side, so x/y/w are fractions of the 640x1387 screenshot. */
+    .pop {
+      position: absolute; display: block; height: auto; max-width: none; pointer-events: none; z-index: 2;
+      left: calc(10px + (100% - 20px) * var(--x)); top: calc(10px + (100% - 20px) * var(--y)); /* % of figure height = screen height + 20px */
+      width: calc((100% - 20px) * var(--w));
+      transform-origin: 50% 50%;
+      transform: translate(var(--dx, 0%), var(--dy, 0%)) rotate(3deg) scale(var(--s, 1.08));
+      box-shadow: 0 0 0 1px rgba(255,255,255,.9), 0 6px 12px rgba(4,20,28,.18), 0 18px 36px rgba(4,20,28,.36);
+    }
+    .pop.p-avatars  { --x: .79375;  --w: .171875; }
+    .pop.p-leftover { --x: .040625; --w: .9203125; --s: 1.08; --dx: 6%;  --dy: -1%;  border-radius: 5.43% / 14.16%; }
+    /* Exploded donut: SVG rebuild of the screenshot donut (same demo values + colours), floating over the left bezel */
+    .boom { position: absolute; left: -16%; top: 25%; width: 76%; aspect-ratio: 1; z-index: 3; pointer-events: none; transform: rotate(3deg); }
+    .boom-svg { display: block; width: 100%; height: 100%; overflow: visible; font-family: inherit;
+      filter: drop-shadow(0 6px 8px rgba(4,20,28,.28)) drop-shadow(0 18px 28px rgba(4,20,28,.36)) drop-shadow(0 0 18px rgba(94,234,212,.35)); }
+    .boom-lab { position: absolute; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+      background: #fff; color: #1F2430; font-size: 11.5px; font-weight: 650; line-height: 1; padding: 6px 8px; border-radius: 9px;
+      box-shadow: 0 8px 18px rgba(4,20,28,.28); }
+    .boom-lab i { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+    .boom-lab b { font-weight: 800; }
+    /* Small icons: lifted a touch, richer colour, soft teal glow */
+    .pop.sm {
+      --s: 1.12; --dy: 6%; filter: saturate(1.35) brightness(1.04) contrast(1.04);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.9), 0 4px 8px rgba(4,20,28,.18), 0 12px 22px rgba(4,20,28,.30), 0 0 16px rgba(94,234,212,.45);
+      border-radius: 24%;
+    }
+    .pop.p-logo     { --x: .034375; --w: .125;     --s: 1.16; --dx: -8%; --dy: -8%; }
+    .pop.p-nav-home { --x: .015625; --w: .190625; border-radius: 22%; }
+    .pop.sm[class*="p-nav-"] { --s: 1.07; --dy: 4%; }
+    .pop.p-nav-budget   { --x: .2375;   --w: .1375; }
+    .pop.p-nav-paycycle { --x: .421875; --w: .15625; }
+    .pop.sm.p-nav-goals    { --x: .61875;  --w: .15;  --s: 1.2; --dy: 10%; z-index: 3; box-shadow: 0 0 0 1.5px rgba(255,255,255,.95), 0 6px 12px rgba(4,20,28,.2), 0 16px 28px rgba(4,20,28,.36), 0 0 22px rgba(94,234,212,.6); }
+    .pop.p-nav-partner  { --x: .815625; --w: .14375; }
+    .pop.p-avatars.sm { --s: 1.16; --dx: 10%; --dy: -10%; border-radius: 999px; }
 
     /* —— Three quick hits —— */
     .hits { max-width: 1120px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2; margin-top: -72px; display: grid; gap: 12px; }
@@ -204,9 +260,9 @@
           <span class="hero-mark"><img src="icons/logo-mark.webp" width="192" height="192" alt=""></span>
           <span class="hero-wordmark">Duo Budget</span>
         </a>
-        <p class="eyebrow"><span class="dot" aria-hidden="true"></span><span class="eyebrow-copy">Coming soon ·<br class="eyebrow-br"> Made in Australia, for Australians</span></p>
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span><span class="eyebrow-copy">Coming soon ·<br class="eyebrow-br"> Made in Australia, for Aussie couples</span></p>
         <h1 id="hero-title">Two paydays.<br><span class="glow">One plan.</span></h1>
-        <p class="pitch">The budget app for couples. Duo Budget splits <strong>shared and personal money</strong> around <strong>both your paydays</strong>, so you each know what's yours, what's ours, and what's left this fortnight.</p>
+        <p class="pitch">Budgeting's easier as a team. Made for couples, Duo Budget sorts your <strong>shared and personal money</strong> around <strong>both your paydays</strong>, so you can both see what's left this fortnight.</p>
         <div class="ctas">
           <a class="btn main" href="#waitlist">Get early access</a>
           <a class="btn ghost" href="/demo/">Try the demo</a>
@@ -239,8 +295,29 @@
       <div class="phone-wrap">
         <figure class="phone">
           <div class="bezel"><img src="img/iphone-home.webp" width="640" height="1387" alt="Duo Budget Home on iPhone: $1,172.78 left over this fortnight for demo couple Chloe and Jack" fetchpriority="high"></div>
+          <img class="pop sm p-logo" src="img/pop/logo.webp" width="80" height="70" alt="" aria-hidden="true" style="--y: .018745">
+          <img class="pop sm p-avatars" src="img/pop/avatars.webp" width="110" height="70" alt="" aria-hidden="true" style="--y: .018745">
+          <img class="pop p-leftover" src="img/pop/leftover.webp" width="589" height="226" alt="" aria-hidden="true" style="--y: .086518">
+          <div class="boom" aria-hidden="true">
+            <svg class="boom-svg" viewBox="-130 -130 260 260" focusable="false">
+              <defs><radialGradient id="boomHole" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#F3F7FA"/></radialGradient><radialGradient id="boomPlate" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#EEF5F7"/></radialGradient><filter id="boomSeg" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#04141C" flood-opacity=".28"/></filter></defs>
+              <circle class="boom-plate" r="106" fill="url(#boomPlate)" stroke="#fff" stroke-width="2"/>
+              <g class="boom-ring" filter="url(#boomSeg)"><path d="M2.40 -85.97A86 86 0 0 1 48.59 -70.96L32.77 -47.86A58 58 0 0 0 1.62 -57.98Z" fill="#0E7490" transform="translate(2.47 -7.61)"/><path d="M52.47 -68.14A86 86 0 0 1 81.02 -28.85L54.64 -19.46A58 58 0 0 0 35.39 -45.95Z" fill="#6D4AD8" transform="translate(6.47 -4.70)"/><path d="M82.50 -24.28A86 86 0 1 1 -82.50 -24.28L-55.64 -16.38A58 58 0 1 0 55.64 -16.38Z" fill="#2F5ED0" transform="translate(0.00 4.80)"/><path d="M-81.02 -28.85A86 86 0 0 1 -2.40 -85.97L-1.62 -57.98A58 58 0 0 0 -54.64 -19.46Z" fill="#037858" transform="translate(-4.70 -6.47)"/></g>
+              <circle r="51" fill="url(#boomHole)" stroke="#E6EEF2" stroke-width="1.5"/>
+              <text y="-6" text-anchor="middle" font-size="11" font-weight="700" letter-spacing=".08em" fill="#5B6170">INCOME</text>
+              <text y="18" text-anchor="middle" font-size="22" font-weight="800" fill="#1F2430">$5,820</text>
+            </svg>
+            <span class="boom-lab" style="left:79%;top:7%"><i style="background:#0E7490"></i>Savings <b>10%</b></span>
+            <span class="boom-lab" style="left:100%;top:30%"><i style="background:#6D4AD8"></i>Personal <b>10%</b></span>
+            <span class="boom-lab" style="left:50%;top:98%"><i style="background:#2F5ED0"></i>Expenses <b>60%</b></span>
+            <span class="boom-lab" style="left:33%;top:-1%"><i style="background:#037858"></i>Left over <b>20%</b></span>
+          </div>
+          <img class="pop sm p-nav-home" src="img/pop/nav-home.webp" width="122" height="90" alt="" aria-hidden="true" style="--y: .927181">
+          <img class="pop sm p-nav-budget" src="img/pop/nav-budget.webp" width="88" height="84" alt="" aria-hidden="true" style="--y: .928623">
+          <img class="pop sm p-nav-paycycle" src="img/pop/nav-paycycle.webp" width="100" height="84" alt="" aria-hidden="true" style="--y: .928623">
+          <img class="pop sm p-nav-goals" src="img/pop/nav-goals.webp" width="96" height="84" alt="" aria-hidden="true" style="--y: .928623">
+          <img class="pop sm p-nav-partner" src="img/pop/nav-partner.webp" width="92" height="84" alt="" aria-hidden="true" style="--y: .928623">
           <span class="tag t1" aria-hidden="true">Ours · <b>Yours</b> · Mine</span>
-          <span class="tag t2" aria-hidden="true">Next payday: <b>1 day</b></span>
         </figure>
       </div>
     </section>
