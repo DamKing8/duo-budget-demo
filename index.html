@@ -3791,7 +3791,9 @@ function parseVoice(text){
 function startListen(onText,onErr,say){
   var native=window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.duoSpeech;
   var Ctor=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(native&&!Ctor){
+  // WKWebView has no Web Speech API. When the iPhone shell registered duoSpeech,
+  // use it even if a constructor exists, so the first tap shows the system prompt.
+  if(native){
     window.__duoVoiceResult=function(t){onText(t);};
     window.__duoVoiceError=function(m){onErr(m||'Voice isn’t available on this iPhone right now. Type the phrase instead.');};
     say('Listening…');try{native.postMessage({action:'start',lang:'en-AU'});}catch(e){onErr('Voice isn’t available in the app shell. Type the phrase instead.');}

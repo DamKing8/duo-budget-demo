@@ -44,6 +44,8 @@ need(plistString(plist, 'CFBundleShortVersionString') === '$(MARKETING_VERSION)'
 need(plistString(plist, 'CFBundleVersion') === '$(CURRENT_PROJECT_VERSION)', 'build number must come from CURRENT_PROJECT_VERSION');
 need(plistString(plist, 'CFBundleIdentifier') === '$(PRODUCT_BUNDLE_IDENTIFIER)', 'bundle id must come from PRODUCT_BUNDLE_IDENTIFIER');
 need(/<key>CFBundleURLSchemes<\/key>\s*<array>\s*<string>au\.duobudget\.app<\/string>\s*<\/array>/.test(plist), 'Info.plist must register the URL scheme au.duobudget.app');
+need(plistString(plist, 'NSMicrophoneUsageDescription') === 'Duo Budget uses the microphone so you can add an expense by saying it out loud.', 'Info.plist must include NSMicrophoneUsageDescription for spoken expenses');
+need(plistString(plist, 'NSSpeechRecognitionUsageDescription') === 'Duo Budget uses speech recognition to turn what you say into an expense entry.', 'Info.plist must include NSSpeechRecognitionUsageDescription for spoken expenses');
 need(!/UIBackgroundModes|aps-environment|com\.apple\.developer|NFCReaderUsageDescription/.test(plist), 'Info.plist must not request push or other paid capabilities');
 
 var project = read('capacitor-ios/App/App.xcodeproj/project.pbxproj');
@@ -115,6 +117,11 @@ need(publicIndex.indexOf('appUrlOpen') !== -1, 'synced web assets must listen fo
 need(publicIndex.indexOf('exchangeCodeForSession') !== -1, 'synced web assets must exchange the PKCE code');
 need(fs.existsSync(path.join(ios, 'App/App/public/supabase.js')), 'synced web assets must include supabase.js');
 need(fs.existsSync(path.join(ios, 'App/App/public/icons')), 'synced web assets must include icons');
+
+var scene = read('capacitor-ios/App/App/SceneDelegate.swift');
+need(scene.indexOf('name: "duoSpeech"') !== -1, 'the iOS shell must register the duoSpeech handler before the page loads');
+need(scene.indexOf('requestAuthorization') !== -1, 'voice entry must ask for speech recognition permission');
+need(scene.indexOf('requestRecordPermission') !== -1, 'voice entry must ask for microphone permission');
 
 var syncJs = read('backend/client/duo-sync.js');
 need(syncJs.indexOf("var NATIVE_AUTH_REDIRECT='au.duobudget.app://auth-callback'") !== -1, 'native redirect must be au.duobudget.app://auth-callback');
