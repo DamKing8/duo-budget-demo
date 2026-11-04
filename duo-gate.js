@@ -22,7 +22,6 @@
   var bioAvailable = false;
   var mode = '';
   var lockKind = '';
-  // One line to swap when the lock-screen slogan is final.
   var LOCK_SLOGAN = 'Plan around both paydays.';
 
   function $(id) { return document.getElementById(id); }
@@ -414,8 +413,12 @@
       var padHtml = (gate.ok || kind !== 'unlock') ? pad('gate-pad') : '';
       if (kind === 'unlock') {
         show('<div class="lock-invite" data-test="lock-screen">' +
-          '<div class="lock-top">' + logo() + '<h2 class="page">' + title + '</h2><p class="lock-slogan" data-test="lock-slogan">' + esc(LOCK_SLOGAN) + '</p></div>' +
-          '<div class="lock-mid">' + dots(0) + padHtml + '<div class="ferr" id="gate-err"></div>' + err + forgot + help + '</div>' +
+          '<div class="lock-mid">' +
+            '<div class="logo mark duo-mark lock-logo"><img src="icons/logo-mark.webp" width="168" height="168" alt=""></div>' +
+            '<h2 class="page">' + title + '</h2>' +
+            '<p class="lock-slogan" data-test="lock-slogan">' + esc(LOCK_SLOGAN) + '</p>' +
+            dots(0) + padHtml + '<div class="ferr" id="gate-err"></div>' + err + forgot + help +
+          '</div>' +
           (bioBtn ? '<div class="lock-foot">' + bioBtn + '</div>' : '') +
           '</div>', { lock: true });
       } else {
