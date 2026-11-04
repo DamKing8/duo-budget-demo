@@ -1034,8 +1034,6 @@ html[data-theme=light] #sp-save.btn.pri{
 button.otp-resend:disabled{opacity:.55}
 .fx-result{margin-top:12px;font-size:22px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
 .fx-result small{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-top:4px}
-.voice-parsed{background:rgba(14,116,144,.08);border:1px solid rgba(14,116,144,.28);border-radius:14px;padding:12px 14px;margin-top:12px;font-size:14px;line-height:1.45}
-.mic-btn{display:flex;align-items:center;justify-content:center;gap:8px}
 @media (max-width:767px){
   #v-dash.on{display:flex;flex-direction:column}
   #v-dash .dcol{display:contents}
@@ -1162,7 +1160,7 @@ html.duo-privacy .app,html.duo-privacy nav.tabs{filter:blur(16px)}
     <div class="card tr-entry" data-layout="trends" data-test="trends-card"><h3><span>Trends</span></h3><div class="row2"><div class="hint" id="trEntryLine"></div><button class="tr-link" data-open-trends data-test="see-trends">See trends</button></div></div>
     </div>
     <div class="card c-split" data-layout="split">
-      <h3><span>Ours · Yours · Mine</span><span class="muted" style="font-size:12px;font-weight:500">whose outgoings</span></h3>
+      <h3><span>Ours · Me · Partner</span><span class="muted" style="font-size:12px;font-weight:500">whose outgoings</span></h3>
       <div class="bar" id="splitBar"></div>
       <div class="split" id="split"></div>
       <div class="hint" id="jsNote" data-test="joint-savings-note"></div>
@@ -1174,7 +1172,7 @@ html.duo-privacy .app,html.duo-privacy nav.tabs{filter:blur(16px)}
   <section class="view" id="v-budget" data-layout-tab="budget">
     <div class="summary-strip"><div><div class="l" id="stripLbl">Left over this fortnight</div><div class="v" id="stripV">$0</div></div><span class="pill" id="stripPill">Fortnight</span></div>
     <div class="bud-head"><h2 class="page">Budget</h2><span style="display:flex;gap:8px"><button class="tr-link" type="button" data-open-spent data-test="budget-spending">Spending</button><button class="tr-link" data-open-trends data-test="budget-trends">Trends</button></span></div>
-    <p class="sub">Tap a name to edit it. Tap the tag to switch between ours, yours and mine. Swipe an expense left to delete. Hold an expense to reorder it. Hold a group to rearrange.</p>
+    <p class="sub">Tap a name to edit it. Tap the tag to switch between ours, me and partner. Swipe an expense left to delete. Hold an expense to reorder it. Hold a group to rearrange.</p>
     <div id="groups"></div>
   </section>
 
@@ -1315,7 +1313,7 @@ function create(opts){
   function load(){try{var m=JSON.parse(store.getItem(MK)||'null');if(m&&m.v===1)return m;}catch(e){}return {v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:null};}
   function persist(){try{store.setItem(MK,JSON.stringify(meta));}catch(e){}}
   function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
-  // ---- no-secrets diagnostics (shown as the "Sync status" line)
+  // Diagnostics stay in the console. The sync card does not show them.
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
   function nativeShell(){var cap=nativeCap();try{return !!(cap&&typeof cap.isNativePlatform==='function'&&cap.isNativePlatform());}catch(e){return false;}}
@@ -1805,7 +1803,7 @@ function fmtCurrency(v,cur,opt){
 function money(v,opt){return fmtCurrency(toDisplay(v),S.currency||'AUD',opt);}
 function moneyRaw(v,opt){return fmtCurrency(v,S.currency||'AUD',opt);}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function ownerLabel(o){return o==='J'?'Joint':(S.names[o]||o);}
+function ownerLabel(o){return o==='J'?'Ours':(S.names[o]||o);}
 // totals in any period, summed at full precision from the amounts as entered
 function totalsIn(c){var t={};CATS.forEach(function(k){t[k.id]=0;});
   S.items.forEach(function(i){if(t[i.cat]!=null)t[i.cat]+=inView(i,c);});
@@ -1919,7 +1917,7 @@ function renderBudget(){
       else h+='<div class="item" data-id="'+i.id+'">'+inner+'</div>';
     });
     if(!its.length)h+='<div class="item"><span class="muted" style="font-size:14px">No items yet</span></div>';
-    h+='</div><button class="addbtn" data-add="'+c.id+'">+ Add to '+c.label.toLowerCase()+'</button>'+(c.id==='expenses'?'<button class="addbtn mic-btn" type="button" data-voice="1" data-test="voice-add">Add an expense by voice</button>':'')+'</div>';
+    h+='</div><button class="addbtn" data-add="'+c.id+'">+ Add to '+c.label.toLowerCase()+'</button></div>';
   });
   $('groups').innerHTML=h;
 }
@@ -2943,7 +2941,7 @@ var VIEWS={
    '<div class="card"><h3><span>Members</span></h3><div class="mlist">'+own+prt+'</div>'+acts+'</div>'+
    '<div class="card"><h3><span>Shared vs private</span></h3>'+
     '<div class="shr"><b>Ours</b><span>Joint items and all goals. Both of you see and edit them.</span></div>'+
-    '<div class="shr"><b>Yours/Mine</b><span>Personal items show whose they are. You both have the same access, so either of you can edit any item.</span></div>'+
+    '<div class="shr"><b>Me and Partner</b><span>Personal items show whose they are. You both have the same access, so either of you can edit any item.</span></div>'+
     '</div>'+
    '<div class="card"><h3><span>Demo controls</span><span class="tag">PROTOTYPE</span></h3>'+
     '<div class="setrow" style="border-top:0;padding-top:0"><div class="l">Simulate partner accepting<small>Instantly joins a demo partner</small></div><button class="switch'+(sim?' on':'')+'" id="m-sim" role="switch" aria-checked="'+sim+'" aria-label="Simulate partner accepting"></button></div>'+
@@ -3097,7 +3095,6 @@ document.querySelector('nav.tabs').addEventListener('click',function(e){
 $('groups').addEventListener('click',function(e){
   if(window.__duoSuppressClick)return;
   var sw=e.target.closest('[data-act="swipe-del"]');if(sw){var row=sw.closest('.item[data-id]');var it=row&&S.items.find(function(i){return i.id===row.dataset.id;});if(it)removeItem(it);return;}
-  var voice=e.target.closest('[data-voice]');if(voice){openVoice();return;}
   var add=e.target.closest('[data-add]');if(add){itemSheet(null,add.dataset.add);return;}
   if(e.target.closest('input,textarea,select'))return;
   var row=e.target.closest('.item[data-id]');if(!row)return;
@@ -3230,7 +3227,7 @@ function renderSync(st){var el=document.getElementById('syncCard');if(!el)return
   }
   if(st.state==='no-household')h+='<label class="fl" for="syncCode">Enter join code</label><input id="syncCode" class="field sync-code" data-test="join-code" placeholder="8 letters or numbers" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"><div class="btns"><button class="btn pri" id="syncJoin">Join</button><button class="btn ghost" id="syncCreate">Start a household</button></div>';
   if(['synced','pending','offline','error','no-household'].indexOf(st.state)>=0&&st.user)h+='<div class="btns"><button class="btn ghost" id="syncOut">Sign out</button></div>';
-  var d=st.debug;if(d)h+='<div class="hint" style="font-size:11px;opacity:.75;margin-top:10px;word-break:break-word" data-test="sync-debug">Sync status: '+esc([d.state,'app '+d.mode,'storage '+d.storage,'session '+d.session,'household '+d.household,'queue '+d.pending,'online '+d.online,'last event '+d.lastEvent,'return '+d.urlReturn,'error '+d.lastError].join(' · '))+'</div>';
+  if(st.debug){try{console.info('Duo sync',st.debug);}catch(e){}}
   el.innerHTML=h;
   var on=function(id,f){var b=document.getElementById(id);if(b)b.addEventListener('click',f);};
   on('syncSignIn',function(){try{sessionStorage.setItem('duo.syncReturn','1');}catch(e){}if(window.DuoGate)DuoGate.startProvider?DuoGate.startProvider('google'):__sync.signIn('google');else __sync.signIn('google');});
@@ -3785,89 +3782,10 @@ function initSwipe(){
   document.addEventListener('contextmenu',function(e){if(drag||hold)e.preventDefault();},true);
 }
 
-function parseVoice(text){
-  var raw=String(text||'').replace(/\s+/g,' ').trim(),t=raw.toLowerCase();
-  var owner='J',cat='expenses';
-  if(/\b(mine|personal|myself)\b/.test(t))owner='D';
-  else if(/\b(shared|ours|joint|together|both)\b/.test(t))owner='J';
-  else if(S&&S.names&&S.names.N&&t.indexOf(String(S.names.N).toLowerCase())>=0)owner='N';
-  else if(S&&S.names&&S.names.D&&t.indexOf(String(S.names.D).toLowerCase())>=0)owner='D';
-  else if(/\b(partner|his|hers)\b/.test(t))owner='N';
-  if(/\b(salary|wage|wages|income|payday)\b/.test(t))cat='income';
-  else if(/\b(savings|saving)\b/.test(t))cat='savings';
-  else if(/\bfun money\b/.test(t))cat='personal';
-  var amt=null,consumed='';
-  var m=t.match(/(\d+)\s*(?:dollars?|bucks|aud|usd)\s+(\d{1,2})(?:\s*cents?)?/);
-  if(m){amt=+m[1]+(+m[2])/100;consumed=m[0];}
-  else{m=t.match(/(\d+(?:[.,]\d{1,2})?)/);if(m){amt=parseFloat(m[1].replace(',','.'));consumed=m[0];}}
-  var desc=t;if(consumed)desc=desc.replace(consumed,' ');
-  desc=desc.replace(/\b(dollars?|bucks|cents?|aud|usd|shared|ours|joint|together|both|personal|mine|myself|my|own|add|expense|please|for|a|an|the|partner|his|hers)\b/g,' ');
-  if(S&&S.names){[S.names.D,S.names.N].forEach(function(n){if(!n)return;desc=desc.replace(new RegExp('\\b'+String(n).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','ig'),' ');});}
-  desc=desc.replace(/\s+/g,' ').trim();
-  if(desc)desc=desc.charAt(0).toUpperCase()+desc.slice(1);
-  return {ok:amt!=null&&isFinite(amt)&&amt>=0,amount:amt,description:desc||'Expense',category:cat,owner:owner,raw:raw,currency:(S&&S.currency)||'AUD',freq:(S&&S.cycle)||'fortnight'};
-}
-function startListen(onText,onErr,say){
-  var native=window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.duoSpeech;
-  var Ctor=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(native&&!Ctor){
-    window.__duoVoiceResult=function(t){onText(t);};
-    window.__duoVoiceError=function(m){onErr(m||'Voice isn’t available on this iPhone right now. Type the phrase instead.');};
-    say('Listening…');try{native.postMessage({action:'start',lang:'en-AU'});}catch(e){onErr('Voice isn’t available in the app shell. Type the phrase instead.');}
-    return;
-  }
-  if(!Ctor){onErr('The microphone isn’t available in this browser. Type the phrase instead. The iPhone app uses Apple’s speech recogniser when this browser API is missing.');return;}
-  try{
-    var rec=new Ctor();rec.lang='en-AU';rec.interimResults=false;rec.maxAlternatives=1;
-    rec.onresult=function(ev){var t=ev.results&&ev.results[0]&&ev.results[0][0]?ev.results[0][0].transcript:'';onText(t);};
-    rec.onerror=function(ev){var code=ev&&ev.error;onErr(code==='not-allowed'?'Microphone permission is off. Type the phrase instead.':'Couldn’t use the microphone'+(code?' ('+code+')':'')+'. Type the phrase instead.');};
-    say('Listening…');rec.start();
-  }catch(err){onErr('The microphone isn’t available here. Type the phrase instead.');}
-}
-function renderVoiceConfirm(sh,text){
-  var p=parseVoice(text),box=sh.querySelector('#v-confirm');
-  if(!p.ok){box.innerHTML='<div class="ferr">No amount in that phrase. Try “coffee 5 dollars 50 shared”.</div>';return;}
-  var catLabel=(CATS.filter(function(c){return c.id===p.cat;})[0]||CATS[3]).label;
-  box.innerHTML='<div class="voice-parsed" data-test="voice-confirm"><b>Check this before saving</b><div data-test="voice-summary">'+esc(p.description)+' · '+moneyRaw(p.amount)+' per '+esc(CYCLES[p.freq].per)+' · '+esc(ownerLabel(p.owner))+' · '+esc(catLabel)+'</div></div>'+
-    '<label class="fl" for="v-name">Description</label><input class="field" id="v-name" value="'+esc(p.description)+'">'+
-    '<label class="fl" for="v-amt">Amount ('+esc(S.currency||'AUD')+')</label><input class="field" id="v-amt" inputmode="decimal" value="'+(Math.round(p.amount*100)/100).toFixed(2)+'">'+
-    '<label class="fl">Shared or personal</label><div class="chips" id="v-own">'+['J','D','N'].map(function(o){return '<button type="button" class="chip'+(o===p.owner?' on':'')+'" data-o="'+o+'">'+esc(ownerLabel(o))+'</button>';}).join('')+'</div>'+
-    '<label class="fl">Category</label><div class="chips" id="v-cat">'+CATS.map(function(c){return '<button type="button" class="chip'+(c.id===p.cat?' on':'')+'" data-c="'+c.id+'">'+c.label+'</button>';}).join('')+'</div>'+
-    '<div class="btns"><button class="btn ghost" id="v-cancel" type="button">Cancel</button><button class="btn pri" id="v-save" type="button" data-test="voice-save">Save expense</button></div>';
-  var owner=p.owner,cat=p.cat;
-  box.querySelector('#v-own').addEventListener('click',function(e){var b=e.target.closest('[data-o]');if(!b)return;owner=b.dataset.o;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});});
-  box.querySelector('#v-cat').addEventListener('click',function(e){var b=e.target.closest('[data-c]');if(!b)return;cat=b.dataset.c;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});});
-  box.querySelector('#v-cancel').addEventListener('click',closeSheet);
-  box.querySelector('#v-save').addEventListener('click',function(){
-    var item={id:uid(),name:(box.querySelector('#v-name').value.trim()||'Expense'),amount:0,freq:S.cycle,owner:owner,cat:cat,tag:''};
-    setAmount(item,fromDisplay(parseAmt(box.querySelector('#v-amt').value)),S.cycle);
-    S.items.push(item);save();closeSheet();renderAll();toast('Added '+item.name);
-  });
-}
-function openVoice(){
-  var web=!!(window.SpeechRecognition||window.webkitSpeechRecognition);
-  var native=!!(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.duoSpeech);
-  openSheet('<h4>Add an expense by voice</h4><div class="muted" id="v-status" data-test="voice-status" style="font-size:14px;line-height:1.45"></div>'+
-    '<label class="fl" for="v-phrase">Phrase</label><input class="field" id="v-phrase" data-test="voice-phrase" placeholder="coffee 5 dollars 50 shared" autocomplete="off">'+
-    '<div class="btns"><button class="btn ghost" id="v-mic" type="button" data-test="voice-mic">Listen</button><button class="btn pri" id="v-parse" type="button" data-test="voice-parse">Read phrase</button></div><div id="v-confirm"></div>',function(sh){
-    var status=sh.querySelector('#v-status');
-    function say(msg){status.textContent=msg;}
-    if(!web&&!native)say('The microphone isn’t available in this browser. Type a phrase such as “coffee 5 dollars 50 shared”, then check it before saving. In the iPhone app, Listen uses Apple’s speech recogniser when this browser API is missing.');
-    else say('Say “coffee 5 dollars 50 shared”. Nothing is saved until you confirm.');
-    if(!web&&!native)sh.querySelector('#v-mic').disabled=true;
-    sh.querySelector('#v-parse').addEventListener('click',function(){renderVoiceConfirm(sh,sh.querySelector('#v-phrase').value);});
-    sh.querySelector('#v-phrase').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();renderVoiceConfirm(sh,this.value);}});
-    sh.querySelector('#v-mic').addEventListener('click',function(){startListen(function(t){sh.querySelector('#v-phrase').value=t;say('Heard: '+t);renderVoiceConfirm(sh,t);},say,say);});
-  });
-}
-function openVoiceConfirm(phrase){
-  openVoice();
-  setTimeout(function(){var input=document.getElementById('v-phrase');if(!input)return;input.value=phrase;var b=document.getElementById('v-parse');if(b)b.click();},40);
-}
 function applyDeepLink(){
   var h=(location.hash||'').replace(/^#/,'');
   if(h==='home')h='dash';
-  if(h==='add-expense'){var budget=document.querySelector('nav.tabs button[data-v="budget"]');if(budget)budget.click();setTimeout(openVoice,40);return;}
+  if(h==='add-expense'){var budget=document.querySelector('nav.tabs button[data-v="budget"]');if(budget)budget.click();setTimeout(function(){itemSheet(null,'expenses');},40);return;}
   if(h==='spent'){openSpent();return;}
   if(['dash','budget','cycle','goals','trends','settings'].indexOf(h)>=0){var b=document.querySelector('nav.tabs button[data-v="'+h+'"]');if(b)b.click();}
 }
@@ -3912,7 +3830,7 @@ if(!PERSONAL_BUILD&&'serviceWorker' in navigator&&location.protocol!=='file:'){n
 
 window.__duoRerender=function(){CATS.forEach(function(c){c.color=TC(c.color)});for(var i=0;i<TR_COL.length;i++)TR_COL[i]=TC(TR_COL[i]);renderAll();if(window.__duoThemeSeg)window.__duoThemeSeg();};
 window.__duo={state:function(){return S;},trends:function(sc){return trModel(sc);},trInsights:function(sc){return trInsights(trModel(sc));},trBreak:function(sc,off){var M=trModel(sc);return trBreak(M,M.rows[M.rows.length-1-(off||0)]);},trWins:trWins,trRows:trRows,invStatus:invStatus,totals:totals,totalsIn:totalsIn,projection:projection,shares:shares,paydaysFor:function(c,d,n){return paydaysFor(c,d,n).map(isoLocal);},payWindow:payWindow,lrPct:lrPct,payAt:function(iso,c,k){return isoLocal(payAt(parseISO(iso),c,k));},migrateV4:migrateV4,spentIn:spentIn,spentByLine:spentByLine,spentByOwner:spentByOwner,parseSpendAmount:parseSpendAmount,entryInWindow:entryInWindow,openSpend:openSpendSheet};
-window.__duo.parseVoice=parseVoice;window.__duo.openVoiceConfirm=openVoiceConfirm;window.__duo.convert=convertFX;window.__duo.fx=function(){return {rates:Object.assign({},FX.rates),asOf:FX.asOf,offline:!!FX.offline,error:FX.error,source:FX.source,currency:S.currency};};window.__duo.layout=function(){return S.layout||null;};window.__duo.widget=function(){try{return JSON.parse(localStorage.getItem('duoBudget.widget')||'null');}catch(e){return null;}};
+window.__duo.convert=convertFX;window.__duo.fx=function(){return {rates:Object.assign({},FX.rates),asOf:FX.asOf,offline:!!FX.offline,error:FX.error,source:FX.source,currency:S.currency};};window.__duo.layout=function(){return S.layout||null;};window.__duo.widget=function(){try{return JSON.parse(localStorage.getItem('duoBudget.widget')||'null');}catch(e){return null;}};
 })();
 </script>
 
