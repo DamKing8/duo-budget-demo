@@ -197,6 +197,7 @@ async function main() {
   await testNativeSignIn();
   await testPasswordAndIdToken();
   await testGuestChoiceDoesNotMerge();
+  await testNativeSignInWhenBrowserCloseRejects();
   console.log('sync ok');
 }
 
@@ -234,16 +235,23 @@ async function testWebSignIn() {
   assert(api.debug().mode === 'browser', 'web sign-in is not marked native');
 }
 
-async function testNativeSignIn() {
+/* Same bridge on Android and iOS: isNativePlatform(), not a platform name.
+   closeRejects covers iOS dismissing SFSafariViewController before Browser.close() runs. */
+function nativeCapacitor(closeRejects) {
   var opened = [];
-  var exchanged = [];
+  var closed = 0;
   var listeners = [];
   global.Capacitor = {
     isNativePlatform: function () { return true; },
+    getPlatform: function () { throw new Error('sign-in must not branch on getPlatform'); },
     Plugins: {
       Browser: {
         open: function (opts) { opened.push(opts.url); return Promise.resolve(); },
-        close: function () { return Promise.resolve(); }
+        close: function () {
+          closed += 1;
+          if (closeRejects) return Promise.reject(new Error('No active window to close!'));
+          return Promise.resolve();
+        }
       },
       App: {
         addListener: function (ev, cb) { listeners.push({ ev: ev, cb: cb }); return Promise.resolve(); },
@@ -251,32 +259,40 @@ async function testNativeSignIn() {
       }
     }
   };
-  var seen = null;
+  return { opened: opened, closed: function () { return closed; }, listeners: listeners };
+}
+
+function nativeAuthClient(exchanged) {
+  return {
+    from: function () {
+      return { select: function () { return Promise.resolve({ data: [], error: null }); } };
+    },
+    auth: {
+      onAuthStateChange: function () {},
+      getSession: function () { return Promise.resolve({ data: { session: null }, error: null }); },
+      signInWithOAuth: function (opts) {
+        nativeAuthClient.seen = opts;
+        return Promise.resolve({ data: { url: 'https://ksrffninlyioqobvdvhu.supabase.co/auth/v1/authorize?provider=google' }, error: null });
+      },
+      exchangeCodeForSession: function (code) {
+        exchanged.push(code);
+        return Promise.resolve({ data: { session: { user: { id: USER_D, email: 'chloe@example.com' } } }, error: null });
+      }
+    }
+  };
+}
+
+async function testNativeSignIn() {
+  var cap = nativeCapacitor(false);
+  var exchanged = [];
+  nativeAuthClient.seen = null;
   try {
     var api = DuoSync.create({
       config: { enabled: true, supabaseUrl: 'https://example.supabase.co', supabaseAnonKey: 'test' },
       storageKey: 'duo-native-signin',
       storage: memory(),
       app: emptyApp(),
-      createClient: function () {
-        return {
-          from: function () {
-            return { select: function () { return Promise.resolve({ data: [], error: null }); } };
-          },
-          auth: {
-            onAuthStateChange: function () {},
-            getSession: function () { return Promise.resolve({ data: { session: null }, error: null }); },
-            signInWithOAuth: function (opts) {
-              seen = opts;
-              return Promise.resolve({ data: { url: 'https://ksrffninlyioqobvdvhu.supabase.co/auth/v1/authorize?provider=google' }, error: null });
-            },
-            exchangeCodeForSession: function (code) {
-              exchanged.push(code);
-              return Promise.resolve({ data: { session: { user: { id: USER_D, email: 'chloe@example.com' } } }, error: null });
-            }
-          }
-        };
-      },
+      createClient: function () { return nativeAuthClient(exchanged); },
       redirectTo: 'https://duobudget.com.au/index.html',
       now: function () { return 0; },
       online: function () { return true; },
@@ -285,13 +301,15 @@ async function testNativeSignIn() {
     await api.start();
     assert(api.debug().mode === 'native', 'native shell is visible in sync status');
     await api.signIn();
+    var seen = nativeAuthClient.seen;
     assert(seen.options.skipBrowserRedirect === true, 'native sign-in does not navigate the webview');
     assert(seen.options.redirectTo === 'au.duobudget.app://auth-callback', 'native redirect is the app scheme');
-    assert(opened.length === 1 && opened[0].indexOf('https://ksrffninlyioqobvdvhu.supabase.co/') === 0, 'native opens the Supabase authorize URL');
-    var open = listeners.filter(function (l) { return l.ev === 'appUrlOpen'; })[0];
+    assert(cap.opened.length === 1 && cap.opened[0].indexOf('https://ksrffninlyioqobvdvhu.supabase.co/') === 0, 'native opens the Supabase authorize URL');
+    var open = cap.listeners.filter(function (l) { return l.ev === 'appUrlOpen'; })[0];
     assert(open, 'native listens for the return link');
     open.cb({ url: 'au.duobudget.app://auth-callback?code=abc123' });
     await new Promise(function (ok) { setTimeout(ok, 30); });
+    assert(cap.closed() === 1, 'native sign-in closes the in-app browser before exchanging the code');
     assert(exchanged.length === 1 && exchanged[0] === 'abc123', 'native exchanges the PKCE code');
     assert(api.status().user === 'chloe@example.com', 'native session is applied');
     open.cb({ url: 'au.duobudget.app://auth-callback?code=abc123' });
@@ -409,6 +427,34 @@ async function testGuestChoiceDoesNotMerge() {
   assert(local.items.length === 1 && local.items[0].name === 'Cloud rent', 'the account budget is the one that stays');
   assert(!local.items.some(function (it) { return it.name === 'Phone only'; }), 'the phone-only line is not merged in');
   assert(!db.budget_items.some(function (r) { return r.name === 'Phone only'; }), 'the phone-only line is not uploaded');
+}
+
+async function testNativeSignInWhenBrowserCloseRejects() {
+  var cap = nativeCapacitor(true);
+  var exchanged = [];
+  try {
+    var api = DuoSync.create({
+      config: { enabled: true, supabaseUrl: 'https://example.supabase.co', supabaseAnonKey: 'test' },
+      storageKey: 'duo-native-signin-close-fails',
+      storage: memory(),
+      app: emptyApp(),
+      createClient: function () { return nativeAuthClient(exchanged); },
+      redirectTo: 'https://duobudget.com.au/index.html',
+      now: function () { return 0; },
+      online: function () { return true; },
+      flushDelay: 60000
+    });
+    await api.start();
+    await api.signIn();
+    var open = cap.listeners.filter(function (l) { return l.ev === 'appUrlOpen'; })[0];
+    open.cb({ url: 'au.duobudget.app://auth-callback?code=xyz789' });
+    await new Promise(function (ok) { setTimeout(ok, 30); });
+    assert(cap.closed() === 1, 'a missing in-app browser is still asked to close');
+    assert(exchanged.length === 1 && exchanged[0] === 'xyz789', 'exchange still runs when Browser.close rejects');
+    assert(api.status().user === 'chloe@example.com', 'session is applied when the browser was already gone');
+  } finally {
+    delete global.Capacitor;
+  }
 }
 
 main().catch(function (e) {

@@ -4,7 +4,8 @@
   "description": "Duo Budget planning app. Android and the Capacitor iOS shell live beside the existing widget project in ios/.",
   "scripts": {
     "sync:www": "node ios/sync-www.js",
-    "cap:sync": "node ios/sync-www.js && npx cap sync",
+    "cap:sync": "node ios/sync-www.js && npx cap sync && node tools/check-ios-ready.js",
+    "ios:prepare": "node ios/sync-www.js && npx cap sync ios && node tools/check-ios-ready.js",
     "android:debug": "npm run cap:sync && cd android && ./gradlew assembleDebug",
     "test:bucket": "TZ=Australia/Sydney node test-spend-bucket.js",
     "test:copy": "node tools/copy-lint.js && node tools/shot-guard.js",
