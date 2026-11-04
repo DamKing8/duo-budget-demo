@@ -1090,6 +1090,25 @@ button.otp-resend:disabled{opacity:.55}
 .lock-after{padding:8px 2px}
 .duo-links{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .duo-links .btn{white-space:nowrap}
+.duo-gate.lock-open .duo-gate-in{min-height:100%;display:flex;flex-direction:column;box-sizing:border-box;padding-bottom:0}
+.lock-invite{flex:1 0 auto;display:flex;flex-direction:column;text-align:center;min-height:100%;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+.lock-top{padding-top:4px}
+.lock-top h2.page{margin:8px 0 4px;text-align:center}
+.lock-slogan{margin:0 8px;color:var(--muted);font-size:15px;line-height:1.4}
+.lock-mid{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%}
+.lock-mid .duo-pad{width:min(280px,100%)}
+.lock-mid .ferr,.lock-mid .sub,.lock-mid .mock,.lock-mid .linkbtn{width:100%;text-align:center}
+.lock-foot{margin-top:auto;width:100%;padding-top:16px}
+.lock-foot .btn{width:100%;border-radius:14px}
+@media (max-height:700px){
+  .lock-invite .duo-mark{width:56px;height:56px;margin:0 auto 4px}
+  .lock-invite .duo-mark img{width:56px;height:56px}
+  .lock-top h2.page{font-size:24px;margin:2px 0}
+  .lock-slogan{font-size:14px}
+  .lock-invite .duo-dots{margin:10px 0}
+  .lock-invite .duo-pad{gap:8px}
+  .lock-invite .duo-pad button{min-height:52px}
+}
 html.duo-gated .app,html.duo-gated nav.tabs{visibility:hidden}
 html.duo-privacy .app,html.duo-privacy nav.tabs{filter:blur(16px)}
 </style>
