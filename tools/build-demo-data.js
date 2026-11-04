@@ -18,7 +18,7 @@ html = html.slice(0, at) + seed + '\n' + html.slice(at);
 if (html.indexOf('Chloe') < 0 || html.indexOf('Jack') < 0) throw new Error('demo household missing');
 fs.writeFileSync(path.join(dest, 'index.html'), html);
 fs.cpSync(path.join(root, 'icons'), path.join(dest, 'icons'), { recursive: true });
-['supabase.js', 'sw.js', 'manifest.webmanifest', 'duo-account.js', 'duo-lock.js', 'duo-gate.js'].forEach(function (f) {
+['supabase.js', 'sw.js', 'manifest.webmanifest', 'duo-account.js', 'duo-lock.js', 'duo-gate.js', 'duo-premium.js', 'duo-premium-ui.js'].forEach(function (f) {
   fs.copyFileSync(path.join(root, f), path.join(dest, f));
 });
 console.log('built ' + dest);

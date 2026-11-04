@@ -1091,6 +1091,9 @@ button.otp-resend:disabled{opacity:.55}
 .duo-links .btn{white-space:nowrap}
 html.duo-gated .app,html.duo-gated nav.tabs{visibility:hidden}
 html.duo-privacy .app,html.duo-privacy nav.tabs{filter:blur(16px)}
+html[data-accent="plum"]{--cyan:#7c3aed;--teal:#5b21b6}
+html[data-accent="sand"]{--cyan:#b45309;--teal:#9a3412}
+html[data-accent="forest"]{--cyan:#047857;--teal:#065f46}
 </style>
 </head>
 <body>
@@ -1212,6 +1215,8 @@ html.duo-privacy .app,html.duo-privacy nav.tabs{filter:blur(16px)}
     <div class="card" id="syncCard" data-layout="set-sync" data-test="sync-card" hidden></div>
     <div class="card" id="accountCard" data-test="account-card" hidden></div>
     <div class="card" id="lockCard" data-test="lock-card" hidden></div>
+    <div class="card" id="premiumCard" data-test="premium-card" hidden></div>
+    <div class="card" id="premiumExtras" data-test="premium-extras" hidden></div>
     <div class="card" data-layout="set-names">
       <label class="fl" for="nameA" style="margin-top:0">Your name</label>
       <input class="field" id="nameA" maxlength="16">
@@ -1267,6 +1272,7 @@ html.duo-privacy .app,html.duo-privacy nav.tabs{filter:blur(16px)}
 <script src="supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R"></script>
 <script>window.DUO_SYNC_CONFIG={"enabled":true,"supabaseUrl":"https://ksrffninlyioqobvdvhu.supabase.co","supabaseAnonKey":"sb_publishable_kYFCNsoHhW537_RtxtOxKg_4agyXKDI"};</script>
 <script>window.DUO_AUTH_CONFIG=Object.assign({apple:false,google:true,allowGoogleWithoutApple:false,appleClientId:"",googleWebClientId:"",googleIosClientId:"",googleAndroidClientId:""},window.DUO_AUTH_CONFIG||{});</script>
+<script>window.DUO_PREMIUM_CONFIG=Object.assign({revenueCatKey:"",revenueCatAppleKey:"",revenueCatGoogleKey:"",mock:true},window.DUO_PREMIUM_CONFIG||{});</script>
 <!-- @@DEPLOY_END@@ -->
 <script id="duo-sync-lib">/*@@SYNC_START@@*/
 /* Duo Budget cloud sync (phase 1: built and tested offline; OFF by default).
@@ -1687,6 +1693,8 @@ return {create:create,TABLES:TABLES,_stable:stable};
 <script src="duo-account.js"></script>
 <script src="duo-lock.js"></script>
 <script src="duo-gate.js"></script>
+<script src="duo-premium.js"></script>
+<script src="duo-premium-ui.js"></script>
 <script>
 (function(){
 'use strict';
@@ -3880,6 +3888,33 @@ if(window.DuoGate)DuoGate.start({
   leaveSample:leaveSample
 });
 window.__duoReady=startSync();
+if(window.DuoPremiumUI){
+  var premiumUi=DuoPremiumUI.install({
+    storage:localStorage,
+    config:function(){return window.DUO_PREMIUM_CONFIG||{};},
+    getS:function(){return S;},
+    save:save,
+    render:function(){renderAll();},
+    openSheet:openSheet,
+    closeSheet:closeSheet,
+    toast:toast,
+    uid:uid,
+    signedIn:function(){var st=__sync&&__sync.status?__sync.status():null;return !!(st&&st.user);},
+    userId:function(){var st=__sync&&__sync.status?__sync.status():null;return st&&st.uid||'';},
+    openPartner:function(){var b=document.querySelector('nav.tabs button[data-v="settings"]');if(b)b.click();},
+    offline:function(){return typeof navigator!=='undefined'&&navigator.onLine===false;},
+    currentSpendWindow:currentSpendWindow,
+    spendOff:function(){return SP.off;},
+    forecast:function(n){var t=totals();return nextPaydays(n).map(function(d,i){return {label:i===0?'This payday':fmtDate(d),left:money(t.remainder)};});}
+  });
+  goalForm=premiumUi.goalForm(goalForm);
+  goalDetail=premiumUi.goalDetail(goalDetail);
+  renderGoals=premiumUi.renderGoals(renderGoals);
+  renderSpent=premiumUi.renderSpent(renderSpent);
+  renderTrends=premiumUi.renderTrends(renderTrends);
+  renderCycle=premiumUi.renderCycle(renderCycle);
+  renderAll();
+}
 initLayout();
 initSwipe();
 bindConverter();

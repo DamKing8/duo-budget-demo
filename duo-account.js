@@ -93,6 +93,8 @@
     add(LEGACY_KEY);
     add(LEGACY_KEY + '.sync');
     add(WIDGET_KEY);
+    add('duoBudget.premium.mock');
+    add('duoBudget.premium.cache');
     if (uid) { add(budgetKey(uid)); add(budgetKey(uid) + '.sync'); }
     eachKey(store, function (k) {
       if (k.indexOf('duoBudget.u.') === 0 || k.indexOf(BACKUP_PREFIX) === 0) add(k);

@@ -7,7 +7,7 @@ var root = path.join(__dirname, '..');
 var dest = path.join(root, 'build', 'capacitor');
 fs.rmSync(dest, { recursive: true, force: true });
 fs.mkdirSync(dest, { recursive: true });
-['index.html', 'supabase.js', 'manifest.webmanifest', 'sw.js', 'duo-account.js', 'duo-lock.js', 'duo-gate.js'].forEach(function (name) {
+['index.html', 'supabase.js', 'manifest.webmanifest', 'sw.js', 'duo-account.js', 'duo-lock.js', 'duo-gate.js', 'duo-premium.js', 'duo-premium-ui.js'].forEach(function (name) {
   fs.copyFileSync(path.join(root, name), path.join(dest, name));
 });
 fs.cpSync(path.join(root, 'icons'), path.join(dest, 'icons'), { recursive: true });

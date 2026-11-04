@@ -73,3 +73,34 @@ Native Google and Apple sheets do nothing until the client ids below are filled 
 - The auth settings in `backend/auth/config.toml`. They are notes for the dashboard, not a push.
 
 Full credential list: `docs/auth-setup.md`.
+
+## Premium
+
+Premium is previewed on the device until a RevenueCat key is set. The preview does not call Apple, Google, or Supabase. Partners → Premium has six states: free, trial, active, lapsed, partner, courtesy. "This store account has a purchase" controls Restore purchases.
+
+The free plan includes partner sync, unlimited expenses, CSV export, and light, dark, and system themes. It includes 2 goals, 3 months of spending and trends, 5 custom categories, 1 bill reminder, and the current payday. Premium is unlimited goals, the older history (still saved), the further paydays, unlimited categories and reminders, and the extra colours.
+
+### Web
+
+```bash
+npx serve .
+```
+
+Open a private window so an old budget does not skip the new cards. Sign in, or use the preview without a store.
+
+| Screen | How |
+| --- | --- |
+| Paywall | Goals → Add a goal once two goals exist. Prices are A$4.99 a month and A$39.99 a year. |
+| Third goal | With three goals on the free preview, the third card says it is read-only. |
+| History | Spending → previous payday until the page says older spending stays saved. |
+| Lapsed | Partners → Premium → lapsed, then open that third goal. |
+| Partner covers you | Partners → Premium → partner. |
+| Restore | Tick "This store account has a purchase", then Restore purchases. |
+
+### iPhone and Android
+
+Same preview. Build with the milestone 1 steps (`npm run cap:sync`, then Xcode or `npm run android:debug`). The preview chips are on the Partner tab. Face ID and the store sheet do not appear, because there is no RevenueCat key and no store product.
+
+A free Apple ID can install this. It cannot complete a real subscription. Sandbox testing needs the products in `docs/premium-products.md`, a RevenueCat project, an App Store sandbox tester, and a Play licence tester. Put the public SDK key in `DUO_PREMIUM_CONFIG` and set `mock` to false. Then Restore purchases calls the store.
+
+The entitlement table and the webhook are files only. They are not on the live database, so a real purchase would not light up Premium until those are applied and the webhook secret is set.
