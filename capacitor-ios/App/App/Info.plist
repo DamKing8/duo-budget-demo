@@ -68,10 +68,6 @@
 	<true/>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Duo Budget uses Face ID to unlock your budget.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Duo Budget uses the microphone so you can add an expense by saying it out loud.</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Duo Budget uses speech recognition to turn what you say into an expense entry.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
