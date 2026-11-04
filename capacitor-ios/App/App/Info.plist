@@ -66,6 +66,8 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Duo Budget uses Face ID to unlock your budget.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

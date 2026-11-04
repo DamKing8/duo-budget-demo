@@ -9,17 +9,22 @@
     "test:bucket": "TZ=Australia/Sydney node test-spend-bucket.js",
     "test:copy": "node tools/copy-lint.js && node tools/shot-guard.js",
     "test:sync": "node tools/inline-sync.js --check && node backend/test/test-sync.js",
+    "test:auth": "node backend/test/test-account.js && node backend/test/test-lock.js",
     "test:sql": "node backend/test/test-rls.js && DUO_STUB_EXPOSED=1 node backend/test/test-rls.js && node backend/test/test-delete-account.js",
     "test:spend": "node tools/build-personal.js && node tools/build-demo-data.js && node tools/privacy-check.js && node test-spending.js",
-    "test": "npm run test:bucket && npm run test:copy && npm run test:sync && npm run test:sql && npm run test:spend"
+    "test": "npm run test:bucket && npm run test:copy && npm run test:sync && npm run test:auth && npm run test:sql && npm run test:spend"
   },
   "dependencies": {
+    "@aparajita/capacitor-biometric-auth": "10.0.0",
+    "@aparajita/capacitor-secure-storage": "8.0.1",
     "@capacitor/android": "^8.6.0",
     "@capacitor/app": "^8.1.2",
     "@capacitor/browser": "^8.0.5",
     "@capacitor/core": "^8.6.0",
     "@capacitor/ios": "^8.6.0",
-    "@capacitor/splash-screen": "^8.0.2"
+    "@capacitor/privacy-screen": "2.0.1",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capgo/capacitor-social-login": "8.7.6"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.6.0",

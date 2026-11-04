@@ -1,4 +1,7 @@
 node_modules/
+auth.local.js
+.env
+.env.local
 www/
 .DS_Store
 *.xcuserstate
