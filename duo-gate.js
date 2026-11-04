@@ -21,6 +21,9 @@
   var bioType = 0;
   var bioAvailable = false;
   var mode = '';
+  var lockKind = '';
+  // One line to swap when the lock-screen slogan is final.
+  var LOCK_SLOGAN = 'Plan around both paydays.';
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -129,11 +132,12 @@
     var g = $('duoGate');
     return !!(g && g.classList.contains('on') && mode.indexOf('lock') === 0);
   }
-  function show(html) {
+  function show(html, opts) {
     var g = $('duoGate');
     if (!g) return;
     g.innerHTML = '<div class="duo-gate-in">' + html + '</div>';
     g.classList.add('on');
+    g.classList.toggle('lock-open', !!(opts && opts.lock));
     g.removeAttribute('hidden');
     document.documentElement.classList.add('duo-gated');
   }
@@ -141,6 +145,7 @@
     var g = $('duoGate');
     if (!g) return;
     g.classList.remove('on');
+    g.classList.remove('lock-open');
     g.setAttribute('hidden', '');
     g.innerHTML = '';
     document.documentElement.classList.remove('duo-gated');
@@ -169,6 +174,7 @@
     return p.checkBiometry().then(function (info) {
       bioAvailable = !!(info && info.isAvailable);
       bioType = info && info.biometryType || 0;
+      if (bioAvailable && mode === 'lock' && lockKind === 'unlock' && !$('gate-bio')) showLock('unlock');
       return bioAvailable;
     }).catch(function () { bioAvailable = false; return false; });
   }
@@ -390,7 +396,9 @@
   function showLock(kind) {
     mode = 'lock';
     kind = kind || 'unlock';
+    lockKind = kind;
     secretGet().then(function (rec) {
+      if (lockKind !== kind) return;
       secret = rec;
       if (kind === 'unlock' && (!secret || !secret.hash)) { showLock('create'); return; }
       var now = Date.now();
@@ -403,8 +411,16 @@
       else if (kind === 'unlock' && gate.reason === 'backoff') err = '<p class="sub">Try again in ' + Math.ceil((gate.until - now) / 1000) + ' seconds.</p>';
       var title = kind === 'create' ? 'Choose a passcode' : kind === 'confirm' ? 'Enter it again' : 'Duo Budget is locked';
       var forgot = kind === 'unlock' ? '<button class="linkbtn" type="button" id="gate-forgot-pass" data-test="forgot-passcode">Forgot passcode?</button>' : '';
-      show('<div data-test="lock-screen"><h2 class="page">' + title + '</h2>' + bioBtn + dots(0) +
-        (gate.ok || kind !== 'unlock' ? pad('gate-pad') : '') + '<div class="ferr" id="gate-err"></div>' + err + forgot + help + '</div>');
+      var padHtml = (gate.ok || kind !== 'unlock') ? pad('gate-pad') : '';
+      if (kind === 'unlock') {
+        show('<div class="lock-invite" data-test="lock-screen">' +
+          '<div class="lock-top">' + logo() + '<h2 class="page">' + title + '</h2><p class="lock-slogan" data-test="lock-slogan">' + esc(LOCK_SLOGAN) + '</p></div>' +
+          '<div class="lock-mid">' + dots(0) + padHtml + '<div class="ferr" id="gate-err"></div>' + err + forgot + help + '</div>' +
+          (bioBtn ? '<div class="lock-foot">' + bioBtn + '</div>' : '') +
+          '</div>', { lock: true });
+      } else {
+        show('<div data-test="lock-screen"><h2 class="page">' + title + '</h2>' + dots(0) + padHtml + '<div class="ferr" id="gate-err"></div>' + err + help + '</div>');
+      }
       if ($('gate-bio')) $('gate-bio').addEventListener('click', tryBio);
       if ($('gate-forgot-pass')) $('gate-forgot-pass').addEventListener('click', forgotPasscode);
       var entered = '';
