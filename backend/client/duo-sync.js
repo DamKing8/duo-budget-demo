@@ -25,7 +25,12 @@ function create(opts){
   function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,user:session&&session.user?session.user.email:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
   // ---- no-secrets diagnostics (shown as the "Sync status" line)
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
-  function displayMode(){try{if(typeof navigator!=='undefined'&&navigator.standalone)return 'home-screen';if(typeof matchMedia!=='undefined'&&matchMedia('(display-mode: standalone)').matches)return 'home-screen';}catch(e){}return 'browser';}
+  function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
+  function nativeShell(){var cap=nativeCap();try{return !!(cap&&typeof cap.isNativePlatform==='function'&&cap.isNativePlatform());}catch(e){return false;}}
+  function nativePlugin(name){var cap=nativeCap();return cap&&cap.Plugins?cap.Plugins[name]:null;}
+  // Custom scheme the Android (and later iOS) shell registers. Supabase must allow this exact redirect.
+  var NATIVE_AUTH_REDIRECT='au.duobudget.app://auth-callback';
+  function displayMode(){try{if(nativeShell())return 'native';if(typeof navigator!=='undefined'&&navigator.standalone)return 'home-screen';if(typeof matchMedia!=='undefined'&&matchMedia('(display-mode: standalone)').matches)return 'home-screen';}catch(e){}return 'browser';}
   function storageOk(){try{var k='__duo_probe';store.setItem(k,'1');if(store.removeItem)store.removeItem(k);return 'ok';}catch(e){return 'blocked';}}
   function debugInfo(s){return {state:s,mode:displayMode(),storage:storageOk(),session:session?'yes':'no',household:meta.household?'linked':'none',pending:meta.queue.length,lastEvent:dbg.lastEvent,lastError:dbg.lastError,urlReturn:dbg.urlReturn,online:isOnline()?'yes':'no'};}
   function fail(code,msg){dbg.lastError=code;setStatus('error',msg);}
@@ -50,6 +55,40 @@ function create(opts){
     var d=(r.description||'').replace(/\+/g,' ');
     if(r.error==='access_denied')return 'Google sign-in didn\'t complete'+(d?' ('+d+')':'')+'. If you didn\'t cancel, this Google account may not be on the app\'s test-user list yet.';
     return 'Sign-in failed: '+r.error+(d?' ('+d+')':'')+'.';
+  }
+  // Native shell: Google opens in the system browser (@capacitor/browser) and returns to
+  // au.duobudget.app://auth-callback. The web build never takes this path.
+  var nativeAuthAttached=false,nativeAuthSeen={};
+  function isNativeAuthUrl(url){return typeof url==='string'&&url.indexOf(NATIVE_AUTH_REDIRECT)===0;}
+  function closeNativeBrowser(){var Browser=nativePlugin('Browser');if(Browser&&Browser.close){try{Promise.resolve(Browser.close()).catch(function(){});}catch(e){}}}
+  function handleNativeAuthUrl(url){
+    if(!isNativeAuthUrl(url))return;
+    closeNativeBrowser();
+    if(nativeAuthSeen[url])return;
+    nativeAuthSeen[url]=1;
+    var parsed;try{parsed=new URL(url);}catch(e){fail('code_exchange_failed','Sign-in came back with a link this app couldn\'t read.');return;}
+    var hash=new URLSearchParams((parsed.hash||'').replace(/^#/,''));
+    function qp(k){return parsed.searchParams.get(k)||hash.get(k);}
+    var err=qp('error');
+    if(err){fail(err,authErrorMessage({error:err,description:qp('error_description')||''}));return;}
+    var code=qp('code');
+    if(!code){fail('code_exchange_failed','Sign-in came back without a code.');return;}
+    if(!client||!client.auth||!client.auth.exchangeCodeForSession){fail('code_exchange_failed','This build can\'t finish Google sign-in.');return;}
+    client.auth.exchangeCodeForSession(code).then(function(res){
+      var e=res&&res.error;
+      if(e){fail(e.code||'code_exchange_failed','Sign-in didn\'t finish: '+(e.message||'the code was rejected')+'.');return;}
+      var s=res&&res.data&&res.data.session;
+      if(s)return afterAuth(s);
+      fail('code_exchange_failed','Sign-in didn\'t finish on this screen.');
+    },function(e){fail('code_exchange_failed',(e&&e.message)||'Sign-in didn\'t finish.');});
+  }
+  function attachNativeAuth(){
+    if(nativeAuthAttached||!nativeShell())return;
+    var App=nativePlugin('App');
+    if(!App)return;
+    nativeAuthAttached=true;
+    if(App.addListener)App.addListener('appUrlOpen',function(ev){handleNativeAuthUrl(ev&&ev.url);});
+    if(App.getLaunchUrl)Promise.resolve(App.getLaunchUrl()).then(function(launch){if(launch&&launch.url)handleNativeAuthUrl(launch.url);},function(){});
   }
   function isOnline(){return opts.online?opts.online():true;}
 
@@ -206,6 +245,7 @@ function create(opts){
     var ret=readAuthReturn();
     if(storageOk()==='blocked'){fail('storage_blocked','This browser is blocking storage (Private Browsing or a strict setting), so sign-in can\'t be kept. Open Duo Budget in a normal Safari tab.');return Promise.resolve(api);}
     client=opts.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce'}});
+    attachNativeAuth();
     if(client.auth.onAuthStateChange)client.auth.onAuthStateChange(function(ev,s){dbg.lastEvent=ev;if(ev==='SIGNED_IN'&&s)afterAuth(s);if(ev==='SIGNED_OUT')afterAuth(null);});
     return client.auth.getSession().then(function(r){
       var s=r&&r.data?r.data.session:null,e=r&&r.error;
@@ -219,7 +259,20 @@ function create(opts){
   var api={
     start:start,onLocalSave:onLocalSave,flush:flush,pull:pull,status:function(){return status;},meta:function(){return meta;},
     debug:function(){return debugInfo(status.state);},
-    signIn:function(){dbg.lastError='-';return client.auth.signInWithOAuth({provider:'google',options:{redirectTo:opts.redirectTo||(typeof location!=='undefined'?location.origin+location.pathname:undefined)}}).then(function(r){if(r&&r.error)fail(r.error.code||'oauth_start_failed','Couldn\'t start Google sign-in: '+r.error.message);return r;},function(e){fail('oauth_start_failed','Couldn\'t start Google sign-in: '+((e&&e.message)||e));});},
+    signIn:function(){dbg.lastError='-';
+      var native=nativeShell();
+      var redirectTo=native?NATIVE_AUTH_REDIRECT:(opts.redirectTo||(typeof location!=='undefined'?location.origin+location.pathname:undefined));
+      var options={redirectTo:redirectTo};
+      if(native)options.skipBrowserRedirect=true;
+      return client.auth.signInWithOAuth({provider:'google',options:options}).then(function(r){
+        if(r&&r.error){fail(r.error.code||'oauth_start_failed','Couldn\'t start Google sign-in: '+r.error.message);return r;}
+        if(!native)return r;
+        var url=r&&r.data&&r.data.url;
+        if(!url){fail('oauth_start_failed','Google sign-in didn\'t return a link to open.');return r;}
+        var Browser=nativePlugin('Browser');
+        if(!Browser||!Browser.open){fail('native_browser_missing','Couldn\'t open the sign-in browser in this app.');return r;}
+        return Promise.resolve(Browser.open({url:url})).then(function(){return r;},function(e){fail('oauth_start_failed','Couldn\'t open Google sign-in: '+((e&&e.message)||e));return r;});
+      },function(e){fail('oauth_start_failed','Couldn\'t start Google sign-in: '+((e&&e.message)||e));});},
     // Email code. No emailRedirectTo: the 6-digit code must work from any origin, including a preview tunnel.
     signInWithEmail:function(email){dbg.lastError='-';
       if(!client||!client.auth||!client.auth.signInWithOtp)return Promise.resolve({error:{message:'Email sign-in isn\'t available in this build.'}});

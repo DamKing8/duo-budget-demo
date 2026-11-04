@@ -1,9 +1,11 @@
 {
   "name": "duo-budget",
   "private": true,
-  "description": "Duo Budget planning app. The iPhone shell is the native project in ios/. Capacitor is an optional later wrapper.",
+  "description": "Duo Budget planning app. Android and the Capacitor iOS shell live beside the existing widget project in ios/.",
   "scripts": {
     "sync:www": "node ios/sync-www.js",
+    "cap:sync": "node ios/sync-www.js && npx cap sync",
+    "android:debug": "npm run cap:sync && cd android && ./gradlew assembleDebug",
     "test:bucket": "TZ=Australia/Sydney node test-spend-bucket.js",
     "test:copy": "node tools/copy-lint.js && node tools/shot-guard.js",
     "test:sync": "node tools/inline-sync.js --check && node backend/test/test-sync.js",
@@ -12,11 +14,15 @@
     "test": "npm run test:bucket && npm run test:copy && npm run test:sync && npm run test:sql && npm run test:spend"
   },
   "dependencies": {
-    "@capacitor/core": "6.2.0",
-    "@capacitor/ios": "6.2.0"
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/browser": "^8.0.5",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/ios": "^8.6.0",
+    "@capacitor/splash-screen": "^8.0.2"
   },
   "devDependencies": {
-    "@capacitor/cli": "6.2.0",
+    "@capacitor/cli": "^8.6.0",
     "pg": "^8.13.1",
     "playwright-core": "^1.49.1"
   }

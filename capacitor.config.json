@@ -1,12 +1,29 @@
 {
-  "appId": "au.com.duobudget.app",
+  "appId": "au.duobudget.app",
   "appName": "Duo Budget",
-  "webDir": "www",
+  "webDir": "build/capacitor",
+  "backgroundColor": "#FBF7EF",
+  "android": {
+    "path": "android"
+  },
   "ios": {
+    "path": "capacitor-ios",
     "contentInset": "never",
     "backgroundColor": "#FBF7EF"
   },
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "iosScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "launchShowDuration": 0,
+      "backgroundColor": "#FBF7EF",
+      "androidScaleType": "CENTER",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": false
+    }
   }
 }

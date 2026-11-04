@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Duo Budget</string>
+    <string name="title_activity_main">Duo Budget</string>
+    <string name="package_name">au.duobudget.app</string>
+    <string name="custom_url_scheme">au.duobudget.app</string>
+</resources>

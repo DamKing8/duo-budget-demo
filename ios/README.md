@@ -18,7 +18,7 @@ The home-screen and lock-screen widgets live in the `DuoWidget` extension. Both 
 | Deployment | iOS 16, iPhone and iPad |
 | Team | empty on purpose |
 
-`capacitor.config.json` at the repo root records the same app id. Do not run `npx cap add ios` in this repo. Capacitor would try to create `ios/App` beside this project and would not include the widget target. `npm run sync:www` only copies the web files into `www/` if you later choose a separate Capacitor shell.
+This folder is the widget shell, not the Capacitor app. Capacitor’s iOS project is `capacitor-ios/` (`ios.path` in `capacitor.config.json`) so `npx cap add ios` does not overwrite `DuoBudget.xcodeproj` or the widget target. The Capacitor app id is `au.duobudget.app`. The bundle ids in this Xcode project stay `au.com.duobudget.app` and `au.com.duobudget.app.widget`. See `docs/native-app.md`.
 
 ## Preview without a Mac
 
