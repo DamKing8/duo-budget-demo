@@ -326,6 +326,13 @@ function testSignInEntryPoints() {
   assert(html.indexOf('Waiting for your partner, tap Invite your partner') > 0, 'a solo household says the partner has not joined');
   assert(html.indexOf('Edit household name') > 0, 'the owner can rename a household from the card');
   assert(html.indexOf('id="currency"') > 0 && html.indexOf('Currency converter') < 0 && html.indexOf('id="fxCard"') < 0, 'display currency stays and the converter card is gone');
+  assert(html.indexOf('data-test="edit-household-top"') > 0 && html.indexOf('data-test="build-stamp"') > 0, 'the partner tab has a top rename button and a build stamp');
+  assert(html.indexOf('function nativeAppShell') > 0 && html.indexOf('nativeAppShell()') > 0, 'the native shell does not keep a service worker');
+  var fixed = DuoSync.settledNames({ D: 'Chloe', N: 'Jack' }, { myName: 'Chloe', partnerName: '', email: 'd.hosking@outlook.com' });
+  assert(fixed.D === 'd.hosking' && fixed.N === '', 'sample names become the email local part and a blank partner');
+  var joined = DuoSync.settledNames({ D: 'Me', N: 'Partner' }, { myName: 'Damon', partnerName: 'Alex', email: 'a@b.c' });
+  assert(joined.D === 'Damon' && joined.N === 'Alex', 'cloud display names replace the bucket labels');
+  assert(DuoSync.needsRenamePrompt({ householdName: 'Chloe', myName: 'Damon' }) && !DuoSync.needsRenamePrompt({ householdName: "Damon's household", myName: 'Damon' }), 'a sample household name asks to be edited once');
   assert(gate.indexOf('createHousehold') < 0, 'signing in does not create a household');
   assert(gate.indexOf('data-test="lock-signin"') > 0 && gate.indexOf('openEmailSignIn()') > 0, 'the app lock button opens email sign-in');
   assert(premium.indexOf('DuoGate.openEmailSignIn') > 0, 'premium sign-in opens the email flow');
