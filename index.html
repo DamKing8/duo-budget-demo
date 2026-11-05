@@ -1085,6 +1085,8 @@ button.otp-resend:disabled{opacity:.55}
 .duo-radio{display:flex;align-items:center;gap:8px;padding:8px 2px;font-weight:650}
 .lock-after{padding:8px 2px}
 .invite-code{font-family:ui-monospace,Menlo,monospace;font-size:28px;font-weight:800;letter-spacing:3px;text-align:center;margin:12px 0 4px;color:var(--text);word-break:break-all}
+.build-stamp{text-align:center;font-size:12px;color:var(--muted);margin:8px 0 4px}
+.build-stamp{text-align:center;font-size:12px;color:var(--muted);margin:8px 0 4px}
 .duo-links{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .duo-links .btn{white-space:nowrap}
 .duo-gate.lock-open .duo-gate-in{min-height:100%;display:flex;flex-direction:column;box-sizing:border-box;padding-bottom:0}
@@ -1232,6 +1234,7 @@ html[data-accent="forest"] .btn.pri,html[data-accent="forest"] .seg button.on,ht
   <section class="view" id="v-settings" data-layout-tab="settings">
     <h2 class="page">Partners</h2>
     <p class="sub">Your household, and the names that show on every item and split. Hold a card to rearrange any tab.</p>
+    <button class="btn pri block" type="button" id="editHouseholdTop" data-test="edit-household-top" hidden style="margin-bottom:14px">Edit household name</button>
     <div class="card" id="syncCard" data-layout="set-sync" data-test="sync-card">
       <div class="row"><b>Cloud sync</b><span class="gstat none">Not signed in</span></div>
       <div class="hint">Beta. Synced data: budget lines, goals, pay cycles and spending.</div>
@@ -1246,7 +1249,7 @@ html[data-accent="forest"] .btn.pri,html[data-accent="forest"] .seg button.on,ht
       <label class="fl" for="nameA" style="margin-top:0">Your name</label>
       <input class="field" id="nameA" maxlength="16">
       <label class="fl" for="nameB">Partner's name</label>
-      <input class="field" id="nameB" maxlength="16">
+      <input class="field" id="nameB" maxlength="16" placeholder="Their name">
       <div class="hint" id="nameBHint" style="display:none"></div>
       <label class="fl" for="currency">Display currency</label>
       <select class="field" id="currency" data-test="currency"><option value="AUD">AUD — Australian dollar</option></select>
@@ -1262,6 +1265,7 @@ html[data-accent="forest"] .btn.pri,html[data-accent="forest"] .seg button.on,ht
       <div class="setrow"><div class="l">Storage<small>Budget and spending on this device. Layout too. Cloud sync covers lines, goals, pay cycles and spending.</small></div><span class="muted" style="font-size:13px">localStorage</span></div>
     </div>
     <div class="card" id="storeCard" data-layout="set-store" data-test="store-card"><h3>Get the app</h3></div>
+    <p class="build-stamp" id="buildStamp" data-test="build-stamp"></p>
     <p class="muted" style="text-align:center;font-size:12px">Duo Budget · prototype v0.1 · demo build, all data made up</p>
   </section>
 </div>
@@ -1285,6 +1289,7 @@ html[data-accent="forest"] .btn.pri,html[data-accent="forest"] .seg button.on,ht
 
 <!-- @@DEPLOY_START@@ supabase-js 2.117.3 (pinned, vendored) + runtime sync config. Public key only (RLS-protected). -->
 <script src="supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R"></script>
+<script>window.DUO_BUILD=window.DUO_BUILD||{sha:"dev",time:""};</script>
 <script>window.DUO_SYNC_CONFIG={"enabled":true,"supabaseUrl":"https://ksrffninlyioqobvdvhu.supabase.co","supabaseAnonKey":"sb_publishable_kYFCNsoHhW537_RtxtOxKg_4agyXKDI"};</script>
 <script>window.DUO_AUTH_CONFIG=Object.assign({apple:false,google:true,allowGoogleWithoutApple:false,appleClientId:"",googleWebClientId:"",googleIosClientId:"",googleAndroidClientId:""},window.DUO_AUTH_CONFIG||{});</script>
 <script>window.DUO_PREMIUM_CONFIG=Object.assign({revenueCatKey:"",revenueCatAppleKey:"",revenueCatGoogleKey:"",mock:true},window.DUO_PREMIUM_CONFIG||{});</script>
@@ -1335,6 +1340,21 @@ function householdTitle(name){
   if(!name||name.toLowerCase()==='me')return 'Our household';
   return name.slice(0,60)+"'s household";
 }
+function isSampleName(n){
+  var t=String(n||'').trim().toLowerCase();
+  return !t||t==='chloe'||t==='jack'||t==='me'||t==='partner';
+}
+function settledNames(local, info){
+  local=local||{}; info=info||{};
+  var D=local.D, N=local.N;
+  if(isSampleName(D))D=!isSampleName(info.myName)?info.myName:realDisplayName('', info.email);
+  if(isSampleName(N))N=info.partnerName&&!isSampleName(info.partnerName)?info.partnerName:'';
+  return {D:D,N:N};
+}
+function needsRenamePrompt(info){
+  info=info||{};
+  return isSampleName(info.householdName)||isSampleName(info.myName);
+}
 
 /* opts: {config, storageKey, app:{getState, commit(reason), localId(), setPay(slot,{cycle,next}), getPay(slot)},
           createClient (supabase-js createClient), storage (localStorage-like), now(), onStatus(status), online() } */
@@ -1346,7 +1366,12 @@ function create(opts){
   function load(){try{var m=JSON.parse(store.getItem(MK)||'null');if(m&&m.v===1)return m;}catch(e){}return {v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:null};}
   function persist(){try{store.setItem(MK,JSON.stringify(meta));}catch(e){}}
   function activeMembers(){if(!ctx||!ctx.members)return [];return ctx.members.filter(function(m){return m&&m.status==='active'&&!m.deleted_at;});}
-  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,householdName:(ctx&&ctx.householdName)||'',members:activeMembers().length,memberNames:activeMembers().map(function(m){return m.display_name;}).filter(Boolean),user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
+  function meAndPartner(){
+    var id=session&&session.user&&session.user.id,mine='',other='';
+    activeMembers().forEach(function(m){if(m.user_id===id)mine=m.display_name||'';else if(!other)other=m.display_name||'';});
+    return {myName:mine,partnerName:other};
+  }
+  function setStatus(s,msg){var who=meAndPartner();status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,householdName:(ctx&&ctx.householdName)||'',members:activeMembers().length,memberNames:activeMembers().map(function(m){return m.display_name;}).filter(Boolean),myName:who.myName,partnerName:who.partnerName,user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
   // Diagnostics stay in the console. The sync card does not show them.
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
@@ -1772,7 +1797,7 @@ function create(opts){
   };
   return api;
 }
-return {create:create,TABLES:TABLES,_stable:stable,readInvite:readInvite,shouldOfferInvite:shouldOfferInvite,realDisplayName:realDisplayName,householdTitle:householdTitle};
+return {create:create,TABLES:TABLES,_stable:stable,readInvite:readInvite,shouldOfferInvite:shouldOfferInvite,realDisplayName:realDisplayName,householdTitle:householdTitle,isSampleName:isSampleName,settledNames:settledNames,needsRenamePrompt:needsRenamePrompt};
 });
 /*@@SYNC_END@@*/</script>
 <script src="duo-account.js"></script>
@@ -3358,7 +3383,10 @@ function beginHousehold(you,title){
 function editCloudHousehold(){
   var st=__sync.status();
   var mine=DuoSync.realDisplayName(S.names.D,st.user);
-  openSheet('<h4>Edit household name</h4><label class="fl" for="rn-you">Your name</label><input class="field" id="rn-you" data-test="rename-your-name" maxlength="60" value="'+esc(mine)+'"><label class="fl" for="rn-title">Household name</label><input class="field" id="rn-title" data-test="rename-household-name" maxlength="80" value="'+esc(st.householdName||DuoSync.householdTitle(mine))+'"><div class="btns"><button class="btn ghost" id="rn-no" type="button">Cancel</button><button class="btn pri" id="rn-yes" type="button" data-test="rename-save">Save</button></div>',function(sh){
+  var stored=st.householdName||'';
+  var title=DuoSync.isSampleName(stored)?DuoSync.householdTitle(mine):(stored||DuoSync.householdTitle(mine));
+  var why=DuoSync.isSampleName(stored)||DuoSync.isSampleName(st.myName)?'<p class="sub">The name on this household is still a sample. Choose your real name.</p>':'';
+  openSheet('<h4>Edit household name</h4>'+why+'<label class="fl" for="rn-you">Your name</label><input class="field" id="rn-you" data-test="rename-your-name" maxlength="60" value="'+esc(mine)+'"><label class="fl" for="rn-title">Household name</label><input class="field" id="rn-title" data-test="rename-household-name" maxlength="80" value="'+esc(title)+'"><div class="btns"><button class="btn ghost" id="rn-no" type="button">Cancel</button><button class="btn pri" id="rn-yes" type="button" data-test="rename-save">Save</button></div>',function(sh){
     sh.querySelector('#rn-no').addEventListener('click',closeSheet);
     sh.querySelector('#rn-yes').addEventListener('click',function(){
       var you=sh.querySelector('#rn-you').value.trim();
@@ -3426,7 +3454,22 @@ function renderSync(st){var el=document.getElementById('syncCard');if(!el)return
     }).catch(function(e){toast((e&&e.message)||'Couldn\'t make an invite code.');renderSync(__sync.status());});
   });
   on('syncCopy',copyInviteCode);
+  var top=document.getElementById('editHouseholdTop');
+  if(top)top.hidden=!(st.user&&st.household);
+  settleSignedInNames(st);
   renderHHCard();}
+function settleSignedInNames(st){
+  if(!st||!st.user||!st.household||!window.DuoSync||!DuoSync.settledNames)return;
+  var next=DuoSync.settledNames({D:S.names.D,N:S.names.N},{myName:st.myName,partnerName:st.partnerName,email:st.user});
+  if(next.D!==S.names.D||next.N!==S.names.N){S.names.D=next.D;S.names.N=next.N;save();}
+  if(!DuoSync.needsRenamePrompt({householdName:st.householdName,myName:st.myName}))return;
+  var key=(st.uid||'')+'|'+(st.household||'');
+  var seen='';try{seen=sessionStorage.getItem('duo.renameOnce')||'';}catch(e){}
+  if(seen===key)return;
+  if($('scrim').classList.contains('on'))return;
+  try{sessionStorage.setItem('duo.renameOnce',key);}catch(e){}
+  editCloudHousehold();
+}
 // Coming back from Google: the page reloads on Home, but the result (claim box or error) lives on the
 // Partner tab. Open it and bring the card into view, so no extra tap or tab switch is needed.
 var __syncRevealed=false;
@@ -3949,7 +3992,7 @@ else if(bootPlan.holdDemo&&bootPlan.signedIn){S=blankBudget();}
 else{load();save();}
 if(!PERSONAL_BUILD)fetchFX();
 var renderAllCore=renderAll;
-renderAll=function(){renderAllCore();layoutApply();publishWidget();var fx=$('fxAsOf');if(fx)fx.textContent=fxStatusText();};
+renderAll=function(){renderAllCore();layoutApply();publishWidget();var fx=$('fxAsOf');if(fx)fx.textContent=fxStatusText();paintBuildStamp();};
 renderAll();
 if(window.DuoGate)DuoGate.start({
   storage:localStorage,plan:bootPlan,
@@ -3969,6 +4012,13 @@ if(window.DuoGate)DuoGate.start({
 });
 var syncCardEl=document.getElementById('syncCard');
 if(syncCardEl)syncCardEl.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-test="sync-signin"]');if(!b)return;if(window.DuoGate&&DuoGate.openEmailSignIn)DuoGate.openEmailSignIn();});
+var editTop=document.getElementById('editHouseholdTop');
+if(editTop)editTop.addEventListener('click',editCloudHousehold);
+function paintBuildStamp(){
+  var b=window.DUO_BUILD||{},text='Build '+(b.sha||'dev')+(b.time?' · '+b.time:'');
+  var el=document.getElementById('buildStamp');if(el)el.textContent=text;
+}
+paintBuildStamp();
 window.__duoReady=startSync();
 if(window.DuoPremiumUI){
   var premiumUi=DuoPremiumUI.install({
@@ -4003,7 +4053,15 @@ applyDeepLink();
 window.addEventListener('hashchange',applyDeepLink);
 window.addEventListener('online',function(){if(PERSONAL_BUILD)return;FX.offline=false;fetchFX();});
 window.addEventListener('offline',function(){FX.offline=!!FX.asOf;FX.error=FX.asOf?'':'offline';var fx=$('fxAsOf');if(fx)fx.textContent=fxStatusText();});
-if(!PERSONAL_BUILD&&'serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('sw.js').catch(function(){});}
+function nativeAppShell(){
+  try{var c=window.Capacitor;if(c&&typeof c.isNativePlatform==='function'&&c.isNativePlatform())return true;}catch(e){}
+  var origin=location.origin||'';
+  return location.protocol==='capacitor:'||origin==='https://localhost'||origin==='capacitor://localhost';
+}
+if(nativeAppShell()){
+  if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});}).catch(function(){});
+  if(window.caches&&caches.keys)caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k);});}).catch(function(){});
+}else if(!PERSONAL_BUILD&&'serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('sw.js').catch(function(){});}
 
 window.__duoRerender=function(){CATS.forEach(function(c){c.color=TC(c.color)});for(var i=0;i<TR_COL.length;i++)TR_COL[i]=TC(TR_COL[i]);renderAll();if(window.__duoThemeSeg)window.__duoThemeSeg();};
 window.__duo={state:function(){return S;},trends:function(sc){return trModel(sc);},trInsights:function(sc){return trInsights(trModel(sc));},trBreak:function(sc,off){var M=trModel(sc);return trBreak(M,M.rows[M.rows.length-1-(off||0)]);},trWins:trWins,trRows:trRows,invStatus:invStatus,totals:totals,totalsIn:totalsIn,projection:projection,shares:shares,paydaysFor:function(c,d,n){return paydaysFor(c,d,n).map(isoLocal);},payWindow:payWindow,lrPct:lrPct,payAt:function(iso,c,k){return isoLocal(payAt(parseISO(iso),c,k));},migrateV4:migrateV4,spentIn:spentIn,spentByLine:spentByLine,spentByOwner:spentByOwner,parseSpendAmount:parseSpendAmount,entryInWindow:entryInWindow,openSpend:openSpendSheet};

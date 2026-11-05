@@ -419,6 +419,8 @@
       var title = kind === 'create' ? 'Choose a 4-digit passcode' : kind === 'confirm' ? 'Enter it once more to confirm' : 'Duo Budget is locked';
       var forgot = kind === 'unlock' ? '<button class="linkbtn" type="button" id="gate-forgot-pass" data-test="forgot-passcode">Forgot passcode?</button>' : '';
       var padHtml = (gate.ok || kind !== 'unlock') ? pad('gate-pad') : '';
+      var build = window.DUO_BUILD || {};
+      var stamp = '<p class="build-stamp" data-test="lock-build">Build ' + esc(build.sha || 'dev') + (build.time ? ' · ' + esc(build.time) : '') + '</p>';
       if (kind === 'unlock') {
         show('<div class="lock-invite" data-test="lock-screen">' +
           '<div class="lock-mid">' +
@@ -427,7 +429,7 @@
             '<p class="lock-slogan" data-test="lock-slogan">' + esc(LOCK_SLOGAN) + '</p>' +
             dots(0) + padHtml + '<div class="ferr" id="gate-err"></div>' + err + forgot + help +
           '</div>' +
-          (bioBtn ? '<div class="lock-foot">' + bioBtn + '</div>' : '') +
+          '<div class="lock-foot">' + (bioBtn || '') + stamp + '</div>' +
           '</div>', { lock: true });
       } else {
         show('<div data-test="lock-screen"><h2 class="page">' + title + '</h2>' + dots(0) + padHtml + '<div class="ferr" id="gate-err"></div>' + err + help + '</div>');

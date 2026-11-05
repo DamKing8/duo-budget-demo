@@ -43,6 +43,21 @@ function householdTitle(name){
   if(!name||name.toLowerCase()==='me')return 'Our household';
   return name.slice(0,60)+"'s household";
 }
+function isSampleName(n){
+  var t=String(n||'').trim().toLowerCase();
+  return !t||t==='chloe'||t==='jack'||t==='me'||t==='partner';
+}
+function settledNames(local, info){
+  local=local||{}; info=info||{};
+  var D=local.D, N=local.N;
+  if(isSampleName(D))D=!isSampleName(info.myName)?info.myName:realDisplayName('', info.email);
+  if(isSampleName(N))N=info.partnerName&&!isSampleName(info.partnerName)?info.partnerName:'';
+  return {D:D,N:N};
+}
+function needsRenamePrompt(info){
+  info=info||{};
+  return isSampleName(info.householdName)||isSampleName(info.myName);
+}
 
 /* opts: {config, storageKey, app:{getState, commit(reason), localId(), setPay(slot,{cycle,next}), getPay(slot)},
           createClient (supabase-js createClient), storage (localStorage-like), now(), onStatus(status), online() } */
@@ -54,7 +69,12 @@ function create(opts){
   function load(){try{var m=JSON.parse(store.getItem(MK)||'null');if(m&&m.v===1)return m;}catch(e){}return {v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:null};}
   function persist(){try{store.setItem(MK,JSON.stringify(meta));}catch(e){}}
   function activeMembers(){if(!ctx||!ctx.members)return [];return ctx.members.filter(function(m){return m&&m.status==='active'&&!m.deleted_at;});}
-  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,householdName:(ctx&&ctx.householdName)||'',members:activeMembers().length,memberNames:activeMembers().map(function(m){return m.display_name;}).filter(Boolean),user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
+  function meAndPartner(){
+    var id=session&&session.user&&session.user.id,mine='',other='';
+    activeMembers().forEach(function(m){if(m.user_id===id)mine=m.display_name||'';else if(!other)other=m.display_name||'';});
+    return {myName:mine,partnerName:other};
+  }
+  function setStatus(s,msg){var who=meAndPartner();status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,householdName:(ctx&&ctx.householdName)||'',members:activeMembers().length,memberNames:activeMembers().map(function(m){return m.display_name;}).filter(Boolean),myName:who.myName,partnerName:who.partnerName,user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
   // Diagnostics stay in the console. The sync card does not show them.
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
@@ -480,5 +500,5 @@ function create(opts){
   };
   return api;
 }
-return {create:create,TABLES:TABLES,_stable:stable,readInvite:readInvite,shouldOfferInvite:shouldOfferInvite,realDisplayName:realDisplayName,householdTitle:householdTitle};
+return {create:create,TABLES:TABLES,_stable:stable,readInvite:readInvite,shouldOfferInvite:shouldOfferInvite,realDisplayName:realDisplayName,householdTitle:householdTitle,isSampleName:isSampleName,settledNames:settledNames,needsRenamePrompt:needsRenamePrompt};
 });
