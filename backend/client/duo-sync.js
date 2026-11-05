@@ -13,6 +13,22 @@ function stable(o){if(o===null||typeof o!=='object')return JSON.stringify(o);if(
 function uuid(){if(typeof crypto!=='undefined'&&crypto.randomUUID)return crypto.randomUUID();var b=new Uint8Array(16);crypto.getRandomValues(b);b[6]=b[6]&15|64;b[8]=b[8]&63|128;var h=Array.prototype.map.call(b,function(x){return (x+256).toString(16).slice(1);}).join('');return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);}
 function ts(x){return x?Date.parse(x):0;}
 function num(v){return v===null||v===undefined?0:Math.round(Number(v)*100)/100;}
+// create_invite is not defined in this repo. public.invites stores code and expires_at
+// (default now() + 7 days). The RPC may return that row, a one-row array, or the code text.
+function readInvite(data){
+  var row=data;
+  if(Array.isArray(row))row=row[0];
+  if(row&&typeof row==='object'&&row.data&&row.code==null&&row.invite_code==null)row=row.data;
+  if(Array.isArray(row))row=row[0];
+  if(typeof row==='string'){var t=row.trim();return t?{code:t,expires:''}:null;}
+  if(!row||typeof row!=='object')return null;
+  var code=row.code||row.invite_code||'';
+  if(!code)return null;
+  return {code:String(code).trim(),expires:row.expires_at||row.expiresAt||row.expires||''};
+}
+function shouldOfferInvite(st){
+  return !!(st&&['synced','pending','offline'].indexOf(st.state)>=0&&st.members===1);
+}
 
 /* opts: {config, storageKey, app:{getState, commit(reason), localId(), setPay(slot,{cycle,next}), getPay(slot)},
           createClient (supabase-js createClient), storage (localStorage-like), now(), onStatus(status), online() } */
@@ -22,7 +38,8 @@ function create(opts){
   var meta=load();var client=null,session=null,ctx=null,channel=null,applying=false,timer=null,flushing=null,status={state:'starting',pending:0};
   function load(){try{var m=JSON.parse(store.getItem(MK)||'null');if(m&&m.v===1)return m;}catch(e){}return {v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:null};}
   function persist(){try{store.setItem(MK,JSON.stringify(meta));}catch(e){}}
-  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
+  function memberCount(){if(!ctx||!ctx.members)return 0;var n=0;ctx.members.forEach(function(m){if(m&&m.status==='active'&&!m.deleted_at)n++;});return n;}
+  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,members:memberCount(),user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
   // Diagnostics stay in the console. The sync card does not show them.
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
@@ -410,5 +427,5 @@ function create(opts){
   };
   return api;
 }
-return {create:create,TABLES:TABLES,_stable:stable};
+return {create:create,TABLES:TABLES,_stable:stable,readInvite:readInvite,shouldOfferInvite:shouldOfferInvite};
 });

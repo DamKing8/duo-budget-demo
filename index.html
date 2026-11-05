@@ -1086,6 +1086,7 @@ button.otp-resend:disabled{opacity:.55}
 .duo-pad button{min-height:64px;border-radius:16px;border:1px solid var(--line);background:var(--card);font-size:22px;font-weight:700}
 .duo-radio{display:flex;align-items:center;gap:8px;padding:8px 2px;font-weight:650}
 .lock-after{padding:8px 2px}
+.invite-code{font-family:ui-monospace,Menlo,monospace;font-size:28px;font-weight:800;letter-spacing:3px;text-align:center;margin:12px 0 4px;color:var(--text);word-break:break-all}
 .duo-links{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .duo-links .btn{white-space:nowrap}
 .duo-gate.lock-open .duo-gate-in{min-height:100%;display:flex;flex-direction:column;box-sizing:border-box;padding-bottom:0}
@@ -1312,6 +1313,22 @@ function stable(o){if(o===null||typeof o!=='object')return JSON.stringify(o);if(
 function uuid(){if(typeof crypto!=='undefined'&&crypto.randomUUID)return crypto.randomUUID();var b=new Uint8Array(16);crypto.getRandomValues(b);b[6]=b[6]&15|64;b[8]=b[8]&63|128;var h=Array.prototype.map.call(b,function(x){return (x+256).toString(16).slice(1);}).join('');return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);}
 function ts(x){return x?Date.parse(x):0;}
 function num(v){return v===null||v===undefined?0:Math.round(Number(v)*100)/100;}
+// create_invite is not defined in this repo. public.invites stores code and expires_at
+// (default now() + 7 days). The RPC may return that row, a one-row array, or the code text.
+function readInvite(data){
+  var row=data;
+  if(Array.isArray(row))row=row[0];
+  if(row&&typeof row==='object'&&row.data&&row.code==null&&row.invite_code==null)row=row.data;
+  if(Array.isArray(row))row=row[0];
+  if(typeof row==='string'){var t=row.trim();return t?{code:t,expires:''}:null;}
+  if(!row||typeof row!=='object')return null;
+  var code=row.code||row.invite_code||'';
+  if(!code)return null;
+  return {code:String(code).trim(),expires:row.expires_at||row.expiresAt||row.expires||''};
+}
+function shouldOfferInvite(st){
+  return !!(st&&['synced','pending','offline'].indexOf(st.state)>=0&&st.members===1);
+}
 
 /* opts: {config, storageKey, app:{getState, commit(reason), localId(), setPay(slot,{cycle,next}), getPay(slot)},
           createClient (supabase-js createClient), storage (localStorage-like), now(), onStatus(status), online() } */
@@ -1321,7 +1338,8 @@ function create(opts){
   var meta=load();var client=null,session=null,ctx=null,channel=null,applying=false,timer=null,flushing=null,status={state:'starting',pending:0};
   function load(){try{var m=JSON.parse(store.getItem(MK)||'null');if(m&&m.v===1)return m;}catch(e){}return {v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:null};}
   function persist(){try{store.setItem(MK,JSON.stringify(meta));}catch(e){}}
-  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
+  function memberCount(){if(!ctx||!ctx.members)return 0;var n=0;ctx.members.forEach(function(m){if(m&&m.status==='active'&&!m.deleted_at)n++;});return n;}
+  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,members:memberCount(),user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
   // Diagnostics stay in the console. The sync card does not show them.
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
@@ -1709,7 +1727,7 @@ function create(opts){
   };
   return api;
 }
-return {create:create,TABLES:TABLES,_stable:stable};
+return {create:create,TABLES:TABLES,_stable:stable,readInvite:readInvite,shouldOfferInvite:shouldOfferInvite};
 });
 /*@@SYNC_END@@*/</script>
 <script src="duo-account.js"></script>
@@ -2039,10 +2057,16 @@ function renderGoals(){
       '<div class="foot">'+pill(p)+'<span class="r">'+goalFoot(p)+'</span></div></div>';
   }).join('')||'<div class="card muted" data-layout="goal-empty">No goals yet. Add one you\'re saving for together.</div>';
 }
+function cloudHouseholdLive(){
+  var st=__sync&&__sync.status?__sync.status():null;
+  return !!(st&&st.user&&['off','blocked','signed-out','starting'].indexOf(st.state)<0);
+}
 function renderHHCard(){
   var h=HH(),el=$('hhCard'),pm=memberBy('partner'),st=invStatus();
+  if(cloudHouseholdLive()){el.hidden=true;el.innerHTML='';return;}
+  el.hidden=false;
   if(!h){
-    el.innerHTML='<h3><span>Household</span><span class="tag">PROTOTYPE</span></h3><div class="muted" style="font-size:14px;line-height:1.45">Set up a shared household and invite '+(S.names.N&&S.names.N!=='Partner'?esc(S.names.N):'your partner')+' so you both see and edit the same budget.</div>'+
+    el.innerHTML='<h3><span>Household</span><span class="tag">Practice only, not synced</span></h3><div class="muted" style="font-size:14px;line-height:1.45">This practice household stays on this phone. It is not the cloud household your partner joins.</div>'+
       '<button class="btn pri block" style="margin-top:14px" id="hhSetup">Set up household</button><button class="linkbtn" id="hhJoin">Have an invite code? <b>Join instead</b></button>';
     return;
   }
@@ -2052,7 +2076,7 @@ function renderHHCard(){
   else if(h.lastLeft){var ln=h.lastLeft.name;pr='<div class="mrow"><div class="av b">'+esc(ln.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(ln)+' (left '+fmtDay(h.lastLeft.at)+')</b><small>Goals stay · their planned contributions are $0</small></div></div>';}
   else pr='<div class="mrow"><div class="av b pending">+</div><div class="mi"><b>Just you for now</b><small>'+(st==='expired'?'Last invite expired':st==='revoked'?'Last invite revoked':'Invite your partner to plan together')+'</small></div></div>';
   var ow=memberBy('owner')||{name:S.names.D,userId:(S.account||{}).userId};
-  el.innerHTML='<h3><span>'+esc(h.name)+'</span><span class="tag">PROTOTYPE</span></h3><div class="mlist" data-test="hh-card"><div class="mrow"><div class="av a">'+esc(S.names.D.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(S.names.D)+(viewer()==='A'?'<span class="you">You</span>':'')+'</b><small>'+CYCLES[S.cycle].adj+' pay</small>'+(sid&&(ow.userId===sid||(!pm&&sid))?'<small class="started">Started the household</small>':'')+'</div></div>'+pr+'</div>'+
+  el.innerHTML='<h3><span>'+esc(h.name)+'</span><span class="tag">Practice only, not synced</span></h3><div class="mlist" data-test="hh-card"><div class="mrow"><div class="av a">'+esc(S.names.D.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(S.names.D)+(viewer()==='A'?'<span class="you">You</span>':'')+'</b><small>'+CYCLES[S.cycle].adj+' pay</small>'+(sid&&(ow.userId===sid||(!pm&&sid))?'<small class="started">Started the household</small>':'')+'</div></div>'+pr+'</div>'+
     '<button class="btn ghost block" style="margin-top:12px" id="hhManage">Manage household</button>'+
     (pm?'<button class="btn danger block" style="margin-top:8px" id="hhLeave">Leave household</button>':'');
 }
@@ -3162,6 +3186,24 @@ function syncApp(){var gen=syncGen;return {getState:function(){if(gen!==syncGen)
   getPay:function(s){if(s==='D')return {cycle:S.cycle,next:S.payDate};var m=partnerMember();return m&&m.payDate?{cycle:m.payCycle||S.cycle,next:m.payDate}:null;},
   setPay:function(s,v){if(s==='D'){S.cycle=v.cycle;S.payDate=v.next;}else{var m=partnerMember();if(m){m.payCycle=v.cycle;m.payDate=v.next;}}}};}
 var emailSign={email:'',error:'',sentAt:0,timer:0,mode:''};
+var cloudInvite=null;
+function inviteExpiryText(exp){
+  var d=new Date(exp);
+  if(isNaN(d.getTime()))return String(exp);
+  return d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+}
+function copyInviteCode(){
+  var code=cloudInvite&&cloudInvite.code;if(!code)return;
+  var done=function(){toast('Code copied');};
+  function fallback(){
+    var t=document.createElement('textarea');t.value=code;t.setAttribute('readonly','');t.style.position='fixed';t.style.left='-9999px';
+    document.body.appendChild(t);t.select();
+    try{document.execCommand('copy');done();}catch(e){toast(code);}
+    t.remove();
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(done,fallback);
+  else fallback();
+}
 var EMAIL_RESEND_MS=30000;
 function otpProblem(err,phase){
   var code=String((err&&err.code)||''),msg=String((err&&err.message)||''),low=(code+' '+msg).toLowerCase();
@@ -3236,7 +3278,13 @@ function renderSync(st){var el=document.getElementById('syncCard');if(!el)return
     if(emailSign.mode==='password')h+='<label class="fl" for="syncPassword">Password</label><input class="field" id="syncPassword" data-test="sync-password" type="password" autocomplete="current-password"><div class="ferr" id="syncEmailErr" data-test="sync-email-err">'+esc(emailSign.error)+'</div><button class="btn pri block" id="syncPasswordGo" type="button" data-test="sync-password-go" style="margin-top:12px">Sign in</button><button class="linkbtn" type="button" id="syncUseCode" data-test="sync-use-code">Email a code instead</button>';
     else h+='<p class="email-note">We\'ll email a 6-digit code. You can set a password later if you want one.</p><div class="ferr" id="syncEmailErr" data-test="sync-email-err">'+esc(emailSign.error)+'</div><button class="btn pri block" id="syncEmailSend" type="button" data-test="sync-email-send" style="margin-top:12px">Email me a code</button><button class="linkbtn" type="button" id="syncUsePassword" data-test="sync-use-password">Use a password instead</button>';
   }
-  if(st.state==='no-household')h+='<label class="fl" for="syncCode">Enter join code</label><input id="syncCode" class="field sync-code" data-test="join-code" placeholder="8 letters or numbers" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"><div class="btns"><button class="btn pri" id="syncJoin">Join</button><button class="btn ghost" id="syncCreate">Start a household</button></div>';
+  if(st.state==='no-household')h+='<label class="fl" for="syncCode">Enter join code</label><input id="syncCode" class="field sync-code" data-test="join-code" placeholder="8 letters or numbers" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"><div class="btns"><button class="btn pri" id="syncJoin" data-test="sync-join">Join</button><button class="btn ghost" id="syncCreate">Start a household</button></div>';
+  if(window.DuoSync&&DuoSync.shouldOfferInvite&&DuoSync.shouldOfferInvite(st)){
+    if(cloudInvite&&cloudInvite.code){
+      var expTxt=cloudInvite.expires?inviteExpiryText(cloudInvite.expires):'';
+      h+='<div data-test="invite-code"><div class="muted" style="font-size:13px;font-weight:600;text-align:center">INVITE CODE</div><div class="invite-code">'+esc(cloudInvite.code)+'</div>'+(expTxt?'<div class="hint" data-test="invite-expiry" style="text-align:center">Expires '+esc(expTxt)+'</div>':'')+'<button class="btn ghost block" id="syncCopy" type="button" data-test="invite-copy">Copy</button></div>';
+    }else h+='<button class="btn pri block" id="syncInvite" type="button" data-test="invite-partner" style="margin-top:12px">Invite your partner</button>';
+  }
   if(['synced','pending','offline','error','no-household'].indexOf(st.state)>=0&&st.user)h+='<div class="btns"><button class="btn ghost" id="syncOut">Sign out</button></div>';
   if(st.debug){try{console.info('Duo sync',st.debug);}catch(e){}}
   el.innerHTML=h;
@@ -3271,7 +3319,17 @@ function renderSync(st){var el=document.getElementById('syncCard');if(!el)return
   revealSyncAfterReturn(st);on('syncOut',function(){if(window.DuoGate)DuoGate.confirmSignOut();else __sync.signOut();});
   if(window.DuoGate)DuoGate.onSync(st);
   on('syncCreate',function(){__sync.createHousehold(S.names.D+(S.names.N&&S.names.N!=='Partner'?' & '+S.names.N:''),S.names.D).catch(function(e){toast(e.message);});});
-  on('syncJoin',function(){__sync.joinHousehold(document.getElementById('syncCode').value,S.names.D).then(function(r){if(r&&r.ok===false)toast(r.reason==='too_many_attempts'?'Too many tries. Try again in an hour.':'That code didn\'t work. Check it with your partner.');}).catch(function(e){toast(e.message);});});}
+  on('syncJoin',function(){__sync.joinHousehold(document.getElementById('syncCode').value,S.names.D).then(function(r){if(r&&r.ok===false)toast(r.reason==='too_many_attempts'?'Too many tries. Try again in an hour.':'That code didn\'t work. Check it with your partner.');else{renderAll();toast('You joined the household');}}).catch(function(e){toast(e.message);});});
+  on('syncInvite',function(){
+    var b=document.getElementById('syncInvite');if(b){b.disabled=true;b.textContent='Creating a code…';}
+    __sync.createInvite().then(function(data){
+      var inv=DuoSync.readInvite?DuoSync.readInvite(data):null;
+      if(!inv){toast('Couldn\'t make an invite code.');renderSync(__sync.status());return;}
+      cloudInvite=inv;renderSync(__sync.status());
+    }).catch(function(e){toast((e&&e.message)||'Couldn\'t make an invite code.');renderSync(__sync.status());});
+  });
+  on('syncCopy',copyInviteCode);
+  renderHHCard();}
 // Coming back from Google: the page reloads on Home, but the result (claim box or error) lives on the
 // Partner tab. Open it and bring the card into view, so no extra tap or tab switch is needed.
 var __syncRevealed=false;
