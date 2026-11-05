@@ -1234,12 +1234,16 @@ html[data-accent="forest"] .btn.pri,html[data-accent="forest"] .seg button.on,ht
   <section class="view" id="v-settings" data-layout-tab="settings">
     <h2 class="page">Partners</h2>
     <p class="sub">Your household, and the names that show on every item and split. Hold a card to rearrange any tab.</p>
+    <div class="card" id="syncCard" data-layout="set-sync" data-test="sync-card">
+      <div class="row"><b>Cloud sync</b><span class="gstat none">Not signed in</span></div>
+      <div class="hint">Beta. Synced data: budget lines, goals, pay cycles and spending.</div>
+      <button class="btn pri block" type="button" data-test="sync-signin" style="margin-top:12px">Sign in to sync with your partner</button>
+    </div>
     <div class="card" id="hhCard" data-layout="set-hh"></div>
-    <div class="card" id="syncCard" data-layout="set-sync" data-test="sync-card" hidden></div>
-    <div class="card" id="accountCard" data-test="account-card" hidden></div>
-    <div class="card" id="lockCard" data-test="lock-card" hidden></div>
-    <div class="card" id="premiumCard" data-test="premium-card" hidden></div>
-    <div class="card" id="premiumExtras" data-test="premium-extras" hidden></div>
+    <div class="card" id="accountCard" data-layout="set-account" data-test="account-card" hidden></div>
+    <div class="card" id="lockCard" data-layout="set-lock" data-test="lock-card" hidden></div>
+    <div class="card" id="premiumCard" data-layout="set-premium" data-test="premium-card" hidden></div>
+    <div class="card" id="premiumExtras" data-layout="set-premium-extras" data-test="premium-extras" hidden></div>
     <div class="card" data-layout="set-names">
       <label class="fl" for="nameA" style="margin-top:0">Your name</label>
       <input class="field" id="nameA" maxlength="16">
@@ -1833,7 +1837,12 @@ function fmtCurrency(v,cur,opt){
 function money(v,opt){return fmtCurrency(toDisplay(v),S.currency||'AUD',opt);}
 function moneyRaw(v,opt){return fmtCurrency(v,S.currency||'AUD',opt);}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function ownerLabel(o){return o==='J'?'Ours':(S.names[o]||o);}
+function shownName(slot){
+  var n=S.names&&S.names[slot];
+  if(n==='Yours'||n==='Mine')return slot==='D'?'Me':'Partner';
+  return n||(slot==='D'?'Me':slot==='N'?'Partner':slot);
+}
+function ownerLabel(o){return o==='J'?'Ours':shownName(o);}
 // totals in any period, summed at full precision from the amounts as entered
 function totalsIn(c){var t={};CATS.forEach(function(k){t[k.id]=0;});
   S.items.forEach(function(i){if(t[i.cat]!=null)t[i.cat]+=inView(i,c);});
@@ -1917,7 +1926,7 @@ function renderDash(){
   S.items.forEach(function(i){var v=inView(i,V);if(i.cat==='income')inc[i.owner]=(inc[i.owner]||0)+v;else{own[i.owner]=(own[i.owner]||0)+v;if(i.owner==='J'&&i.cat==='savings')js+=v;}});
   var tot=own.J+own.D+own.N||1,cols={J:TC('#14b8a6'),D:TC('#22d3ee'),N:TC('#a78bfa')};
   $('splitBar').innerHTML=['J','D','N'].map(function(o){return '<i style="width:'+(own[o]/tot*100)+'%;background:'+cols[o]+'"></i>';}).join('');
-  var names={J:'Ours',D:S.names.D,N:S.names.N};
+  var names={J:'Ours',D:'Me',N:'Partner'};
   $('split').innerHTML=['J','D','N'].map(function(o){return '<div class="s"><div class="n"><span class="dot" style="background:'+cols[o]+'"></span>'+esc(names[o])+'</div><div class="v">'+money(own[o])+'</div></div>';}).join('');
   $('jsNote').innerHTML=js>0.004?'“Ours” includes <b>'+money(js)+'</b> of joint savings: joint savings count as a joint outgoing here, alongside joint bills.':'';
   // fair share: joint outgoings, less any joint-owned income, split by each partner's own income
@@ -2167,7 +2176,7 @@ function currentSpendWindow(off){
   return {start:payAt(a,c,k),end:payAt(a,c,k+1),cycle:c};
 }
 function payer(){return viewer()==='B'?'N':'D';}
-function whoseLabel(o){return o==='J'?'Ours':(S.names[o]||o);}
+function whoseLabel(o){return ownerLabel(o);}
 function plannedSpend(cats,owner){
   var s=0;
   (S.items||[]).forEach(function(i){
@@ -2232,8 +2241,8 @@ function renderSpentCard(){
   el.innerHTML=top.length?top.map(function(o){return '<div class="over-line" data-test="spent-over-line"><span>'+esc(o.name)+'</span><b>Running over by '+money(o.by)+'</b></div>';}).join(''):'<div class="hint">Nothing\'s over budget this '+per+'.</div>';
 }
 function spendScopes(){
-  var s=[['all','All'],['J','Ours'],['D',S.names.D||'Me']];
-  if(S.names&&S.names.N)s.push(['N',S.names.N]);
+  var s=[['all','All'],['J','Ours'],['D',shownName('D')]];
+  if(S.names&&S.names.N)s.push(['N',shownName('N')]);
   return s;
 }
 function spendRowHtml(e){
@@ -2490,7 +2499,7 @@ function trRowsFromSpends(wins){
 }
 function trRows(){var w=trWins();if(typeof TRENDS_SYNTH==='function')return {src:'demo',rows:TRENDS_SYNTH(w)};var rows=trRowsFromSpends(w);if(!rows)return {src:null,rows:[]};return {src:'recorded',rows:rows};}
 function trHasN(){return !!(S.names&&S.names.N)&&(!!memberBy('partner')||S.items.some(function(i){return i.owner==='N';}));}
-function trScopes(){var s=[['all','All'],['shared','Shared'],['D',S.names.D||'Me']];if(trHasN())s.push(['N',S.names.N]);return s;}
+function trScopes(){var s=[['all','All'],['shared','Shared'],['D',shownName('D')]];if(trHasN())s.push(['N',shownName('N')]);return s;}
 function trOwn(sc){return sc==='all'?['J','D','N']:sc==='shared'?['J']:[sc];}
 function trPlanOf(i){return conv(+i.amount||0,i.freq,trCyc());}
 function trOut(i){return i.cat==='expenses'||i.cat==='personal';}
@@ -2723,7 +2732,7 @@ function goalForm(orig){
     '<div class="two"><div><label class="fl" for="g-target">Target amount</label><input class="field" id="g-target" inputmode="decimal" value="'+v(w.target)+'" placeholder="0"></div>'+
     '<div><label class="fl" for="g-saved">Saved so far</label><input class="field" id="g-saved" inputmode="decimal" value="'+v(w.saved)+'" placeholder="0"></div></div>'+
     '<label class="fl" for="g-date">Target date</label><input class="field" type="date" id="g-date" value="'+esc(w.targetDate)+'">'+
-    '<label class="fl">Who contributes</label><div class="chips" id="g-who">'+[['D',S.names.D],['N',S.names.N],['both','Both']].map(function(o){return '<button class="chip'+(w.who===o[0]?' on':'')+'" data-w="'+o[0]+'">'+esc(o[1])+'</button>';}).join('')+'</div>'+
+    '<label class="fl">Who contributes</label><div class="chips" id="g-who">'+[['D',shownName('D')],['N',shownName('N')],['both','Both']].map(function(o){return '<button class="chip'+(w.who===o[0]?' on':'')+'" data-w="'+o[0]+'">'+esc(o[1])+'</button>';}).join('')+'</div>'+
     '<div id="g-splitwrap"><label class="fl">Split</label><div class="chips" id="g-split">'+[['even','50/50'],['income','By income '+ki+'/'+(100-ki)],['custom','Custom']].map(function(o){return '<button class="chip'+(w.split===o[0]?' on':'')+'" data-s="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>'+
       '<div class="two" id="g-custom"><div><label class="fl" for="g-cd">'+esc(S.names.D)+' / '+cy.per+'</label><input class="field" id="g-cd" inputmode="decimal" placeholder="0"></div><div><label class="fl" for="g-cn">'+esc(S.names.N)+' / '+cy.per+'</label><input class="field" id="g-cn" inputmode="decimal" placeholder="0"></div></div></div>'+
     '<label class="fl" for="g-per" id="g-perlbl">Contribution per '+cy.per+'</label><input class="field" id="g-per" inputmode="decimal" value="'+v(cvP(w.perF))+'" placeholder="0.00">'+
@@ -3266,19 +3275,12 @@ function openEmailCode(email){
     setTimeout(function(){try{input.focus();}catch(e){}},40);
   });
 }
+function syncDebugRequested(){try{return /(?:^|[?&])debug=1(?:&|$)/.test(location.search||'');}catch(e){return false;}}
 function renderSync(st){var el=document.getElementById('syncCard');if(!el)return;el.hidden=false;
   var lbl={blocked:'Off on this build',starting:'Starting…','signed-out':'Not signed in','no-household':'Signed in, no household yet','choose-budget':'Choose a budget',pending:'Changes waiting to sync',synced:'Synced',offline:'Offline, saved on this phone',error:'Sync problem'}[st.state]||st.state;
   var h='<div class="row"><b>Cloud sync</b><span class="gstat '+(st.state==='synced'?'ok':st.state==='error'?'bad':st.state==='pending'||st.state==='offline'?'warn':'none')+'" data-test="sync-state">'+esc(lbl)+'</span></div>'+
     '<div class="hint" data-test="sync-msg">'+esc(st.msg||(st.user?'Signed in as '+st.user+(st.pending?' · '+st.pending+' waiting':''):'Beta. Synced data: budget lines, goals, pay cycles and spending.'))+'</div>';
-  if(st.state==='signed-out'||(st.state==='error'&&!st.user)){
-    var prov=window.DuoAccount?DuoAccount.visibleProviders(window.DUO_AUTH_CONFIG||{},authPlatform()):{apple:false,google:true,email:true};
-    if(prov.apple)h+='<div class="btns"><button class="btn apple block" id="syncApple" type="button">Continue with Apple</button></div>';
-    if(prov.google)h+='<div class="btns"><button class="btn google block" id="syncSignIn" type="button">Continue with Google</button></div>';
-    if(!prov.apple&&!prov.google&&authPlatform()==='ios')h+='<p class="email-note">Sign in with Apple isn\'t available in this build yet, so Google is hidden on iPhone. Email still works.</p>';
-    h+='<div class="or">or use email</div><label class="fl" for="syncEmail">Email</label><input class="field" id="syncEmail" data-test="sync-email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" value="'+esc(emailSign.email)+'">';
-    if(emailSign.mode==='password')h+='<label class="fl" for="syncPassword">Password</label><input class="field" id="syncPassword" data-test="sync-password" type="password" autocomplete="current-password"><div class="ferr" id="syncEmailErr" data-test="sync-email-err">'+esc(emailSign.error)+'</div><button class="btn pri block" id="syncPasswordGo" type="button" data-test="sync-password-go" style="margin-top:12px">Sign in</button><button class="linkbtn" type="button" id="syncUseCode" data-test="sync-use-code">Email a code instead</button>';
-    else h+='<p class="email-note">We\'ll email a 6-digit code. You can set a password later if you want one.</p><div class="ferr" id="syncEmailErr" data-test="sync-email-err">'+esc(emailSign.error)+'</div><button class="btn pri block" id="syncEmailSend" type="button" data-test="sync-email-send" style="margin-top:12px">Email me a code</button><button class="linkbtn" type="button" id="syncUsePassword" data-test="sync-use-password">Use a password instead</button>';
-  }
+  if(!st.user&&(st.state==='signed-out'||st.state==='error'||st.state==='starting'))h+='<button class="btn pri block" type="button" data-test="sync-signin" style="margin-top:12px">Sign in to sync with your partner</button>';
   if(st.state==='no-household')h+='<label class="fl" for="syncCode">Enter join code</label><input id="syncCode" class="field sync-code" data-test="join-code" placeholder="8 letters or numbers" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"><div class="btns"><button class="btn pri" id="syncJoin" data-test="sync-join">Join</button><button class="btn ghost" id="syncCreate">Start a household</button></div>';
   if(window.DuoSync&&DuoSync.shouldOfferInvite&&DuoSync.shouldOfferInvite(st)){
     if(cloudInvite&&cloudInvite.code){
@@ -3287,36 +3289,10 @@ function renderSync(st){var el=document.getElementById('syncCard');if(!el)return
     }else h+='<button class="btn pri block" id="syncInvite" type="button" data-test="invite-partner" style="margin-top:12px">Invite your partner</button>';
   }
   if(['synced','pending','offline','error','no-household'].indexOf(st.state)>=0&&st.user)h+='<div class="btns"><button class="btn ghost" id="syncOut">Sign out</button></div>';
-  if(st.debug){try{console.info('Duo sync',st.debug);}catch(e){}}
+  if(st.debug&&syncDebugRequested()){var d=st.debug;h+='<div class="hint" data-test="sync-debug" style="font-size:11px;opacity:.75;margin-top:10px;word-break:break-word">Sync status: '+esc([d.state,'app '+d.mode,'storage '+d.storage,'session '+d.session,'household '+d.household,'queue '+d.pending,'online '+d.online,'last event '+d.lastEvent,'return '+d.urlReturn,'error '+d.lastError].join(' · '))+'</div>';}
+  else if(st.debug){try{console.info('Duo sync',st.debug);}catch(e){}}
   el.innerHTML=h;
   var on=function(id,f){var b=document.getElementById(id);if(b)b.addEventListener('click',f);};
-  on('syncSignIn',function(){try{sessionStorage.setItem('duo.syncReturn','1');}catch(e){}if(window.DuoGate)DuoGate.startProvider?DuoGate.startProvider('google'):__sync.signIn('google');else __sync.signIn('google');});
-  on('syncApple',function(){try{sessionStorage.setItem('duo.syncReturn','1');}catch(e){}if(window.DuoGate&&DuoGate.startProvider)DuoGate.startProvider('apple');else __sync.signIn('apple');});
-  on('syncUsePassword',function(){emailSign.mode='password';emailSign.error='';renderSync(__sync.status());});
-  on('syncUseCode',function(){emailSign.mode='';emailSign.error='';renderSync(__sync.status());});
-  on('syncPasswordGo',function(){
-    var field=document.getElementById('syncEmail'),pw=document.getElementById('syncPassword');
-    var addr=(field&&field.value||'').trim(),password=pw?pw.value:'';
-    emailSign.email=addr;
-    if(!validEmail(addr)){emailSign.error='Enter a valid email address.';renderSync(__sync.status());return;}
-    var problem=window.DuoAccount?DuoAccount.passwordProblem(password):'';
-    if(problem){emailSign.error=problem;renderSync(__sync.status());return;}
-    __sync.signInWithPassword(addr,password).then(function(r){
-      if(r&&r.error){emailSign.error='That email and password didn\'t match. You can email a code instead.';renderSync(__sync.status());}
-    });
-  });
-  var emailInput=document.getElementById('syncEmail');
-  if(emailInput)emailInput.addEventListener('input',function(){emailSign.email=this.value;emailSign.error='';var er=document.getElementById('syncEmailErr');if(er)er.textContent='';});
-  on('syncEmailSend',function(){
-    var field=document.getElementById('syncEmail'),addr=(field&&field.value||'').trim();emailSign.email=addr;
-    if(!validEmail(addr)){emailSign.error='Enter a valid email address.';var er=document.getElementById('syncEmailErr');if(er)er.textContent=emailSign.error;return;}
-    emailSign.error='';var btn=document.getElementById('syncEmailSend');if(btn){btn.disabled=true;btn.textContent='Sending…';}
-    __sync.signInWithEmail(addr).then(function(r){
-      if(r&&r.error){emailSign.error=otpProblem(r.error,'send');renderSync(__sync.status());return;}
-      emailSign.sentAt=Date.now();openEmailCode(addr);
-      if(btn){btn.disabled=false;btn.textContent='Email me a code';}
-    });
-  });
   revealSyncAfterReturn(st);on('syncOut',function(){if(window.DuoGate)DuoGate.confirmSignOut();else __sync.signOut();});
   if(window.DuoGate)DuoGate.onSync(st);
   on('syncCreate',function(){__sync.createHousehold(S.names.D+(S.names.N&&S.names.N!=='Partner'?' & '+S.names.N:''),S.names.D).catch(function(e){toast(e.message);});});
@@ -3888,6 +3864,8 @@ if(window.DuoGate)DuoGate.start({
   currentEmail:function(){var st=__sync&&__sync.status?__sync.status():null;return st&&st.user||'';},
   leaveSample:leaveSample
 });
+var syncCardEl=document.getElementById('syncCard');
+if(syncCardEl)syncCardEl.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-test="sync-signin"]');if(!b)return;if(window.DuoGate&&DuoGate.openEmailSignIn)DuoGate.openEmailSignIn();});
 window.__duoReady=startSync();
 if(window.DuoPremiumUI){
   var premiumUi=DuoPremiumUI.install({
