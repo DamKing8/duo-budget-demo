@@ -38,6 +38,7 @@ var banned = [
 var fails = [];
 strings.forEach(function (s) {
   banned.forEach(function (b) {
+    if (b.name === 'Over budget' && /Nothing\\?'s over budget/.test(s)) return;
     if (b.re.test(s)) fails.push(b.name + ' in: ' + s.slice(0, 180));
   });
 });

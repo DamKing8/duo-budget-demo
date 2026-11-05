@@ -1,0 +1,48 @@
+# NOT APPLIED. This is the auth configuration to set in the Supabase dashboard
+# (or `supabase/config.toml` if the project is later linked). Nothing in this
+# file is pushed to the live project ksrffninlyioqobvdvhu.
+#
+# Do not put the Google client secret or the Apple private key in git.
+# Those stay in the dashboard.
+
+[auth]
+enabled = true
+site_url = "https://duobudget.com.au"
+additional_redirect_urls = [
+  "https://duobudget.com.au/**",
+  "http://localhost:3000/**",
+  "au.duobudget.app://auth-callback"
+]
+# Password is optional. People who set one use at least 8 characters.
+# Leaked-password protection: turn it on only if it is already on the current plan.
+minimum_password_length = 8
+password_requirements = ""
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+otp_length = 6
+otp_expiry = 3600
+# The confirmation and recovery templates must include {{ .Token }}
+# so the app can ask for a 6-digit code instead of a link.
+# Keep the send rate inside Resend's free 100 emails a day.
+
+[auth.manual_linking]
+enabled = true
+
+[auth.external.apple]
+enabled = false
+client_id = ""
+secret = ""
+# When this is turned on, also add the iOS bundle id au.duobudget.app
+# as an additional client id. Leave enabled = false until the Apple
+# Developer credentials exist. The app hides the Apple button while this is off.
+
+[auth.external.google]
+enabled = true
+client_id = ""
+secret = ""
+# Skip nonce check stays false. Additional client ids (iOS, and the
+# Android client if its token audience differs) are added in the dashboard,
+# not here, because this file is not applied.
+skip_nonce_check = false

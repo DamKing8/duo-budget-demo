@@ -195,6 +195,8 @@ async function main() {
 
   await testWebSignIn();
   await testNativeSignIn();
+  await testPasswordAndIdToken();
+  await testGuestChoiceDoesNotMerge();
   console.log('sync ok');
 }
 
@@ -298,6 +300,115 @@ async function testNativeSignIn() {
   } finally {
     delete global.Capacitor;
   }
+}
+
+async function testPasswordAndIdToken() {
+  delete global.Capacitor;
+  var calls = [];
+  var api = DuoSync.create({
+    config: { enabled: true, supabaseUrl: 'https://example.supabase.co', supabaseAnonKey: 'test' },
+    storageKey: 'duo-password',
+    storage: memory(),
+    app: emptyApp(),
+    createClient: function () {
+      return {
+        auth: {
+          onAuthStateChange: function () {},
+          getSession: function () { return Promise.resolve({ data: { session: null }, error: null }); },
+          signInWithPassword: function (body) { calls.push(['password', body.email]); return Promise.resolve({ data: { session: { user: { id: USER_D, email: body.email } } }, error: null }); },
+          signInWithIdToken: function (body) { calls.push(['id', body.provider, body.nonce]); return Promise.resolve({ data: { session: { user: { id: USER_D, email: 'ada@example.com' } } }, error: null }); },
+          updateUser: function (body) { calls.push(['update', body.password.length]); return Promise.resolve({ data: { user: { id: USER_D } }, error: null }); },
+          signInWithOAuth: function () { return Promise.resolve({ data: {}, error: null }); }
+        },
+        from: function () { return { select: function () { return Promise.resolve({ data: [], error: null }); } }; },
+        rpc: function (name) {
+          calls.push(['rpc', name]);
+          if (name === 'delete_my_data') return Promise.resolve({ data: null, error: null });
+          return Promise.resolve({ data: null, error: { message: 'missing' } });
+        },
+        functions: { invoke: function () { calls.push(['fn']); return Promise.resolve({ data: null, error: { message: 'not deployed' } }); } }
+      };
+    },
+    now: function () { return 0; },
+    online: function () { return true; },
+    flushDelay: 60000
+  });
+  await api.start();
+  await api.signInWithPassword('ada@example.com', 'correct-horse');
+  assert(api.status().user === 'ada@example.com', 'password sign-in uses the same account');
+  await api.signInWithIdToken('apple', 'header.payload.sig', 'raw-nonce');
+  assert(calls.some(function (c) { return c[0] === 'id' && c[1] === 'apple' && c[2] === 'raw-nonce'; }), 'the raw nonce is passed to Supabase');
+  var updated = await api.updatePassword('another-long-password');
+  assert(updated && updated.data && updated.data.user, 'a signed-in person can set a password');
+  var deleted = await api.deleteAccount();
+  assert(deleted && deleted.ok && deleted.via === 'delete_my_data' && deleted.authUserRemains, 'deletion falls back to the existing database function when the edge function is absent');
+  assert(calls.some(function (c) { return c[0] === 'rpc' && c[1] === 'delete_my_account'; }), 'the unapplied account function is tried first');
+}
+
+async function testGuestChoiceDoesNotMerge() {
+  var store = memory();
+  var local = { names: { D: 'Chloe', N: 'Jack' }, cycle: 'fortnight', payDate: '2026-10-16', items: [{ id: 'phone', name: 'Phone only', amount: 10, freq: 'fortnight', cat: 'expenses', tag: '', owner: 'J' }], goals: [], spends: [] };
+  var cloudId = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
+  var db = {
+    household_members: [{ id: MEM_D, household_id: HH, user_id: USER_D, status: 'active', deleted_at: null, joined_at: '2020-01-01T00:00:00.000Z', display_name: 'Chloe' }],
+    budget_items: [{ id: cloudId, household_id: HH, name: 'Cloud rent', amount: 50, freq: 'fortnight', category: 'expenses', tag: '', owner_member_id: null, sort_order: 0, updated_at: '2026-10-01T00:00:00.000Z', deleted_at: null, server_updated_at: '2026-10-01T00:00:00.000Z' }],
+    goals: [], pay_cycles: [], spend_entries: []
+  };
+  var choice = null;
+  function client() {
+    return {
+      from: function (table) {
+        return {
+          select: function () {
+            var filters = [];
+            var q = {
+              eq: function (c, v) { filters.push([c, v]); return q; },
+              gt: function () { return q; },
+              order: function () { return Promise.resolve(run()); },
+              then: function (ok, bad) { return Promise.resolve(run()).then(ok, bad); }
+            };
+            function run() {
+              var rows = (db[table] || []).filter(function (r) { return filters.every(function (f) { return r[f[0]] === f[1]; }); });
+              return { data: rows.map(function (r) { return Object.assign({}, r); }), error: null };
+            }
+            return q;
+          },
+          upsert: function (rows) {
+            rows.forEach(function (row) {
+              var list = db[table] || (db[table] = []);
+              var i = list.findIndex(function (r) { return r.id === row.id; });
+              if (i >= 0) list[i] = Object.assign({}, list[i], row);
+              else list.push(Object.assign({}, row));
+            });
+            return Promise.resolve({ error: null });
+          }
+        };
+      },
+      channel: function () { return { on: function () { return this; }, subscribe: function () { return this; } }; },
+      removeChannel: function () {},
+      auth: {
+        onAuthStateChange: function () {},
+        getSession: function () { return Promise.resolve({ data: { session: { user: { id: USER_D, email: 'chloe@example.com' } } }, error: null }); }
+      }
+    };
+  }
+  var api = DuoSync.create({
+    config: { enabled: true, supabaseUrl: 'https://example.supabase.co', supabaseAnonKey: 'test' },
+    storageKey: 'duo-guest-choice',
+    storage: store,
+    app: appFor(local),
+    createClient: client,
+    guestBudget: function () { return true; },
+    onLinkChoice: function (info) { choice = info; return 'use-cloud'; },
+    now: function () { return Date.parse('2026-10-24T00:00:00.000Z'); },
+    online: function () { return true; },
+    flushDelay: 60000
+  });
+  await api.start();
+  assert(choice && choice.kind === 'choose-cloud' && choice.cloudHas, 'an existing cloud budget asks before anything is combined');
+  assert(local.items.length === 1 && local.items[0].name === 'Cloud rent', 'the account budget is the one that stays');
+  assert(!local.items.some(function (it) { return it.name === 'Phone only'; }), 'the phone-only line is not merged in');
+  assert(!db.budget_items.some(function (r) { return r.name === 'Phone only'; }), 'the phone-only line is not uploaded');
 }
 
 main().catch(function (e) {

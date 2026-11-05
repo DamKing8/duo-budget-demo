@@ -239,7 +239,6 @@ body.noscroll{overflow:hidden}
 .pview{display:flex;justify-content:center;margin:-2px 0 12px}
 .pill.violet{background:rgba(109,74,216,.14);color:var(--violet);border-color:rgba(109,74,216,.35)}
 .ob-hero{text-align:center;margin:6px 0 18px}.ob-hero .logo{width:64px;height:64px;border-radius:20px;margin:0 auto 14px}.ob-hero .logo svg{width:36px;height:36px}
-.ob-hero .brandlock{display:block;width:min(220px,72%);height:auto;margin:2px auto 14px}
 .ob-hero p.sub{margin:6px 10px 0}
 .btn.apple{background:#fff;color:#000;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn.apple svg{width:18px;height:18px}
@@ -659,7 +658,6 @@ body.noscroll{overflow:hidden}
 .pview{display:flex;justify-content:center;margin:-2px 0 12px}
 .pill.violet{background:rgba(167,139,250,.14);color:var(--violet);border-color:rgba(167,139,250,.35)}
 .ob-hero{text-align:center;margin:6px 0 18px}.ob-hero .logo{width:64px;height:64px;border-radius:20px;margin:0 auto 14px}.ob-hero .logo svg{width:36px;height:36px}
-.ob-hero .brandlock{display:block;width:min(220px,72%);height:auto;margin:2px auto 14px}
 .ob-hero p.sub{margin:6px 10px 0}
 .btn.apple{background:#fff;color:#000;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn.apple svg{width:18px;height:18px}
@@ -853,6 +851,9 @@ nav.tabs{background:rgba(12,22,44,.88)!important}
 .store-badges{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:4px}
 .store-badges .badge-slot{display:inline-block;height:40px;min-width:120px}
 .ob-hero .stores{margin:14px 0 0}
+.ob-hero .brandword{display:flex;flex-direction:column;align-items:center;gap:4px;margin:2px auto 10px}
+.ob-hero .brandword img{width:72px;height:72px;display:block}
+.ob-hero .brandword .word{color:var(--text);font-weight:800;font-size:28px;letter-spacing:-.7px;line-height:1.05;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Rounded","SF Pro Text","Segoe UI",Roboto,Inter,"Helvetica Neue",Arial,sans-serif}
 #storeCard .stores{text-align:left}#storeCard .store-badges{justify-content:flex-start}
 #storeCard h3{margin:0 0 10px;font-size:16px}
 /* ===== Even grid (v3): squared-up rows on iPad; Budget untouched ===== */
@@ -1033,8 +1034,6 @@ html[data-theme=light] #sp-save.btn.pri{
 button.otp-resend:disabled{opacity:.55}
 .fx-result{margin-top:12px;font-size:22px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
 .fx-result small{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-top:4px}
-.voice-parsed{background:rgba(14,116,144,.08);border:1px solid rgba(14,116,144,.28);border-radius:14px;padding:12px 14px;margin-top:12px;font-size:14px;line-height:1.45}
-.mic-btn{display:flex;align-items:center;justify-content:center;gap:8px}
 @media (max-width:767px){
   #v-dash.on{display:flex;flex-direction:column}
   #v-dash .dcol{display:contents}
@@ -1070,6 +1069,48 @@ button.otp-resend:disabled{opacity:.55}
   #v-settings>h2.page,#v-settings>p.sub,#v-settings>p.muted,#v-cycle>h2.page,#v-cycle>p.sub,#v-trends>.tr-head,#v-trends>p.sub,#v-trends>.tr-scope{grid-column:1/-1}
 }
 </style>
+<style id="duo-gate-css">
+.duo-gate{display:none}
+.duo-gate.on{display:block;position:fixed;inset:0;z-index:80;overflow:auto;background:var(--bg);color:var(--text)}
+.duo-gate-in{max-width:420px;margin:0 auto;padding:calc(28px + var(--safe-t)) 22px calc(28px + var(--safe-b))}
+.duo-welcome{text-align:center}
+.duo-welcome h2{margin-top:12px}
+.duo-mark{width:72px;height:72px;margin:12px auto 8px}
+.duo-mark img{width:72px;height:72px}
+.duo-actions{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.duo-actions .btn{margin-top:0}
+.duo-dots{display:flex;gap:14px;justify-content:center;margin:22px 0}
+.duo-dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);display:block}
+.duo-dots i.on{background:var(--cyan);border-color:var(--cyan)}
+.duo-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:280px;margin:8px auto 0}
+.duo-pad button{min-height:64px;border-radius:16px;border:1px solid var(--line);background:var(--card);font-size:22px;font-weight:700}
+.duo-radio{display:flex;align-items:center;gap:8px;padding:8px 2px;font-weight:650}
+.lock-after{padding:8px 2px}
+.duo-links{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.duo-links .btn{white-space:nowrap}
+.duo-gate.lock-open .duo-gate-in{min-height:100%;display:flex;flex-direction:column;box-sizing:border-box;padding-bottom:0}
+.lock-invite{flex:1 0 auto;display:flex;flex-direction:column;text-align:center;min-height:100%;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+.lock-invite .lock-logo{width:168px;height:168px;margin:0 auto 6px}
+.lock-invite .lock-logo img{width:168px;height:168px;display:block}
+.lock-invite h2.page{margin:6px 0 2px;text-align:center}
+.lock-slogan{margin:0 8px;color:var(--muted);font-size:15px;line-height:1.4}
+.lock-mid{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%}
+.lock-invite .duo-dots{margin:14px 0 6px}
+.lock-mid .duo-pad{width:min(280px,100%);margin-top:0}
+.lock-mid .ferr,.lock-mid .sub,.lock-mid .mock,.lock-mid .linkbtn{width:100%;text-align:center}
+.lock-foot{width:100%;padding-top:16px}
+.lock-foot .btn{width:100%;border-radius:14px}
+@media (max-height:700px){
+  .lock-invite .lock-logo,.lock-invite .lock-logo img{width:144px;height:144px}
+  .lock-invite h2.page{font-size:24px;margin:2px 0}
+  .lock-slogan{font-size:14px}
+  .lock-invite .duo-dots{margin:8px 0 4px}
+  .lock-invite .duo-pad{gap:8px}
+  .lock-invite .duo-pad button{min-height:52px}
+}
+html.duo-gated .app,html.duo-gated nav.tabs{visibility:hidden}
+html.duo-privacy .app,html.duo-privacy nav.tabs{filter:blur(16px)}
+</style>
 </head>
 <body>
 <div class="app">
@@ -1084,6 +1125,7 @@ button.otp-resend:disabled{opacity:.55}
   <!-- DASHBOARD -->
   <section class="view on" id="v-dash" data-layout-tab="dash">
     <div class="dash-title"><h2 class="page">Home</h2><p class="sub" id="dashSub"></p><p class="layout-hint">Hold a card, then drag it to another row or column.</p></div>
+    <div class="card" id="backupNudge" data-test="backup-nudge-card" hidden></div>
     <div class="dcol">
     <div class="card hero" data-layout="hero">
       <div class="lbl" id="heroLbl">Left over this fortnight</div>
@@ -1118,7 +1160,7 @@ button.otp-resend:disabled{opacity:.55}
     <div class="card tr-entry" data-layout="trends" data-test="trends-card"><h3><span>Trends</span></h3><div class="row2"><div class="hint" id="trEntryLine"></div><button class="tr-link" data-open-trends data-test="see-trends">See trends</button></div></div>
     </div>
     <div class="card c-split" data-layout="split">
-      <h3><span>Ours · Yours · Mine</span><span class="muted" style="font-size:12px;font-weight:500">whose outgoings</span></h3>
+      <h3><span>Ours · Me · Partner</span><span class="muted" style="font-size:12px;font-weight:500">whose outgoings</span></h3>
       <div class="bar" id="splitBar"></div>
       <div class="split" id="split"></div>
       <div class="hint" id="jsNote" data-test="joint-savings-note"></div>
@@ -1130,7 +1172,7 @@ button.otp-resend:disabled{opacity:.55}
   <section class="view" id="v-budget" data-layout-tab="budget">
     <div class="summary-strip"><div><div class="l" id="stripLbl">Left over this fortnight</div><div class="v" id="stripV">$0</div></div><span class="pill" id="stripPill">Fortnight</span></div>
     <div class="bud-head"><h2 class="page">Budget</h2><span style="display:flex;gap:8px"><button class="tr-link" type="button" data-open-spent data-test="budget-spending">Spending</button><button class="tr-link" data-open-trends data-test="budget-trends">Trends</button></span></div>
-    <p class="sub">Tap a name to edit it. Tap the tag to switch between ours, yours and mine. Swipe an expense left to delete. Hold an expense to reorder it. Hold a group to rearrange.</p>
+    <p class="sub">Tap a name to edit it. Tap the tag to switch between ours, me and partner. Swipe an expense left to delete. Hold an expense to reorder it. Hold a group to rearrange.</p>
     <div id="groups"></div>
   </section>
 
@@ -1187,6 +1229,8 @@ button.otp-resend:disabled{opacity:.55}
     <p class="sub">Your household, and the names that show on every item and split. Hold a card to rearrange any tab.</p>
     <div class="card" id="hhCard" data-layout="set-hh"></div>
     <div class="card" id="syncCard" data-layout="set-sync" data-test="sync-card" hidden></div>
+    <div class="card" id="accountCard" data-test="account-card" hidden></div>
+    <div class="card" id="lockCard" data-test="lock-card" hidden></div>
     <div class="card" data-layout="set-names">
       <label class="fl" for="nameA" style="margin-top:0">Your name</label>
       <input class="field" id="nameA" maxlength="16">
@@ -1236,10 +1280,12 @@ button.otp-resend:disabled{opacity:.55}
 <div class="flow" id="flow" role="dialog" aria-modal="true"><div class="flow-in"><div class="flow-top"><button class="xbtn" id="flowBack" aria-label="Back">‹</button><div class="fdots" id="flowDots"></div><button class="xbtn" id="flowClose" aria-label="Close">✕</button></div><div id="flowBody"></div></div></div>
 <div class="scrim" id="scrim"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
+<div id="duoGate" class="duo-gate" hidden></div>
 
 <!-- @@DEPLOY_START@@ supabase-js 2.117.3 (pinned, vendored) + runtime sync config. Public key only (RLS-protected). -->
 <script src="supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R"></script>
 <script>window.DUO_SYNC_CONFIG={"enabled":true,"supabaseUrl":"https://ksrffninlyioqobvdvhu.supabase.co","supabaseAnonKey":"sb_publishable_kYFCNsoHhW537_RtxtOxKg_4agyXKDI"};</script>
+<script>window.DUO_AUTH_CONFIG=Object.assign({apple:false,google:true,allowGoogleWithoutApple:false,appleClientId:"",googleWebClientId:"",googleIosClientId:"",googleAndroidClientId:""},window.DUO_AUTH_CONFIG||{});</script>
 <!-- @@DEPLOY_END@@ -->
 <script id="duo-sync-lib">/*@@SYNC_START@@*/
 /* Duo Budget cloud sync (phase 1: built and tested offline; OFF by default).
@@ -1266,8 +1312,8 @@ function create(opts){
   var meta=load();var client=null,session=null,ctx=null,channel=null,applying=false,timer=null,flushing=null,status={state:'starting',pending:0};
   function load(){try{var m=JSON.parse(store.getItem(MK)||'null');if(m&&m.v===1)return m;}catch(e){}return {v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:null};}
   function persist(){try{store.setItem(MK,JSON.stringify(meta));}catch(e){}}
-  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,user:session&&session.user?session.user.email:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
-  // ---- no-secrets diagnostics (shown as the "Sync status" line)
+  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
+  // Diagnostics stay in the console. The sync card does not show them.
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
   function nativeShell(){var cap=nativeCap();try{return !!(cap&&typeof cap.isNativePlatform==='function'&&cap.isNativePlatform());}catch(e){return false;}}
@@ -1302,7 +1348,7 @@ function create(opts){
   }
   // Native shell: Google opens in the system browser (@capacitor/browser) and returns to
   // au.duobudget.app://auth-callback. The web build never takes this path.
-  var nativeAuthAttached=false,nativeAuthSeen={};
+  var nativeAuthAttached=false,nativeAuthSeen={},disposed=false;
   function isNativeAuthUrl(url){return typeof url==='string'&&url.indexOf(NATIVE_AUTH_REDIRECT)===0;}
   function closeNativeBrowser(){var Browser=nativePlugin('Browser');if(Browser&&Browser.close){try{Promise.resolve(Browser.close()).catch(function(){});}catch(e){}}}
   function handleNativeAuthUrl(url){
@@ -1407,7 +1453,7 @@ function create(opts){
   // ---------------------------------------------------------------- local change detection -> queue
   function enqueue(t,row){meta.queue=meta.queue.filter(function(q){return !(q.t===t&&q.row.id===row.id);});meta.queue.push({t:t,row:row});}
   function onLocalSave(){
-    if(!ctx||applying)return;
+    if(disposed||!ctx||applying)return;
     var pack=localRecords(),recs=pack.recs,held=pack.held,stamp=new Date(now()).toISOString(),seen={};
     TABLES.forEach(function(t){Object.keys(recs[t]).forEach(function(k){var r=recs[t][k],h=stable(r);seen[k]=1;if(meta.snap[k]!==h){meta.snap[k]=h;meta.ua[r.id]=stamp;r.updated_at=stamp;r.deleted_at=null;enqueue(t,r);}});});
     Object.keys(held).forEach(function(k){seen[k]=1;});
@@ -1445,7 +1491,7 @@ function create(opts){
     var k=keyOf(row.id);if(k){if(row.deleted_at)delete meta.snap[k];else meta.snap[k]=stable(cloudShape(t,row));}
     return changed;
   }
-  function commitRemote(n,reason){if(!n)return;applying=true;try{app.commit(reason||'sync');}finally{applying=false;}persist();}
+  function commitRemote(n,reason){if(disposed||!n)return;applying=true;try{app.commit(reason||'sync');}finally{applying=false;}persist();}
   function pull(){
     if(!client||!ctx)return Promise.resolve(0);
     if(!isOnline()){setStatus('offline');return Promise.resolve(0);}
@@ -1462,24 +1508,78 @@ function create(opts){
   }
 
   // ---------------------------------------------------------------- household + auth
+  function isGuestBudget(){try{return typeof opts.guestBudget==='function'?!!opts.guestBudget():!!opts.guestBudget;}catch(e){return false;}}
+  function localHasData(){var S=app.getState()||{};return !!((S.items&&S.items.length)||(S.goals&&S.goals.length)||(S.spends&&S.spends.length));}
+  function clearLocalRows(){var S=app.getState();if(!S)return;S.items=[];S.goals=[];if(S.spends)S.spends=[];}
+  function listCloud(){
+    return TABLES.reduce(function(p,t){return p.then(function(acc){
+      return client.from(t).select('*').eq('household_id',ctx.household).then(function(res){
+        if(res&&res.error)throw res.error;acc[t]=(res&&res.data)||[];return acc;
+      });
+    });},Promise.resolve({}));
+  }
+  function cloudHasRows(acc){return TABLES.some(function(t){return (acc[t]||[]).some(function(r){return r&&!r.deleted_at;});});}
+  function adoptCloudRows(){
+    var S2=app.getState();if(!S2)return;
+    var cloudHas=Object.keys(meta.snap).some(function(k){return k[0]==='i';});
+    if(!cloudHas)return;
+    S2.items=(S2.items||[]).filter(function(it){return meta.ids['i:'+it.id];});
+    S2.goals=(S2.goals||[]).filter(function(g){return meta.ids['g:'+g.id];});
+    S2.spends=(S2.spends||[]).filter(function(e){return meta.ids['s:'+e.id];});
+    commitRemote(1,'adopt');
+  }
+  function finishLink(first, choice){
+    if(disposed)return Promise.resolve(null);
+    if(choice==='replace-cloud'){
+      return listCloud().then(function(acc){
+        if(disposed)return null;
+        var stamp=new Date(now()).toISOString();
+        TABLES.forEach(function(t){(acc[t]||[]).forEach(function(row){
+          if(!row||row.deleted_at)return;
+          enqueue(t,{id:row.id,household_id:ctx.household,updated_at:stamp,deleted_at:stamp});
+        });});
+        onLocalSave();subscribe();return flush();
+      }).then(function(){return ctx?ctx.household:null;});
+    }
+    if(choice==='fresh'||choice==='use-cloud')clearLocalRows();
+    return pull().then(function(){
+      if(disposed)return null;
+      // Legacy first link, and "use the account budget": cloud rows stay, phone-only rows do not upload.
+      // keep-local skips that filter so a new empty household can take this phone's budget.
+      if(first&&choice!=='keep-local')adoptCloudRows();
+      onLocalSave();subscribe();return flush();
+    }).then(function(){return ctx?ctx.household:null;});
+  }
   function loadHousehold(){
+    if(disposed)return Promise.resolve(null);
     return client.from('household_members').select('*').then(function(res){if(res.error)throw res.error;
+      if(disposed)return null;
       var mine=(res.data||[]).find(function(m){return m.user_id===ctx0().me&&m.status==='active';});
       if(!mine){ctx=null;setStatus('no-household');return null;}
       ctx=buildCtx(mine.household_id,(res.data||[]).filter(function(m){return m.household_id===mine.household_id;}));
       var first=meta.household!==ctx.household;
       if(first){meta={v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:ctx.household};idToKey={};}
-      var S=app.getState();if(ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;if(ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
-      return pull().then(function(n){
-        // first link: if the cloud household already has data it wins (adopt it); otherwise upload this phone's data
-        if(first){var S2=app.getState();var cloudHas=Object.keys(meta.snap).some(function(k){return k[0]==='i';});
-          if(cloudHas){S2.items=S2.items.filter(function(it){return meta.ids['i:'+it.id];});S2.goals=S2.goals.filter(function(g){return meta.ids['g:'+g.id];});S2.spends=(S2.spends||[]).filter(function(e){return meta.ids['s:'+e.id];});commitRemote(1,'adopt');}}
-        onLocalSave();subscribe();return flush();}).then(function(){return ctx.household;});
+      var S=app.getState();if(S&&ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;if(S&&ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
+      if(first&&isGuestBudget()&&localHasData()&&typeof opts.onLinkChoice==='function'){
+        return listCloud().then(function(acc){
+          if(disposed)return null;
+          var cloudHas=cloudHasRows(acc);
+          var kind=cloudHas?'choose-cloud':'keep-or-fresh';
+          setStatus('choose-budget',cloudHas?'This account already has a budget.':'You have a budget on this phone.');
+          return Promise.resolve(opts.onLinkChoice({kind:kind,cloudHas:cloudHas,localHas:true})).then(function(choice){
+            if(disposed)return null;
+            if(kind==='choose-cloud')choice=choice==='replace-cloud'?'replace-cloud':'use-cloud';
+            else choice=choice==='keep-local'?'keep-local':'fresh';
+            return finishLink(first,choice);
+          });
+        });
+      }
+      return finishLink(first,null);
     });
   }
   function ctx0(){return {me:session&&session.user?session.user.id:null};}
   var authFlight=null,authFor=null;
-  function afterAuth(s){session=s;if(!s){ctx=null;authFlight=null;authFor=null;setStatus('signed-out');return Promise.resolve(null);}
+  function afterAuth(s){if(disposed)return Promise.resolve(null);session=s;if(!s){ctx=null;authFlight=null;authFor=null;setStatus('signed-out');return Promise.resolve(null);}
     var uid=s.user&&s.user.id;if(authFlight&&authFor===uid)return authFlight;   // SIGNED_IN event + getSession both arrive: link once
     authFor=uid;authFlight=loadHousehold().catch(function(e){dbg.lastError=(e&&e.code)||'load_failed';setStatus('error',e.message||String(e));});return authFlight;}
   function start(){
@@ -1503,20 +1603,46 @@ function create(opts){
   var api={
     start:start,onLocalSave:onLocalSave,flush:flush,pull:pull,status:function(){return status;},meta:function(){return meta;},
     debug:function(){return debugInfo(status.state);},
-    signIn:function(){dbg.lastError='-';
+    signIn:function(provider){dbg.lastError='-';
+      provider=provider==='apple'?'apple':'google';
+      var label=provider==='apple'?'Apple':'Google';
       var native=nativeShell();
       var redirectTo=native?NATIVE_AUTH_REDIRECT:(opts.redirectTo||(typeof location!=='undefined'?location.origin+location.pathname:undefined));
       var options={redirectTo:redirectTo};
       if(native)options.skipBrowserRedirect=true;
-      return client.auth.signInWithOAuth({provider:'google',options:options}).then(function(r){
-        if(r&&r.error){fail(r.error.code||'oauth_start_failed','Couldn\'t start Google sign-in: '+r.error.message);return r;}
+      return client.auth.signInWithOAuth({provider:provider,options:options}).then(function(r){
+        if(r&&r.error){fail(r.error.code||'oauth_start_failed','Couldn\'t start '+label+' sign-in: '+r.error.message);return r;}
         if(!native)return r;
         var url=r&&r.data&&r.data.url;
-        if(!url){fail('oauth_start_failed','Google sign-in didn\'t return a link to open.');return r;}
+        if(!url){fail('oauth_start_failed',label+' sign-in didn\'t return a link to open.');return r;}
         var Browser=nativePlugin('Browser');
         if(!Browser||!Browser.open){fail('native_browser_missing','Couldn\'t open the sign-in browser in this app.');return r;}
-        return Promise.resolve(Browser.open({url:url})).then(function(){return r;},function(e){fail('oauth_start_failed','Couldn\'t open Google sign-in: '+((e&&e.message)||e));return r;});
-      },function(e){fail('oauth_start_failed','Couldn\'t start Google sign-in: '+((e&&e.message)||e));});},
+        return Promise.resolve(Browser.open({url:url})).then(function(){return r;},function(e){fail('oauth_start_failed','Couldn\'t open '+label+' sign-in: '+((e&&e.message)||e));return r;});
+      },function(e){fail('oauth_start_failed','Couldn\'t start '+label+' sign-in: '+((e&&e.message)||e));});},
+    signInWithIdToken:function(provider,token,nonce){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.signInWithIdToken)return Promise.resolve({error:{message:'This build can\'t finish that sign-in.'}});
+      var body={provider:provider,token:token};
+      if(nonce)body.nonce=nonce;
+      return client.auth.signInWithIdToken(body).then(function(r){
+        var s=r&&r.data&&r.data.session;if(s)return afterAuth(s).then(function(){return r;});return r||{};
+      },function(e){return {error:{message:(e&&e.message)||'Couldn\'t finish sign-in.'}};});},
+    signInWithPassword:function(email,password){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.signInWithPassword)return Promise.resolve({error:{message:'Password sign-in isn\'t available in this build.'}});
+      return client.auth.signInWithPassword({email:String(email||'').trim(),password:String(password||'')}).then(function(r){
+        var s=r&&r.data&&r.data.session;if(s)return afterAuth(s).then(function(){return r;});return r||{};
+      },function(e){return {error:{message:(e&&e.message)||'Couldn\'t sign in with that password.'}};});},
+    updatePassword:function(password){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.updateUser)return Promise.resolve({error:{message:'Couldn\'t save a password in this build.'}});
+      return client.auth.updateUser({password:String(password||'')}).then(function(r){return r||{};},function(e){return {error:{message:(e&&e.message)||'Couldn\'t save that password.'}};});},
+    // Recovery uses the same 6-digit code as sign-in when the email template contains {{ .Token }}.
+    sendRecoveryCode:function(email){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.resetPasswordForEmail)return Promise.resolve({error:{message:'Couldn\'t send a reset code in this build.'}});
+      return client.auth.resetPasswordForEmail(String(email||'').trim()).then(function(r){return r||{};},function(e){return {error:{message:(e&&e.message)||'Couldn\'t send a reset code.'}};});},
+    verifyRecoveryCode:function(email,token){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.verifyOtp)return Promise.resolve({error:{message:'Couldn\'t check that code.'}});
+      return client.auth.verifyOtp({email:String(email||'').trim(),token:String(token||'').replace(/\D/g,''),type:'recovery'}).then(function(r){
+        var s=r&&r.data&&r.data.session;if(s)return afterAuth(s).then(function(){return r;});return r||{};
+      },function(e){return {error:{message:(e&&e.message)||'Couldn\'t check that code.'}};});},
     // Email code. No emailRedirectTo: the 6-digit code must work from any origin, including a preview tunnel.
     signInWithEmail:function(email){dbg.lastError='-';
       if(!client||!client.auth||!client.auth.signInWithOtp)return Promise.resolve({error:{message:'Email sign-in isn\'t available in this build.'}});
@@ -1526,7 +1652,46 @@ function create(opts){
       return client.auth.verifyOtp({email:String(email||'').trim(),token:String(token||'').replace(/\D/g,''),type:'email'}).then(function(r){
         var s=r&&r.data&&r.data.session;if(s)return afterAuth(s).then(function(){return r;});return r||{};
       },function(e){return {error:{message:(e&&e.message)||'Couldn\'t check that code.'}};});},
-    signOut:function(){if(channel&&client.removeChannel)client.removeChannel(channel);channel=null;return client.auth.signOut().then(function(){return afterAuth(null);});},
+    signOut:function(){if(channel&&client&&client.removeChannel)client.removeChannel(channel);channel=null;if(!client||!client.auth||!client.auth.signOut)return afterAuth(null);return client.auth.signOut().then(function(){return afterAuth(null);},function(){return afterAuth(null);});},
+    stop:function(){disposed=true;if(timer)clearTimeout(timer);timer=null;if(channel&&client&&client.removeChannel)client.removeChannel(channel);channel=null;},
+    deleteAccount:function(){
+      function rpc(name){
+        if(!client||!client.rpc)return Promise.resolve({error:{message:'Account deletion isn\'t available in this build.'}});
+        return client.rpc(name).then(function(r){return r||{};},function(e){return {error:{message:(e&&e.message)||'Couldn\'t delete the account.'}};});
+      }
+      function fallback(){
+        return rpc('delete_my_account').then(function(a){
+          if(a&&!a.error)return {ok:true,via:'delete_my_account'};
+          return rpc('delete_my_data').then(function(b){
+            if(b&&b.error)return b;
+            return {ok:true,via:'delete_my_data',authUserRemains:true};
+          });
+        });
+      }
+      if(client&&client.functions&&client.functions.invoke){
+        return client.functions.invoke('delete-account',{body:{}}).then(function(r){
+          if(r&&!r.error)return {ok:true,via:'function'};
+          return fallback();
+        },fallback);
+      }
+      return fallback();
+    },
+    linkIdentity:function(provider){
+      if(!client||!client.auth||!client.auth.linkIdentity)return Promise.resolve({error:{message:'Linking isn\'t available in this build.'}});
+      var native=nativeShell();
+      var redirectTo=native?NATIVE_AUTH_REDIRECT:(opts.redirectTo||(typeof location!=='undefined'?location.origin+location.pathname:undefined));
+      var options={redirectTo:redirectTo};
+      if(native)options.skipBrowserRedirect=true;
+      return client.auth.linkIdentity({provider:provider,options:options}).then(function(r){return r||{};},function(e){return {error:{message:(e&&e.message)||'Couldn\'t link that sign-in.'}};});
+    },
+    unlinkIdentity:function(identity){
+      if(!client||!client.auth||!client.auth.unlinkIdentity)return Promise.resolve({error:{message:'Unlinking isn\'t available in this build.'}});
+      return client.auth.unlinkIdentity(identity).then(function(r){return r||{};},function(e){return {error:{message:(e&&e.message)||'Couldn\'t remove that sign-in.'}};});
+    },
+    identities:function(){
+      if(!client||!client.auth||!client.auth.getUserIdentities)return Promise.resolve({data:{identities:[]}});
+      return client.auth.getUserIdentities().then(function(r){return r||{data:{identities:[]}};},function(){return {data:{identities:[]}};});
+    },
     createHousehold:function(name,display){return client.rpc('create_household',{p_name:name,p_display_name:display}).then(function(r){if(r.error)throw r.error;return loadHousehold();});},
     createInvite:function(){return client.rpc('create_invite',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return r.data;});},
     joinHousehold:function(code,display){return client.rpc('join_household',{p_code:code,p_display_name:display}).then(function(r){if(r.error)throw r.error;if(!r.data||!r.data.ok)return r.data;return loadHousehold().then(function(){return r.data;});});},
@@ -1538,11 +1703,16 @@ function create(opts){
 return {create:create,TABLES:TABLES,_stable:stable};
 });
 /*@@SYNC_END@@*/</script>
+<script src="duo-account.js"></script>
+<script src="duo-lock.js"></script>
+<script src="duo-gate.js"></script>
 <script>
 (function(){
 'use strict';
 var KEY='duoBudget.demo.v1';/*@@KEY@@*/ // separate key so the demo never reads a personal budget saved in the same browser
 var PERSONAL_BUILD=false;/*@@PERSONAL@@*/
+var sampleOnly=false;
+var syncGen=0;
 /* Cloud sync (Supabase). OFF by default: with enabled:false nothing below loads, connects or changes.
    No key lives in this file. Phase 2 injects {enabled, supabaseAnonKey} at runtime via window.DUO_SYNC_CONFIG
    from a local untracked build (tools/make-sync-build.js). The personal build never syncs (allowPersonalData). */
@@ -1618,7 +1788,11 @@ function load(){try{var raw=localStorage.getItem(KEY);S=raw?JSON.parse(raw):demo
   migrateV4(S);
   if(window.__DUO_PREVIEW_SEED__)seedPreviewSpends();
 }
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}if(__sync)__sync.onLocalSave();}
+function blankBudget(){
+  var t=new Date();t.setHours(0,0,0,0);
+  return {names:{D:'Me',N:'Partner'},currency:'AUD',cycle:'fortnight',view:'fortnight',payDate:isoLocal(t),items:[],goals:[],spends:[],v:4};
+}
+function save(){if(sampleOnly)return;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}if(__sync&&syncGen)__sync.onLocalSave();}
 function r2(v){return Math.round((v+Number.EPSILON)*100)/100;}
 function fmtCurrency(v,cur,opt){
   opt=opt||{};var n=Number(v)||0,o={style:'currency',currency:cur||'AUD'};
@@ -1629,7 +1803,7 @@ function fmtCurrency(v,cur,opt){
 function money(v,opt){return fmtCurrency(toDisplay(v),S.currency||'AUD',opt);}
 function moneyRaw(v,opt){return fmtCurrency(v,S.currency||'AUD',opt);}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function ownerLabel(o){return o==='J'?'Joint':(S.names[o]||o);}
+function ownerLabel(o){return o==='J'?'Ours':(S.names[o]||o);}
 // totals in any period, summed at full precision from the amounts as entered
 function totalsIn(c){var t={};CATS.forEach(function(k){t[k.id]=0;});
   S.items.forEach(function(i){if(t[i.cat]!=null)t[i.cat]+=inView(i,c);});
@@ -1742,8 +1916,8 @@ function renderBudget(){
       if(c.id==='expenses')h+='<div class="item" data-id="'+i.id+'" data-expense="1"><div class="swipe-actions"><button type="button" data-act="swipe-del">Delete</button></div><div class="swipe-front">'+inner+'</div></div>';
       else h+='<div class="item" data-id="'+i.id+'">'+inner+'</div>';
     });
-    if(!its.length)h+='<div class="item"><span class="muted" style="font-size:14px">No items yet</span></div>';
-    h+='</div><button class="addbtn" data-add="'+c.id+'">+ Add to '+c.label.toLowerCase()+'</button>'+(c.id==='expenses'?'<button class="addbtn mic-btn" type="button" data-voice="1" data-test="voice-add">Add an expense by voice</button>':'')+'</div>';
+    if(!its.length)h+='<div class="item"><span class="muted" style="font-size:14px">Nothing here yet</span></div>';
+    h+='</div><button class="addbtn" data-add="'+c.id+'">+ Add to '+c.label.toLowerCase()+'</button></div>';
   });
   $('groups').innerHTML=h;
 }
@@ -1852,7 +2026,7 @@ function renderGoals(){
     return '<div class="card goal" data-layout="goal-'+g.id+'" data-gid="'+g.id+'" data-test="goal-card" style="cursor:pointer"><div class="top"><div class="emoji">'+esc(g.emoji||'🎯')+'</div><div class="gt"><b>'+esc(g.name)+'</b><small>'+money(cvP(g.perF))+' / '+cy.per+' · '+esc(whoShort(g))+'</small></div><div class="pct">'+Math.round(p.pct)+'%</div></div>'+
       '<div class="prog '+cls+'"><i style="width:'+p.pct+'%"></i></div><div class="meta"><span>'+money(g.saved,{whole:true})+' of '+money(g.target,{whole:true})+'</span><span data-test="goal-left">'+(p.left>0?money(p.left,{whole:true})+' to go':'Done')+'</span></div>'+
       '<div class="foot">'+pill(p)+'<span class="r">'+goalFoot(p)+'</span></div></div>';
-  }).join('')||'<div class="card muted" data-layout="goal-empty">No goals yet. Add one to start tracking it.</div>';
+  }).join('')||'<div class="card muted" data-layout="goal-empty">No goals yet. Add one you\'re saving for together.</div>';
 }
 function renderHHCard(){
   var h=HH(),el=$('hhCard'),pm=memberBy('partner'),st=invStatus();
@@ -1865,7 +2039,7 @@ function renderHHCard(){
   if(pm)pr='<div class="mrow"><div class="av b">'+esc(pm.name.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(pm.name)+(viewer()==='B'?'<span class="you">You</span>':'')+'</b><small>'+CYCLES[pm.payCycle].adj+' pay</small>'+(sid&&pm.userId===sid?'<small class="started">Started the household</small>':'')+'</div><span class="gstat ok">Joined</span></div>';
   else if(st==='pending')pr='<div class="mrow"><div class="av b pending">?</div><div class="mi"><b>'+esc(h.invite.forName||'Partner')+' (invited)</b><small>Code '+h.invite.code+' · expires '+fmtDay(h.invite.expiresAt)+'</small></div><span class="gstat warn">Pending</span></div>';
   else if(h.lastLeft){var ln=h.lastLeft.name;pr='<div class="mrow"><div class="av b">'+esc(ln.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(ln)+' (left '+fmtDay(h.lastLeft.at)+')</b><small>Goals stay · their planned contributions are $0</small></div></div>';}
-  else pr='<div class="mrow"><div class="av b pending">+</div><div class="mi"><b>No partner yet</b><small>'+(st==='expired'?'Last invite expired':st==='revoked'?'Last invite revoked':'Invite your partner to join')+'</small></div></div>';
+  else pr='<div class="mrow"><div class="av b pending">+</div><div class="mi"><b>Just you for now</b><small>'+(st==='expired'?'Last invite expired':st==='revoked'?'Last invite revoked':'Invite your partner to plan together')+'</small></div></div>';
   var ow=memberBy('owner')||{name:S.names.D,userId:(S.account||{}).userId};
   el.innerHTML='<h3><span>'+esc(h.name)+'</span><span class="tag">PROTOTYPE</span></h3><div class="mlist" data-test="hh-card"><div class="mrow"><div class="av a">'+esc(S.names.D.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(S.names.D)+(viewer()==='A'?'<span class="you">You</span>':'')+'</b><small>'+CYCLES[S.cycle].adj+' pay</small>'+(sid&&(ow.userId===sid||(!pm&&sid))?'<small class="started">Started the household</small>':'')+'</div></div>'+pr+'</div>'+
     '<button class="btn ghost block" style="margin-top:12px" id="hhManage">Manage household</button>'+
@@ -2019,7 +2193,7 @@ function renderSpentCard(){
   });
   overs.sort(function(a,b){return b.by-a.by;});
   var top=overs.slice(0,2),el=$('spentCardOver');
-  el.innerHTML=top.length?top.map(function(o){return '<div class="over-line" data-test="spent-over-line"><span>'+esc(o.name)+'</span><b>Running over by '+money(o.by)+'</b></div>';}).join(''):'<div class="hint">Nothing is running over this '+per+'.</div>';
+  el.innerHTML=top.length?top.map(function(o){return '<div class="over-line" data-test="spent-over-line"><span>'+esc(o.name)+'</span><b>Running over by '+money(o.by)+'</b></div>';}).join(''):'<div class="hint">Nothing\'s over budget this '+per+'.</div>';
 }
 function spendScopes(){
   var s=[['all','All'],['J','Ours'],['D',S.names.D||'Me']];
@@ -2051,8 +2225,8 @@ function renderSpent(){
   var planned=plannedSpend(['expenses','personal'],owner||undefined);
   var left=planned-net,over=left<-0.004;
   $('spentSummary').innerHTML='<div class="spent-sum"><div><div class="k">Spent</div><div class="v" data-test="sum-spent">'+(net<-0.004?'$0 spent':money(Math.max(0,net)))+'</div></div><div><div class="k">Planned</div><div class="v" data-test="sum-planned">'+money(planned)+'</div></div><div><div class="k">'+(over?'Running over':'Left')+'</div><div class="v'+(over?' over':'')+'" data-test="sum-left">'+(over?('Running over by '+money(-left)):money(Math.max(0,left)))+'</div></div></div>'+(net<-0.004?'<div class="hint">$0 spent, '+money(-net)+' refunded.</div>':'');
-  if(!all.length){el.innerHTML='<div class="card tr-empty" data-test="spent-empty"><b>Nothing recorded this '+per+' yet.</b><div class="muted" style="font-size:14px;line-height:1.45">Add what you spend to see it against your plan.</div></div>';return;}
-  if(!list.length){el.innerHTML='<div class="card tr-empty" data-test="spent-empty"><b>Nothing recorded for this view this '+per+'.</b><div class="muted" style="font-size:14px;line-height:1.45">The other scopes still have spending for this '+per+'.</div></div>';return;}
+  if(!all.length){el.innerHTML='<div class="card tr-empty" data-test="spent-empty"><b>No spending this '+per+' yet.</b><div class="muted" style="font-size:14px;line-height:1.45">Add what you spend to see how it tracks against your plan.</div></div>';return;}
+  if(!list.length){el.innerHTML='<div class="card tr-empty" data-test="spent-empty"><b>Nothing here this '+per+'.</b><div class="muted" style="font-size:14px;line-height:1.45">Switch between Ours, Me and Partner to see the rest.</div></div>';return;}
   list.sort(function(a,b){if(a.on!==b.on)return a.on<b.on?1:-1;return (b.at||0)-(a.at||0);});
   var html='',last='';
   list.forEach(function(e){if(e.on!==last){last=e.on;var d=parseISO(e.on);html+='<div class="dayhead">'+esc(d?fmtDate(d):e.on)+'</div>';}html+=spendRowHtml(e);});
@@ -2540,7 +2714,7 @@ function goalForm(orig){
       else if(p.reached)h2='<b>Already reached</b>. Saved covers the target.';
       else if(!p.date)h2='Pick a target date to work out what\'s needed each '+cy.per+'.';
       else if(p.status==='overdue')h2='That date has passed. Pick a future date.';
-      else if(!p.cycles)h2='No paydays before that date. Pick a later date.';
+      else if(!p.cycles)h2='No paydays before then. Try a later date.';
       else{
         h2='To save <b>'+money(p.left)+'</b> by '+fmtLong(p.date)+' you need <b>'+money(p.req)+' / '+cy.per+'</b> over '+cyc(p.cycles)+'. '+pill(p);
         if(p.status==='behind'&&!(w.who==='both'&&w.split==='custom'))h2+='<div class="row"><span>Planned '+money(p.per)+'</span><button class="btn ghost sm" id="g-use" data-v="'+toDisplay(p.req)+'">Use '+money(p.req)+'</button></div>';
@@ -2584,7 +2758,7 @@ var CODE_ABC='ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O, 1/I/L to avoid typos
 var INVITE_DAYS=7,DAY=86400000;
 var APPLE='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.87-.76-1.47.02-2.83.86-3.59 2.18-1.53 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.24 2.73 2.2 1.1-.04 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.41 1.2-2.47-.03-.01-2.3-.88-2.32-3.5zM14.2 6.13c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.64-1.05 1.68-.92 2.67.97.08 1.96-.49 2.56-1.22z"/></svg>';
 var GOOGLE='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.3-4.8 3.3-7.9z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 0 1 0-4.3V7.1H2.1a11 11 0 0 0 0 9.9l3.7-2.8z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7.1l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>';
-var LOGO='<img class="brandlock" src="icons/logo-lockup.webp" width="660" height="569" alt="Duo Budget" onerror="this.style.display=\'none\'">';
+var LOGO='<div class="brandword"><img src="icons/logo-mark.webp" width="72" height="72" alt=""><div class="word">duo budget</div></div>';
 function genCode(){var c='',a=new Uint32Array(6);try{window.crypto.getRandomValues(a);}catch(e){for(var k=0;k<6;k++)a[k]=Math.floor(Math.random()*1e9);}for(var i=0;i<6;i++)c+=CODE_ABC.charAt(a[i]%CODE_ABC.length);return c;}
 function HH(){return S.household||null;}
 // someone who left is shown by name with the date, never as "Partner" / "P" (Cleo 3.8)
@@ -2757,9 +2931,9 @@ var VIEWS={
     acts='<div class="mbtns"><button class="btn danger sm" id="m-remove">Remove '+esc(oth)+'</button><button class="btn danger sm" id="m-leave">Leave household</button></div>';}
   else if(st==='pending'){prt='<div class="mrow" data-test="m-partner"><div class="av b pending">?</div><div class="mi"><b>'+esc(i.forName||'Partner')+' · invited</b><small>Code '+i.code+' · expires '+fmtDay(i.expiresAt)+(i.sends?' · sent '+i.sends+'×':'')+'</small></div><span class="gstat warn" data-test="m-status">Pending</span></div>';
     acts='<div class="mbtns"><button class="btn ghost sm" id="m-resend">Resend</button><button class="btn ghost sm" id="m-show">Show code</button><button class="btn danger sm" id="m-revoke">Revoke</button></div>';}
-  else{var lab={expired:['Invite expired','bad','Expired'],revoked:['Invite revoked','bad','Revoked'],none:['No partner yet','none','Not invited']}[st];
+  else{var lab={expired:['Invite expired','bad','Expired'],revoked:['Invite revoked','bad','Revoked'],none:['Just you for now','none','Not invited']}[st];
     if(h.lastLeft&&st==='none')prt='<div class="mrow" data-test="m-partner"><div class="av b">'+esc(h.lastLeft.name.charAt(0).toUpperCase())+'</div><div class="mi"><b data-test="m-leftname">'+esc(h.lastLeft.name)+' (left '+fmtDay(h.lastLeft.at)+')</b><small>Goals kept, their planned contributions are $0</small></div><span class="gstat none" data-test="m-status">'+(h.lastLeft.how==='removed'?'Removed':'Left')+'</span></div>';
-    else prt='<div class="mrow" data-test="m-partner"><div class="av b pending">+</div><div class="mi"><b>'+lab[0]+'</b><small>'+(st==='expired'?'Code '+i.code+' expired '+fmtDay(i.expiresAt):st==='revoked'?'Code '+i.code+' no longer works':'Invite your partner to share this budget')+'</small></div><span class="gstat '+lab[1]+'" data-test="m-status">'+lab[2]+'</span></div>';
+    else prt='<div class="mrow" data-test="m-partner"><div class="av b pending">+</div><div class="mi"><b>'+lab[0]+'</b><small>'+(st==='expired'?'Code '+i.code+' expired '+fmtDay(i.expiresAt):st==='revoked'?'Code '+i.code+' no longer works':'Invite your partner to plan together')+'</small></div><span class="gstat '+lab[1]+'" data-test="m-status">'+lab[2]+'</span></div>';
     acts='<div class="mbtns"><button class="btn pri sm" id="m-new">'+(st==='none'?'Invite partner':'Send a new invite')+'</button></div>';}
   var sim=!!pm;
   return {h:'<h2 class="page">'+esc(h.name)+'</h2><p class="sub">Household · created '+fmtDay(h.createdAt)+' · 2 members max · same access for both</p>'+
@@ -2767,7 +2941,7 @@ var VIEWS={
    '<div class="card"><h3><span>Members</span></h3><div class="mlist">'+own+prt+'</div>'+acts+'</div>'+
    '<div class="card"><h3><span>Shared vs private</span></h3>'+
     '<div class="shr"><b>Ours</b><span>Joint items and all goals. Both of you see and edit them.</span></div>'+
-    '<div class="shr"><b>Yours/Mine</b><span>Personal items show whose they are. You both have the same access, so either of you can edit any item.</span></div>'+
+    '<div class="shr"><b>Me and Partner</b><span>Personal items show whose they are. You both have the same access, so either of you can edit any item.</span></div>'+
     '</div>'+
    '<div class="card"><h3><span>Demo controls</span><span class="tag">PROTOTYPE</span></h3>'+
     '<div class="setrow" style="border-top:0;padding-top:0"><div class="l">Simulate partner accepting<small>Instantly joins a demo partner</small></div><button class="switch'+(sim?' on':'')+'" id="m-sim" role="switch" aria-checked="'+sim+'" aria-label="Simulate partner accepting"></button></div>'+
@@ -2921,7 +3095,6 @@ document.querySelector('nav.tabs').addEventListener('click',function(e){
 $('groups').addEventListener('click',function(e){
   if(window.__duoSuppressClick)return;
   var sw=e.target.closest('[data-act="swipe-del"]');if(sw){var row=sw.closest('.item[data-id]');var it=row&&S.items.find(function(i){return i.id===row.dataset.id;});if(it)removeItem(it);return;}
-  var voice=e.target.closest('[data-voice]');if(voice){openVoice();return;}
   var add=e.target.closest('[data-add]');if(add){itemSheet(null,add.dataset.add);return;}
   if(e.target.closest('input,textarea,select'))return;
   var row=e.target.closest('.item[data-id]');if(!row)return;
@@ -2974,10 +3147,10 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden)rend
 /* ---------------- cloud sync glue (inactive unless enabled) ---------------- */
 var __sync=null;
 function partnerMember(){return S.household&&S.household.members?S.household.members.filter(function(m){return m.role==='partner';})[0]:null;}
-function syncApp(){return {getState:function(){return S;},commit:function(){save();renderAll();},localId:uid,
+function syncApp(){var gen=syncGen;return {getState:function(){if(gen!==syncGen)return blankBudget();if(sampleOnly){if(!syncApp.blank)syncApp.blank=blankBudget();return syncApp.blank;}return S;},commit:function(){if(gen!==syncGen||sampleOnly)return;save();renderAll();},localId:uid,
   getPay:function(s){if(s==='D')return {cycle:S.cycle,next:S.payDate};var m=partnerMember();return m&&m.payDate?{cycle:m.payCycle||S.cycle,next:m.payDate}:null;},
   setPay:function(s,v){if(s==='D'){S.cycle=v.cycle;S.payDate=v.next;}else{var m=partnerMember();if(m){m.payCycle=v.cycle;m.payDate=v.next;}}}};}
-var emailSign={email:'',error:'',sentAt:0,timer:0};
+var emailSign={email:'',error:'',sentAt:0,timer:0,mode:''};
 var EMAIL_RESEND_MS=30000;
 function otpProblem(err,phase){
   var code=String((err&&err.code)||''),msg=String((err&&err.message)||''),low=(code+' '+msg).toLowerCase();
@@ -3040,19 +3213,38 @@ function openEmailCode(email){
   });
 }
 function renderSync(st){var el=document.getElementById('syncCard');if(!el)return;el.hidden=false;
-  var lbl={blocked:'Off on this build',starting:'Starting…','signed-out':'Not signed in','no-household':'Signed in, no household yet',pending:'Changes waiting to sync',synced:'Synced',offline:'Offline, saved on this phone',error:'Sync problem'}[st.state]||st.state;
+  var lbl={blocked:'Off on this build',starting:'Starting…','signed-out':'Not signed in','no-household':'Signed in, no household yet','choose-budget':'Choose a budget',pending:'Changes waiting to sync',synced:'Synced',offline:'Offline, saved on this phone',error:'Sync problem'}[st.state]||st.state;
   var h='<div class="row"><b>Cloud sync</b><span class="gstat '+(st.state==='synced'?'ok':st.state==='error'?'bad':st.state==='pending'||st.state==='offline'?'warn':'none')+'" data-test="sync-state">'+esc(lbl)+'</span></div>'+
     '<div class="hint" data-test="sync-msg">'+esc(st.msg||(st.user?'Signed in as '+st.user+(st.pending?' · '+st.pending+' waiting':''):'Beta. Synced data: budget lines, goals, pay cycles and spending.'))+'</div>';
-  if(st.state==='signed-out'||(st.state==='error'&&!st.user))h+='<div class="btns"><button class="btn google block" id="syncSignIn" type="button">Sign in with Google</button></div>'+
-    '<div class="or">or use email</div><label class="fl" for="syncEmail">Email</label><input class="field" id="syncEmail" data-test="sync-email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" value="'+esc(emailSign.email)+'">'+
-    '<p class="email-note">We’ll email a 6-digit code. No password, and no link to tap.</p><div class="ferr" id="syncEmailErr" data-test="sync-email-err">'+esc(emailSign.error)+'</div>'+
-    '<button class="btn pri block" id="syncEmailSend" type="button" data-test="sync-email-send" style="margin-top:12px">Email me a code</button>';
+  if(st.state==='signed-out'||(st.state==='error'&&!st.user)){
+    var prov=window.DuoAccount?DuoAccount.visibleProviders(window.DUO_AUTH_CONFIG||{},authPlatform()):{apple:false,google:true,email:true};
+    if(prov.apple)h+='<div class="btns"><button class="btn apple block" id="syncApple" type="button">Continue with Apple</button></div>';
+    if(prov.google)h+='<div class="btns"><button class="btn google block" id="syncSignIn" type="button">Continue with Google</button></div>';
+    if(!prov.apple&&!prov.google&&authPlatform()==='ios')h+='<p class="email-note">Sign in with Apple isn\'t available in this build yet, so Google is hidden on iPhone. Email still works.</p>';
+    h+='<div class="or">or use email</div><label class="fl" for="syncEmail">Email</label><input class="field" id="syncEmail" data-test="sync-email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" value="'+esc(emailSign.email)+'">';
+    if(emailSign.mode==='password')h+='<label class="fl" for="syncPassword">Password</label><input class="field" id="syncPassword" data-test="sync-password" type="password" autocomplete="current-password"><div class="ferr" id="syncEmailErr" data-test="sync-email-err">'+esc(emailSign.error)+'</div><button class="btn pri block" id="syncPasswordGo" type="button" data-test="sync-password-go" style="margin-top:12px">Sign in</button><button class="linkbtn" type="button" id="syncUseCode" data-test="sync-use-code">Email a code instead</button>';
+    else h+='<p class="email-note">We\'ll email a 6-digit code. You can set a password later if you want one.</p><div class="ferr" id="syncEmailErr" data-test="sync-email-err">'+esc(emailSign.error)+'</div><button class="btn pri block" id="syncEmailSend" type="button" data-test="sync-email-send" style="margin-top:12px">Email me a code</button><button class="linkbtn" type="button" id="syncUsePassword" data-test="sync-use-password">Use a password instead</button>';
+  }
   if(st.state==='no-household')h+='<label class="fl" for="syncCode">Enter join code</label><input id="syncCode" class="field sync-code" data-test="join-code" placeholder="8 letters or numbers" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"><div class="btns"><button class="btn pri" id="syncJoin">Join</button><button class="btn ghost" id="syncCreate">Start a household</button></div>';
   if(['synced','pending','offline','error','no-household'].indexOf(st.state)>=0&&st.user)h+='<div class="btns"><button class="btn ghost" id="syncOut">Sign out</button></div>';
-  var d=st.debug;if(d)h+='<div class="hint" style="font-size:11px;opacity:.75;margin-top:10px;word-break:break-word" data-test="sync-debug">Sync status: '+esc([d.state,'app '+d.mode,'storage '+d.storage,'session '+d.session,'household '+d.household,'queue '+d.pending,'online '+d.online,'last event '+d.lastEvent,'return '+d.urlReturn,'error '+d.lastError].join(' · '))+'</div>';
+  if(st.debug){try{console.info('Duo sync',st.debug);}catch(e){}}
   el.innerHTML=h;
   var on=function(id,f){var b=document.getElementById(id);if(b)b.addEventListener('click',f);};
-  on('syncSignIn',function(){try{sessionStorage.setItem('duo.syncReturn','1');}catch(e){}__sync.signIn();});
+  on('syncSignIn',function(){try{sessionStorage.setItem('duo.syncReturn','1');}catch(e){}if(window.DuoGate)DuoGate.startProvider?DuoGate.startProvider('google'):__sync.signIn('google');else __sync.signIn('google');});
+  on('syncApple',function(){try{sessionStorage.setItem('duo.syncReturn','1');}catch(e){}if(window.DuoGate&&DuoGate.startProvider)DuoGate.startProvider('apple');else __sync.signIn('apple');});
+  on('syncUsePassword',function(){emailSign.mode='password';emailSign.error='';renderSync(__sync.status());});
+  on('syncUseCode',function(){emailSign.mode='';emailSign.error='';renderSync(__sync.status());});
+  on('syncPasswordGo',function(){
+    var field=document.getElementById('syncEmail'),pw=document.getElementById('syncPassword');
+    var addr=(field&&field.value||'').trim(),password=pw?pw.value:'';
+    emailSign.email=addr;
+    if(!validEmail(addr)){emailSign.error='Enter a valid email address.';renderSync(__sync.status());return;}
+    var problem=window.DuoAccount?DuoAccount.passwordProblem(password):'';
+    if(problem){emailSign.error=problem;renderSync(__sync.status());return;}
+    __sync.signInWithPassword(addr,password).then(function(r){
+      if(r&&r.error){emailSign.error='That email and password didn\'t match. You can email a code instead.';renderSync(__sync.status());}
+    });
+  });
   var emailInput=document.getElementById('syncEmail');
   if(emailInput)emailInput.addEventListener('input',function(){emailSign.email=this.value;emailSign.error='';var er=document.getElementById('syncEmailErr');if(er)er.textContent='';});
   on('syncEmailSend',function(){
@@ -3065,7 +3257,8 @@ function renderSync(st){var el=document.getElementById('syncCard');if(!el)return
       if(btn){btn.disabled=false;btn.textContent='Email me a code';}
     });
   });
-  revealSyncAfterReturn(st);on('syncOut',function(){__sync.signOut();});
+  revealSyncAfterReturn(st);on('syncOut',function(){if(window.DuoGate)DuoGate.confirmSignOut();else __sync.signOut();});
+  if(window.DuoGate)DuoGate.onSync(st);
   on('syncCreate',function(){__sync.createHousehold(S.names.D+(S.names.N&&S.names.N!=='Partner'?' & '+S.names.N:''),S.names.D).catch(function(e){toast(e.message);});});
   on('syncJoin',function(){__sync.joinHousehold(document.getElementById('syncCode').value,S.names.D).then(function(r){if(r&&r.ok===false)toast(r.reason==='too_many_attempts'?'Too many tries. Try again in an hour.':'That code didn\'t work. Check it with your partner.');}).catch(function(e){toast(e.message);});});}
 // Coming back from Google: the page reloads on Home, but the result (claim box or error) lives on the
@@ -3079,17 +3272,38 @@ function revealSyncAfterReturn(st){
   var b=document.querySelector('nav.tabs button[data-v="settings"]');if(b&&!b.classList.contains('on'))b.click();
   setTimeout(function(){var c=document.getElementById('syncCard');if(c&&c.scrollIntoView)c.scrollIntoView({block:'center'});},60);
 }
+function authPlatform(){
+  try{var c=window.Capacitor;if(c&&typeof c.isNativePlatform==='function'&&c.isNativePlatform()&&typeof c.getPlatform==='function')return c.getPlatform();}catch(e){}
+  return 'web';
+}
+function leaveSample(uid){
+  sampleOnly=false;syncApp.blank=null;
+  if(__sync&&__sync.stop)__sync.stop();
+  syncGen++;
+  KEY=window.DuoAccount?DuoAccount.budgetKey(uid):KEY;
+  S=blankBudget();
+  if(window.DuoAccount)DuoAccount.claimOwner(localStorage,uid);
+  save();
+  startSync();
+}
 function startSync(){
+  if(__sync&&__sync.stop)__sync.stop();
+  syncGen++;
+  if(!startSync.bound){startSync.bound=1;window.addEventListener('online',function(){if(__sync)__sync.online();});}
   var inj=window.DUO_SYNC_CONFIG||{},test=window.__DUO_SYNC_TEST__||null;
   var cfg=Object.assign({},SYNC_CONFIG,{enabled:!!inj.enabled,supabaseAnonKey:inj.supabaseAnonKey||'',supabaseUrl:inj.supabaseUrl||SYNC_CONFIG.supabaseUrl,supabaseJsUrl:inj.supabaseJsUrl||SYNC_CONFIG.supabaseJsUrl});
   cfg.allowPersonalData=SYNC_CONFIG.allowPersonalData;          // cannot be switched on from outside the file
   if(!cfg.enabled)return;
-  var blocked=KEY.indexOf('.demo.')<0&&!cfg.allowPersonalData?'Cloud sync is off in your personal build. Your real budget stays on this phone.':'';
+  // The personal build uses duoBudget.v1 and must never sync. Signed-in keys are duoBudget.u.<id>.v1.
+  var syncKey=KEY.indexOf('.demo.')>=0||KEY.indexOf('duoBudget.u.')===0;
+  var blocked=!syncKey&&!cfg.allowPersonalData?'Cloud sync is off in your personal build. Your real budget stays on this phone.':'';
   if(!blocked&&!cfg.supabaseAnonKey)blocked='No project key configured on this device.';
   var getCC=blocked?Promise.resolve(null):test&&test.createClient?Promise.resolve(test.createClient):window.supabase&&window.supabase.createClient?Promise.resolve(window.supabase.createClient):import(cfg.supabaseJsUrl).then(function(m){return m.createClient;});
   getCC.then(function(cc){__sync=DuoSync.create({config:cfg,storageKey:KEY,storage:localStorage,app:syncApp(),createClient:cc,blocked:blocked,
-      online:function(){return navigator.onLine;},onStatus:renderSync});
-    window.addEventListener('online',function(){__sync.online();});return __sync.start();})
+      online:function(){return navigator.onLine;},onStatus:renderSync,
+      guestBudget:function(){return window.DuoGate?DuoGate.isGuestBudget():false;},
+      onLinkChoice:function(info){return new Promise(function(resolve){if(window.DuoGate)DuoGate.askLink(info,function(choice){var uid=window.DuoAccount&&DuoAccount.readSessionUserId(localStorage);if(uid)DuoAccount.claimOwner(localStorage,uid);resolve(choice);});else resolve(info&&info.cloudHas?'use-cloud':'fresh');});}});
+    return __sync.start();})
   .catch(function(e){renderSync({state:'error',msg:'Couldn\'t load the sync library.'});});
 }
 /* Inserted into the app IIFE. Display currency, layout drag, swipe delete, voice, widget snapshot. */
@@ -3568,102 +3782,43 @@ function initSwipe(){
   document.addEventListener('contextmenu',function(e){if(drag||hold)e.preventDefault();},true);
 }
 
-function parseVoice(text){
-  var raw=String(text||'').replace(/\s+/g,' ').trim(),t=raw.toLowerCase();
-  var owner='J',cat='expenses';
-  if(/\b(mine|personal|myself)\b/.test(t))owner='D';
-  else if(/\b(shared|ours|joint|together|both)\b/.test(t))owner='J';
-  else if(S&&S.names&&S.names.N&&t.indexOf(String(S.names.N).toLowerCase())>=0)owner='N';
-  else if(S&&S.names&&S.names.D&&t.indexOf(String(S.names.D).toLowerCase())>=0)owner='D';
-  else if(/\b(partner|his|hers)\b/.test(t))owner='N';
-  if(/\b(salary|wage|wages|income|payday)\b/.test(t))cat='income';
-  else if(/\b(savings|saving)\b/.test(t))cat='savings';
-  else if(/\bfun money\b/.test(t))cat='personal';
-  var amt=null,consumed='';
-  var m=t.match(/(\d+)\s*(?:dollars?|bucks|aud|usd)\s+(\d{1,2})(?:\s*cents?)?/);
-  if(m){amt=+m[1]+(+m[2])/100;consumed=m[0];}
-  else{m=t.match(/(\d+(?:[.,]\d{1,2})?)/);if(m){amt=parseFloat(m[1].replace(',','.'));consumed=m[0];}}
-  var desc=t;if(consumed)desc=desc.replace(consumed,' ');
-  desc=desc.replace(/\b(dollars?|bucks|cents?|aud|usd|shared|ours|joint|together|both|personal|mine|myself|my|own|add|expense|please|for|a|an|the|partner|his|hers)\b/g,' ');
-  if(S&&S.names){[S.names.D,S.names.N].forEach(function(n){if(!n)return;desc=desc.replace(new RegExp('\\b'+String(n).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','ig'),' ');});}
-  desc=desc.replace(/\s+/g,' ').trim();
-  if(desc)desc=desc.charAt(0).toUpperCase()+desc.slice(1);
-  return {ok:amt!=null&&isFinite(amt)&&amt>=0,amount:amt,description:desc||'Expense',category:cat,owner:owner,raw:raw,currency:(S&&S.currency)||'AUD',freq:(S&&S.cycle)||'fortnight'};
-}
-function startListen(onText,onErr,say){
-  var native=window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.duoSpeech;
-  var Ctor=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(native&&!Ctor){
-    window.__duoVoiceResult=function(t){onText(t);};
-    window.__duoVoiceError=function(m){onErr(m||'Voice isn’t available on this iPhone right now. Type the phrase instead.');};
-    say('Listening…');try{native.postMessage({action:'start',lang:'en-AU'});}catch(e){onErr('Voice isn’t available in the app shell. Type the phrase instead.');}
-    return;
-  }
-  if(!Ctor){onErr('The microphone isn’t available in this browser. Type the phrase instead. The iPhone app uses Apple’s speech recogniser when this browser API is missing.');return;}
-  try{
-    var rec=new Ctor();rec.lang='en-AU';rec.interimResults=false;rec.maxAlternatives=1;
-    rec.onresult=function(ev){var t=ev.results&&ev.results[0]&&ev.results[0][0]?ev.results[0][0].transcript:'';onText(t);};
-    rec.onerror=function(ev){var code=ev&&ev.error;onErr(code==='not-allowed'?'Microphone permission is off. Type the phrase instead.':'Couldn’t use the microphone'+(code?' ('+code+')':'')+'. Type the phrase instead.');};
-    say('Listening…');rec.start();
-  }catch(err){onErr('The microphone isn’t available here. Type the phrase instead.');}
-}
-function renderVoiceConfirm(sh,text){
-  var p=parseVoice(text),box=sh.querySelector('#v-confirm');
-  if(!p.ok){box.innerHTML='<div class="ferr">No amount in that phrase. Try “coffee 5 dollars 50 shared”.</div>';return;}
-  var catLabel=(CATS.filter(function(c){return c.id===p.cat;})[0]||CATS[3]).label;
-  box.innerHTML='<div class="voice-parsed" data-test="voice-confirm"><b>Check this before saving</b><div data-test="voice-summary">'+esc(p.description)+' · '+moneyRaw(p.amount)+' per '+esc(CYCLES[p.freq].per)+' · '+esc(ownerLabel(p.owner))+' · '+esc(catLabel)+'</div></div>'+
-    '<label class="fl" for="v-name">Description</label><input class="field" id="v-name" value="'+esc(p.description)+'">'+
-    '<label class="fl" for="v-amt">Amount ('+esc(S.currency||'AUD')+')</label><input class="field" id="v-amt" inputmode="decimal" value="'+(Math.round(p.amount*100)/100).toFixed(2)+'">'+
-    '<label class="fl">Shared or personal</label><div class="chips" id="v-own">'+['J','D','N'].map(function(o){return '<button type="button" class="chip'+(o===p.owner?' on':'')+'" data-o="'+o+'">'+esc(ownerLabel(o))+'</button>';}).join('')+'</div>'+
-    '<label class="fl">Category</label><div class="chips" id="v-cat">'+CATS.map(function(c){return '<button type="button" class="chip'+(c.id===p.cat?' on':'')+'" data-c="'+c.id+'">'+c.label+'</button>';}).join('')+'</div>'+
-    '<div class="btns"><button class="btn ghost" id="v-cancel" type="button">Cancel</button><button class="btn pri" id="v-save" type="button" data-test="voice-save">Save expense</button></div>';
-  var owner=p.owner,cat=p.cat;
-  box.querySelector('#v-own').addEventListener('click',function(e){var b=e.target.closest('[data-o]');if(!b)return;owner=b.dataset.o;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});});
-  box.querySelector('#v-cat').addEventListener('click',function(e){var b=e.target.closest('[data-c]');if(!b)return;cat=b.dataset.c;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});});
-  box.querySelector('#v-cancel').addEventListener('click',closeSheet);
-  box.querySelector('#v-save').addEventListener('click',function(){
-    var item={id:uid(),name:(box.querySelector('#v-name').value.trim()||'Expense'),amount:0,freq:S.cycle,owner:owner,cat:cat,tag:''};
-    setAmount(item,fromDisplay(parseAmt(box.querySelector('#v-amt').value)),S.cycle);
-    S.items.push(item);save();closeSheet();renderAll();toast('Added '+item.name);
-  });
-}
-function openVoice(){
-  var web=!!(window.SpeechRecognition||window.webkitSpeechRecognition);
-  var native=!!(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.duoSpeech);
-  openSheet('<h4>Add an expense by voice</h4><div class="muted" id="v-status" data-test="voice-status" style="font-size:14px;line-height:1.45"></div>'+
-    '<label class="fl" for="v-phrase">Phrase</label><input class="field" id="v-phrase" data-test="voice-phrase" placeholder="coffee 5 dollars 50 shared" autocomplete="off">'+
-    '<div class="btns"><button class="btn ghost" id="v-mic" type="button" data-test="voice-mic">Listen</button><button class="btn pri" id="v-parse" type="button" data-test="voice-parse">Read phrase</button></div><div id="v-confirm"></div>',function(sh){
-    var status=sh.querySelector('#v-status');
-    function say(msg){status.textContent=msg;}
-    if(!web&&!native)say('The microphone isn’t available in this browser. Type a phrase such as “coffee 5 dollars 50 shared”, then check it before saving. In the iPhone app, Listen uses Apple’s speech recogniser when this browser API is missing.');
-    else say('Say “coffee 5 dollars 50 shared”. Nothing is saved until you confirm.');
-    if(!web&&!native)sh.querySelector('#v-mic').disabled=true;
-    sh.querySelector('#v-parse').addEventListener('click',function(){renderVoiceConfirm(sh,sh.querySelector('#v-phrase').value);});
-    sh.querySelector('#v-phrase').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();renderVoiceConfirm(sh,this.value);}});
-    sh.querySelector('#v-mic').addEventListener('click',function(){startListen(function(t){sh.querySelector('#v-phrase').value=t;say('Heard: '+t);renderVoiceConfirm(sh,t);},say,say);});
-  });
-}
-function openVoiceConfirm(phrase){
-  openVoice();
-  setTimeout(function(){var input=document.getElementById('v-phrase');if(!input)return;input.value=phrase;var b=document.getElementById('v-parse');if(b)b.click();},40);
-}
 function applyDeepLink(){
   var h=(location.hash||'').replace(/^#/,'');
   if(h==='home')h='dash';
-  if(h==='add-expense'){var budget=document.querySelector('nav.tabs button[data-v="budget"]');if(budget)budget.click();setTimeout(openVoice,40);return;}
+  if(h==='add-expense'){var budget=document.querySelector('nav.tabs button[data-v="budget"]');if(budget)budget.click();setTimeout(function(){itemSheet(null,'expenses');},40);return;}
   if(h==='spent'){openSpent();return;}
   if(['dash','budget','cycle','goals','trends','settings'].indexOf(h)>=0){var b=document.querySelector('nav.tabs button[data-v="'+h+'"]');if(b)b.click();}
 }
 
 loadFXCache();
 buildCurrencySelects();
-load();
-save();
+var bootPlan=window.DuoAccount?DuoAccount.boot(localStorage,{legacyKey:KEY,now:Date.now(),skipWelcome:PERSONAL_BUILD||!!window.__DUO_PREVIEW_SEED__}):{screen:'app',key:KEY,holdDemo:false};
+if(bootPlan.wipe&&window.DuoAccount)bootPlan=DuoAccount.applyInactive(localStorage,bootPlan);
+if(bootPlan.key)KEY=bootPlan.key;
+if(bootPlan.screen==='welcome'){sampleOnly=true;load();}
+else if(bootPlan.holdDemo&&bootPlan.signedIn){S=blankBudget();}
+else{load();save();}
 if(!PERSONAL_BUILD)fetchFX();
 var renderAllCore=renderAll;
 renderAll=function(){renderAllCore();layoutApply();publishWidget();var fx=$('fxAsOf');if(fx)fx.textContent=fxStatusText();updateConverter();};
 renderAll();
-startSync();
+if(window.DuoGate)DuoGate.start({
+  storage:localStorage,plan:bootPlan,
+  sampleOnly:function(){return sampleOnly;},setSampleOnly:function(v){sampleOnly=v;},
+  getKey:function(){return KEY;},setKey:function(k){KEY=k;},
+  getState:function(){return S;},setState:function(next){S=next;},
+  blank:blankBudget,useDemo:function(){S=demo();},
+  save:save,render:function(){renderAll();},
+  sync:function(){return __sync;},restartSync:startSync,ready:function(){return window.__duoReady;},
+  validEmail:validEmail,otpProblem:otpProblem,platform:authPlatform,
+  authConfig:function(){return window.DUO_AUTH_CONFIG||{};},
+  openSheet:openSheet,closeSheet:closeSheet,toast:toast,
+  openPartner:function(){var b=document.querySelector('nav.tabs button[data-v="settings"]');if(b)b.click();},
+  currentUid:function(){var st=__sync&&__sync.status?__sync.status():null;return st&&st.uid||'';},
+  currentEmail:function(){var st=__sync&&__sync.status?__sync.status():null;return st&&st.user||'';},
+  leaveSample:leaveSample
+});
+window.__duoReady=startSync();
 initLayout();
 initSwipe();
 bindConverter();
@@ -3675,7 +3830,7 @@ if(!PERSONAL_BUILD&&'serviceWorker' in navigator&&location.protocol!=='file:'){n
 
 window.__duoRerender=function(){CATS.forEach(function(c){c.color=TC(c.color)});for(var i=0;i<TR_COL.length;i++)TR_COL[i]=TC(TR_COL[i]);renderAll();if(window.__duoThemeSeg)window.__duoThemeSeg();};
 window.__duo={state:function(){return S;},trends:function(sc){return trModel(sc);},trInsights:function(sc){return trInsights(trModel(sc));},trBreak:function(sc,off){var M=trModel(sc);return trBreak(M,M.rows[M.rows.length-1-(off||0)]);},trWins:trWins,trRows:trRows,invStatus:invStatus,totals:totals,totalsIn:totalsIn,projection:projection,shares:shares,paydaysFor:function(c,d,n){return paydaysFor(c,d,n).map(isoLocal);},payWindow:payWindow,lrPct:lrPct,payAt:function(iso,c,k){return isoLocal(payAt(parseISO(iso),c,k));},migrateV4:migrateV4,spentIn:spentIn,spentByLine:spentByLine,spentByOwner:spentByOwner,parseSpendAmount:parseSpendAmount,entryInWindow:entryInWindow,openSpend:openSpendSheet};
-window.__duo.parseVoice=parseVoice;window.__duo.openVoiceConfirm=openVoiceConfirm;window.__duo.convert=convertFX;window.__duo.fx=function(){return {rates:Object.assign({},FX.rates),asOf:FX.asOf,offline:!!FX.offline,error:FX.error,source:FX.source,currency:S.currency};};window.__duo.layout=function(){return S.layout||null;};window.__duo.widget=function(){try{return JSON.parse(localStorage.getItem('duoBudget.widget')||'null');}catch(e){return null;}};
+window.__duo.convert=convertFX;window.__duo.fx=function(){return {rates:Object.assign({},FX.rates),asOf:FX.asOf,offline:!!FX.offline,error:FX.error,source:FX.source,currency:S.currency};};window.__duo.layout=function(){return S.layout||null;};window.__duo.widget=function(){try{return JSON.parse(localStorage.getItem('duoBudget.widget')||'null');}catch(e){return null;}};
 })();
 </script>
 

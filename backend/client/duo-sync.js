@@ -22,8 +22,8 @@ function create(opts){
   var meta=load();var client=null,session=null,ctx=null,channel=null,applying=false,timer=null,flushing=null,status={state:'starting',pending:0};
   function load(){try{var m=JSON.parse(store.getItem(MK)||'null');if(m&&m.v===1)return m;}catch(e){}return {v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:null};}
   function persist(){try{store.setItem(MK,JSON.stringify(meta));}catch(e){}}
-  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,user:session&&session.user?session.user.email:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
-  // ---- no-secrets diagnostics (shown as the "Sync status" line)
+  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
+  // Diagnostics stay in the console. The sync card does not show them.
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
   function nativeShell(){var cap=nativeCap();try{return !!(cap&&typeof cap.isNativePlatform==='function'&&cap.isNativePlatform());}catch(e){return false;}}
@@ -58,7 +58,7 @@ function create(opts){
   }
   // Native shell: Google opens in the system browser (@capacitor/browser) and returns to
   // au.duobudget.app://auth-callback. The web build never takes this path.
-  var nativeAuthAttached=false,nativeAuthSeen={};
+  var nativeAuthAttached=false,nativeAuthSeen={},disposed=false;
   function isNativeAuthUrl(url){return typeof url==='string'&&url.indexOf(NATIVE_AUTH_REDIRECT)===0;}
   function closeNativeBrowser(){var Browser=nativePlugin('Browser');if(Browser&&Browser.close){try{Promise.resolve(Browser.close()).catch(function(){});}catch(e){}}}
   function handleNativeAuthUrl(url){
@@ -163,7 +163,7 @@ function create(opts){
   // ---------------------------------------------------------------- local change detection -> queue
   function enqueue(t,row){meta.queue=meta.queue.filter(function(q){return !(q.t===t&&q.row.id===row.id);});meta.queue.push({t:t,row:row});}
   function onLocalSave(){
-    if(!ctx||applying)return;
+    if(disposed||!ctx||applying)return;
     var pack=localRecords(),recs=pack.recs,held=pack.held,stamp=new Date(now()).toISOString(),seen={};
     TABLES.forEach(function(t){Object.keys(recs[t]).forEach(function(k){var r=recs[t][k],h=stable(r);seen[k]=1;if(meta.snap[k]!==h){meta.snap[k]=h;meta.ua[r.id]=stamp;r.updated_at=stamp;r.deleted_at=null;enqueue(t,r);}});});
     Object.keys(held).forEach(function(k){seen[k]=1;});
@@ -201,7 +201,7 @@ function create(opts){
     var k=keyOf(row.id);if(k){if(row.deleted_at)delete meta.snap[k];else meta.snap[k]=stable(cloudShape(t,row));}
     return changed;
   }
-  function commitRemote(n,reason){if(!n)return;applying=true;try{app.commit(reason||'sync');}finally{applying=false;}persist();}
+  function commitRemote(n,reason){if(disposed||!n)return;applying=true;try{app.commit(reason||'sync');}finally{applying=false;}persist();}
   function pull(){
     if(!client||!ctx)return Promise.resolve(0);
     if(!isOnline()){setStatus('offline');return Promise.resolve(0);}
@@ -218,24 +218,78 @@ function create(opts){
   }
 
   // ---------------------------------------------------------------- household + auth
+  function isGuestBudget(){try{return typeof opts.guestBudget==='function'?!!opts.guestBudget():!!opts.guestBudget;}catch(e){return false;}}
+  function localHasData(){var S=app.getState()||{};return !!((S.items&&S.items.length)||(S.goals&&S.goals.length)||(S.spends&&S.spends.length));}
+  function clearLocalRows(){var S=app.getState();if(!S)return;S.items=[];S.goals=[];if(S.spends)S.spends=[];}
+  function listCloud(){
+    return TABLES.reduce(function(p,t){return p.then(function(acc){
+      return client.from(t).select('*').eq('household_id',ctx.household).then(function(res){
+        if(res&&res.error)throw res.error;acc[t]=(res&&res.data)||[];return acc;
+      });
+    });},Promise.resolve({}));
+  }
+  function cloudHasRows(acc){return TABLES.some(function(t){return (acc[t]||[]).some(function(r){return r&&!r.deleted_at;});});}
+  function adoptCloudRows(){
+    var S2=app.getState();if(!S2)return;
+    var cloudHas=Object.keys(meta.snap).some(function(k){return k[0]==='i';});
+    if(!cloudHas)return;
+    S2.items=(S2.items||[]).filter(function(it){return meta.ids['i:'+it.id];});
+    S2.goals=(S2.goals||[]).filter(function(g){return meta.ids['g:'+g.id];});
+    S2.spends=(S2.spends||[]).filter(function(e){return meta.ids['s:'+e.id];});
+    commitRemote(1,'adopt');
+  }
+  function finishLink(first, choice){
+    if(disposed)return Promise.resolve(null);
+    if(choice==='replace-cloud'){
+      return listCloud().then(function(acc){
+        if(disposed)return null;
+        var stamp=new Date(now()).toISOString();
+        TABLES.forEach(function(t){(acc[t]||[]).forEach(function(row){
+          if(!row||row.deleted_at)return;
+          enqueue(t,{id:row.id,household_id:ctx.household,updated_at:stamp,deleted_at:stamp});
+        });});
+        onLocalSave();subscribe();return flush();
+      }).then(function(){return ctx?ctx.household:null;});
+    }
+    if(choice==='fresh'||choice==='use-cloud')clearLocalRows();
+    return pull().then(function(){
+      if(disposed)return null;
+      // Legacy first link, and "use the account budget": cloud rows stay, phone-only rows do not upload.
+      // keep-local skips that filter so a new empty household can take this phone's budget.
+      if(first&&choice!=='keep-local')adoptCloudRows();
+      onLocalSave();subscribe();return flush();
+    }).then(function(){return ctx?ctx.household:null;});
+  }
   function loadHousehold(){
+    if(disposed)return Promise.resolve(null);
     return client.from('household_members').select('*').then(function(res){if(res.error)throw res.error;
+      if(disposed)return null;
       var mine=(res.data||[]).find(function(m){return m.user_id===ctx0().me&&m.status==='active';});
       if(!mine){ctx=null;setStatus('no-household');return null;}
       ctx=buildCtx(mine.household_id,(res.data||[]).filter(function(m){return m.household_id===mine.household_id;}));
       var first=meta.household!==ctx.household;
       if(first){meta={v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:ctx.household};idToKey={};}
-      var S=app.getState();if(ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;if(ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
-      return pull().then(function(n){
-        // first link: if the cloud household already has data it wins (adopt it); otherwise upload this phone's data
-        if(first){var S2=app.getState();var cloudHas=Object.keys(meta.snap).some(function(k){return k[0]==='i';});
-          if(cloudHas){S2.items=S2.items.filter(function(it){return meta.ids['i:'+it.id];});S2.goals=S2.goals.filter(function(g){return meta.ids['g:'+g.id];});S2.spends=(S2.spends||[]).filter(function(e){return meta.ids['s:'+e.id];});commitRemote(1,'adopt');}}
-        onLocalSave();subscribe();return flush();}).then(function(){return ctx.household;});
+      var S=app.getState();if(S&&ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;if(S&&ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
+      if(first&&isGuestBudget()&&localHasData()&&typeof opts.onLinkChoice==='function'){
+        return listCloud().then(function(acc){
+          if(disposed)return null;
+          var cloudHas=cloudHasRows(acc);
+          var kind=cloudHas?'choose-cloud':'keep-or-fresh';
+          setStatus('choose-budget',cloudHas?'This account already has a budget.':'You have a budget on this phone.');
+          return Promise.resolve(opts.onLinkChoice({kind:kind,cloudHas:cloudHas,localHas:true})).then(function(choice){
+            if(disposed)return null;
+            if(kind==='choose-cloud')choice=choice==='replace-cloud'?'replace-cloud':'use-cloud';
+            else choice=choice==='keep-local'?'keep-local':'fresh';
+            return finishLink(first,choice);
+          });
+        });
+      }
+      return finishLink(first,null);
     });
   }
   function ctx0(){return {me:session&&session.user?session.user.id:null};}
   var authFlight=null,authFor=null;
-  function afterAuth(s){session=s;if(!s){ctx=null;authFlight=null;authFor=null;setStatus('signed-out');return Promise.resolve(null);}
+  function afterAuth(s){if(disposed)return Promise.resolve(null);session=s;if(!s){ctx=null;authFlight=null;authFor=null;setStatus('signed-out');return Promise.resolve(null);}
     var uid=s.user&&s.user.id;if(authFlight&&authFor===uid)return authFlight;   // SIGNED_IN event + getSession both arrive: link once
     authFor=uid;authFlight=loadHousehold().catch(function(e){dbg.lastError=(e&&e.code)||'load_failed';setStatus('error',e.message||String(e));});return authFlight;}
   function start(){
@@ -259,20 +313,46 @@ function create(opts){
   var api={
     start:start,onLocalSave:onLocalSave,flush:flush,pull:pull,status:function(){return status;},meta:function(){return meta;},
     debug:function(){return debugInfo(status.state);},
-    signIn:function(){dbg.lastError='-';
+    signIn:function(provider){dbg.lastError='-';
+      provider=provider==='apple'?'apple':'google';
+      var label=provider==='apple'?'Apple':'Google';
       var native=nativeShell();
       var redirectTo=native?NATIVE_AUTH_REDIRECT:(opts.redirectTo||(typeof location!=='undefined'?location.origin+location.pathname:undefined));
       var options={redirectTo:redirectTo};
       if(native)options.skipBrowserRedirect=true;
-      return client.auth.signInWithOAuth({provider:'google',options:options}).then(function(r){
-        if(r&&r.error){fail(r.error.code||'oauth_start_failed','Couldn\'t start Google sign-in: '+r.error.message);return r;}
+      return client.auth.signInWithOAuth({provider:provider,options:options}).then(function(r){
+        if(r&&r.error){fail(r.error.code||'oauth_start_failed','Couldn\'t start '+label+' sign-in: '+r.error.message);return r;}
         if(!native)return r;
         var url=r&&r.data&&r.data.url;
-        if(!url){fail('oauth_start_failed','Google sign-in didn\'t return a link to open.');return r;}
+        if(!url){fail('oauth_start_failed',label+' sign-in didn\'t return a link to open.');return r;}
         var Browser=nativePlugin('Browser');
         if(!Browser||!Browser.open){fail('native_browser_missing','Couldn\'t open the sign-in browser in this app.');return r;}
-        return Promise.resolve(Browser.open({url:url})).then(function(){return r;},function(e){fail('oauth_start_failed','Couldn\'t open Google sign-in: '+((e&&e.message)||e));return r;});
-      },function(e){fail('oauth_start_failed','Couldn\'t start Google sign-in: '+((e&&e.message)||e));});},
+        return Promise.resolve(Browser.open({url:url})).then(function(){return r;},function(e){fail('oauth_start_failed','Couldn\'t open '+label+' sign-in: '+((e&&e.message)||e));return r;});
+      },function(e){fail('oauth_start_failed','Couldn\'t start '+label+' sign-in: '+((e&&e.message)||e));});},
+    signInWithIdToken:function(provider,token,nonce){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.signInWithIdToken)return Promise.resolve({error:{message:'This build can\'t finish that sign-in.'}});
+      var body={provider:provider,token:token};
+      if(nonce)body.nonce=nonce;
+      return client.auth.signInWithIdToken(body).then(function(r){
+        var s=r&&r.data&&r.data.session;if(s)return afterAuth(s).then(function(){return r;});return r||{};
+      },function(e){return {error:{message:(e&&e.message)||'Couldn\'t finish sign-in.'}};});},
+    signInWithPassword:function(email,password){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.signInWithPassword)return Promise.resolve({error:{message:'Password sign-in isn\'t available in this build.'}});
+      return client.auth.signInWithPassword({email:String(email||'').trim(),password:String(password||'')}).then(function(r){
+        var s=r&&r.data&&r.data.session;if(s)return afterAuth(s).then(function(){return r;});return r||{};
+      },function(e){return {error:{message:(e&&e.message)||'Couldn\'t sign in with that password.'}};});},
+    updatePassword:function(password){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.updateUser)return Promise.resolve({error:{message:'Couldn\'t save a password in this build.'}});
+      return client.auth.updateUser({password:String(password||'')}).then(function(r){return r||{};},function(e){return {error:{message:(e&&e.message)||'Couldn\'t save that password.'}};});},
+    // Recovery uses the same 6-digit code as sign-in when the email template contains {{ .Token }}.
+    sendRecoveryCode:function(email){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.resetPasswordForEmail)return Promise.resolve({error:{message:'Couldn\'t send a reset code in this build.'}});
+      return client.auth.resetPasswordForEmail(String(email||'').trim()).then(function(r){return r||{};},function(e){return {error:{message:(e&&e.message)||'Couldn\'t send a reset code.'}};});},
+    verifyRecoveryCode:function(email,token){dbg.lastError='-';
+      if(!client||!client.auth||!client.auth.verifyOtp)return Promise.resolve({error:{message:'Couldn\'t check that code.'}});
+      return client.auth.verifyOtp({email:String(email||'').trim(),token:String(token||'').replace(/\D/g,''),type:'recovery'}).then(function(r){
+        var s=r&&r.data&&r.data.session;if(s)return afterAuth(s).then(function(){return r;});return r||{};
+      },function(e){return {error:{message:(e&&e.message)||'Couldn\'t check that code.'}};});},
     // Email code. No emailRedirectTo: the 6-digit code must work from any origin, including a preview tunnel.
     signInWithEmail:function(email){dbg.lastError='-';
       if(!client||!client.auth||!client.auth.signInWithOtp)return Promise.resolve({error:{message:'Email sign-in isn\'t available in this build.'}});
@@ -282,7 +362,46 @@ function create(opts){
       return client.auth.verifyOtp({email:String(email||'').trim(),token:String(token||'').replace(/\D/g,''),type:'email'}).then(function(r){
         var s=r&&r.data&&r.data.session;if(s)return afterAuth(s).then(function(){return r;});return r||{};
       },function(e){return {error:{message:(e&&e.message)||'Couldn\'t check that code.'}};});},
-    signOut:function(){if(channel&&client.removeChannel)client.removeChannel(channel);channel=null;return client.auth.signOut().then(function(){return afterAuth(null);});},
+    signOut:function(){if(channel&&client&&client.removeChannel)client.removeChannel(channel);channel=null;if(!client||!client.auth||!client.auth.signOut)return afterAuth(null);return client.auth.signOut().then(function(){return afterAuth(null);},function(){return afterAuth(null);});},
+    stop:function(){disposed=true;if(timer)clearTimeout(timer);timer=null;if(channel&&client&&client.removeChannel)client.removeChannel(channel);channel=null;},
+    deleteAccount:function(){
+      function rpc(name){
+        if(!client||!client.rpc)return Promise.resolve({error:{message:'Account deletion isn\'t available in this build.'}});
+        return client.rpc(name).then(function(r){return r||{};},function(e){return {error:{message:(e&&e.message)||'Couldn\'t delete the account.'}};});
+      }
+      function fallback(){
+        return rpc('delete_my_account').then(function(a){
+          if(a&&!a.error)return {ok:true,via:'delete_my_account'};
+          return rpc('delete_my_data').then(function(b){
+            if(b&&b.error)return b;
+            return {ok:true,via:'delete_my_data',authUserRemains:true};
+          });
+        });
+      }
+      if(client&&client.functions&&client.functions.invoke){
+        return client.functions.invoke('delete-account',{body:{}}).then(function(r){
+          if(r&&!r.error)return {ok:true,via:'function'};
+          return fallback();
+        },fallback);
+      }
+      return fallback();
+    },
+    linkIdentity:function(provider){
+      if(!client||!client.auth||!client.auth.linkIdentity)return Promise.resolve({error:{message:'Linking isn\'t available in this build.'}});
+      var native=nativeShell();
+      var redirectTo=native?NATIVE_AUTH_REDIRECT:(opts.redirectTo||(typeof location!=='undefined'?location.origin+location.pathname:undefined));
+      var options={redirectTo:redirectTo};
+      if(native)options.skipBrowserRedirect=true;
+      return client.auth.linkIdentity({provider:provider,options:options}).then(function(r){return r||{};},function(e){return {error:{message:(e&&e.message)||'Couldn\'t link that sign-in.'}};});
+    },
+    unlinkIdentity:function(identity){
+      if(!client||!client.auth||!client.auth.unlinkIdentity)return Promise.resolve({error:{message:'Unlinking isn\'t available in this build.'}});
+      return client.auth.unlinkIdentity(identity).then(function(r){return r||{};},function(e){return {error:{message:(e&&e.message)||'Couldn\'t remove that sign-in.'}};});
+    },
+    identities:function(){
+      if(!client||!client.auth||!client.auth.getUserIdentities)return Promise.resolve({data:{identities:[]}});
+      return client.auth.getUserIdentities().then(function(r){return r||{data:{identities:[]}};},function(){return {data:{identities:[]}};});
+    },
     createHousehold:function(name,display){return client.rpc('create_household',{p_name:name,p_display_name:display}).then(function(r){if(r.error)throw r.error;return loadHousehold();});},
     createInvite:function(){return client.rpc('create_invite',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return r.data;});},
     joinHousehold:function(code,display){return client.rpc('join_household',{p_code:code,p_display_name:display}).then(function(r){if(r.error)throw r.error;if(!r.data||!r.data.ok)return r.data;return loadHousehold().then(function(){return r.data;});});},

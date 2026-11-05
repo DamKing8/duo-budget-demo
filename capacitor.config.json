@@ -16,6 +16,14 @@
     "iosScheme": "https"
   },
   "plugins": {
+    "SocialLogin": {
+      "providers": {
+        "google": true,
+        "apple": true,
+        "facebook": false,
+        "twitter": false
+      }
+    },
     "SplashScreen": {
       "launchAutoHide": true,
       "launchShowDuration": 0,
