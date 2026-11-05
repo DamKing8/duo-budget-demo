@@ -47,7 +47,7 @@
       var v = view();
       var signed = ctx.signedIn ? ctx.signedIn() : false;
       if (P.paywallKind(v.row, { now: Date.now() }) === 'covered') {
-        ctx.openSheet('<h4 data-test="partner-covered">Premium is on</h4><p class="sub">' + esc(v.row.payer_name || 'Your partner') + '\'s subscription covers you both. There is nothing to buy.</p><button class="btn pri block" type="button" id="pw-close">Close</button>', function (sh) {
+        ctx.openSheet('<h4 data-test="partner-covered">Premium is on</h4><p class="sub">' + esc(v.row.payer_name || 'Your partner') + '\'s subscription covers you both. Nothing to buy.</p><button class="btn pri block" type="button" id="pw-close">Close</button>', function (sh) {
           sh.querySelector('#pw-close').addEventListener('click', ctx.closeSheet);
         });
         return;
@@ -59,24 +59,30 @@
         return;
       }
       if (!signed) {
-        ctx.openSheet('<h4 data-test="paywall">Duo Premium</h4><p class="sub">Sign in to subscribe. The free plan stays on this phone either way.</p><button class="btn pri block" type="button" id="pw-signin">Continue to sign in</button>', function (sh) {
+        ctx.openSheet('<h4 data-test="paywall">Duo Premium</h4><p class="sub">Sign in to subscribe. Your free plan stays on this phone either way.</p><button class="btn pri block" type="button" id="pw-signin">Continue to sign in</button>', function (sh) {
           sh.querySelector('#pw-signin').addEventListener('click', function () { ctx.closeSheet(); if (ctx.openPartner) ctx.openPartner(); });
         });
         return;
       }
       var trial = P.trialAvailable(v.row);
-      var why = feature === 'goals' ? 'A third goal is part of Premium.'
-        : feature === 'history' ? 'History past 3 months is part of Premium.'
-        : feature === 'themes' ? 'Extra colours are part of Premium. Light and dark stay free.'
-        : feature === 'forecast' ? 'Looking ahead past this payday is part of Premium.'
-        : feature === 'categories' ? 'More than 5 custom categories is part of Premium.'
-        : feature === 'reminders' ? 'More than one bill reminder is part of Premium.'
-        : 'One subscription covers both of you.';
-      ctx.openSheet('<h4 data-test="paywall">Duo Premium</h4><p class="sub">' + esc(why) + ' Placeholder copy. One plan covers the household.</p>' +
-        (trial ? '<p class="sub">14-day trial, once per household.</p>' : '<p class="sub">This household has already used its trial.</p>') +
-        '<button class="btn pri block" type="button" id="pw-annual" data-test="plan-annual">' + esc(P.PRODUCTS.annual.price) + ' a year</button>' +
+      var why = feature === 'goals' ? 'Want a third goal? That\'s part of Premium.'
+        : feature === 'history' ? 'Looking back more than 3 months is part of Premium.'
+        : feature === 'themes' ? 'Extra colours are part of Premium. Light and dark mode stay free.'
+        : feature === 'forecast' ? 'Planning past your next payday is part of Premium.'
+        : feature === 'categories' ? 'Free includes 5 custom categories. Premium adds more.'
+        : feature === 'reminders' ? 'Free includes 1 bill reminder. Premium adds more.'
+        : 'One subscription covers you both.';
+      if (!document.getElementById('pw-best-style')) {
+        var style = document.createElement('style');
+        style.id = 'pw-best-style';
+        style.textContent = '#pw-annual{display:flex;align-items:center;justify-content:center;gap:8px}.pw-best{font-size:12px;font-weight:800;letter-spacing:.02em;line-height:1.2;padding:3px 8px;border-radius:999px;background:rgba(0,0,0,.16)}';
+        document.head.appendChild(style);
+      }
+      ctx.openSheet('<h4 data-test="paywall">Duo Premium</h4><p class="sub">' + esc(why) + '</p>' +
+        (trial ? '<p class="sub">Try it free for 14 days. One trial per household.</p>' : '<p class="sub">Your household has already had its free trial.</p>') +
+        '<button class="btn pri block" type="button" id="pw-annual" data-test="plan-annual"><span class="pw-best">Best value</span><span>' + esc(P.PRODUCTS.annual.price) + ' a year</span></button>' +
         '<button class="btn ghost block" type="button" id="pw-month" data-test="plan-monthly" style="margin-top:8px">' + esc(P.PRODUCTS.monthly.price) + ' a month</button>' +
-        '<p class="mock">App Store and Google Play. Web payment comes later.</p>', function (sh) {
+        '<p class="mock">Paid through the App Store or Google Play.</p>', function (sh) {
         function buy(id) {
           if (!usingMock()) { ctx.toast('Store billing is not configured on this build yet.'); return; }
           var state = trial ? 'trial' : 'active';
@@ -96,10 +102,10 @@
         var Purchases = cap && cap.Plugins && cap.Plugins.Purchases;
         if (Purchases && Purchases.restorePurchases) {
           Purchases.restorePurchases().then(function () {
-            ctx.openSheet('<h4 data-test="restore-result">Restore purchases</h4><p class="sub">If the store has a subscription for this account, Premium will show here after the next refresh.</p><button class="btn pri block" id="rs-close" type="button">Close</button>', function (sh) {
+            ctx.openSheet('<h4 data-test="restore-result">Restore purchases</h4><p class="sub">If this store account has a subscription, we\'ve asked the store to restore it. This screen does not switch to Premium on its own yet.</p><button class="btn pri block" id="rs-close" type="button">Close</button>', function (sh) {
               sh.querySelector('#rs-close').addEventListener('click', ctx.closeSheet);
             });
-          }).catch(function () { ctx.toast('Couldn\'t reach the store.'); });
+          }).catch(function () { ctx.toast('We couldn\'t reach the store. Try again soon.'); });
           return;
         }
       }
@@ -111,7 +117,7 @@
         });
         return;
       }
-      ctx.openSheet('<h4 data-test="restore-result">Restore purchases</h4><p class="sub">No purchases to restore on this store account.</p><button class="btn pri block" id="rs-close" type="button">Close</button>', function (sh) {
+      ctx.openSheet('<h4 data-test="restore-result">Restore purchases</h4><p class="sub">We didn\'t find a purchase on this store account.</p><button class="btn pri block" id="rs-close" type="button">Close</button>', function (sh) {
         sh.querySelector('#rs-close').addEventListener('click', ctx.closeSheet);
       });
     }
@@ -129,10 +135,10 @@
       var v = view();
       var status = 'Free plan';
       if (v.premium && v.row && v.row.covered) status = 'Premium is on. ' + (v.row.payer_name || 'Your partner') + '\'s subscription covers you both.';
-      else if (v.premium && v.row && v.row.status === 'trialing') status = 'Premium trial is on for this household.';
-      else if (v.premium && v.row && v.row.courtesy) status = 'Premium stays for 14 days after the payer left.';
+      else if (v.premium && v.row && v.row.status === 'trialing') status = 'Your Premium trial is on.';
+      else if (v.premium && v.row && v.row.courtesy) status = 'Premium stays on for 14 days after the person who paid leaves.';
       else if (v.premium) status = 'Premium is on for this household.';
-      else if (v.lapsed) status = 'Premium has ended. Extra goals and history are read-only. Nothing was deleted.';
+      else if (v.lapsed) status = 'Premium has ended. Extra goals and history are now read-only. Nothing\'s been deleted.';
       var mock = usingMock();
       var states = ['free', 'trial', 'active', 'lapsed', 'partner', 'courtesy'];
       card.innerHTML = '<h3><span>Premium</span></h3><p class="sub" data-test="premium-status"' + (v.row && v.row.covered ? ' data-covered="1"' : '') + '>' + esc(status) + '</p>' +
@@ -335,7 +341,7 @@
       }
     };
     function openReadonly(g, ended) {
-      ctx.openSheet('<h4 data-test="goal-readonly">' + esc(g && g.name || 'Goal') + '</h4><p class="sub">' + (ended ? 'Premium has ended. This goal is read-only. Nothing was deleted.' : 'This goal is read-only on the free plan. Nothing was deleted.') + '</p><button class="btn pri block" type="button" id="ro-premium">See Premium</button><button class="btn ghost block" type="button" id="ro-close" style="margin-top:8px">Close</button>', function (sh) {
+      ctx.openSheet('<h4 data-test="goal-readonly">' + esc(g && g.name || 'Goal') + '</h4><p class="sub">' + (ended ? 'Premium has ended. This goal is read-only. Nothing\'s been deleted.' : 'On the free plan this goal is read-only. Nothing\'s been deleted.') + '</p><button class="btn pri block" type="button" id="ro-premium">See Premium</button><button class="btn ghost block" type="button" id="ro-close" style="margin-top:8px">Close</button>', function (sh) {
         sh.querySelector('#ro-close').addEventListener('click', ctx.closeSheet);
         sh.querySelector('#ro-premium').addEventListener('click', function () { ctx.closeSheet(); openPaywall('goals'); });
       });

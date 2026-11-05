@@ -1905,7 +1905,7 @@ function renderBudget(){
       if(c.id==='expenses')h+='<div class="item" data-id="'+i.id+'" data-expense="1"><div class="swipe-actions"><button type="button" data-act="swipe-del">Delete</button></div><div class="swipe-front">'+inner+'</div></div>';
       else h+='<div class="item" data-id="'+i.id+'">'+inner+'</div>';
     });
-    if(!its.length)h+='<div class="item"><span class="muted" style="font-size:14px">No items yet</span></div>';
+    if(!its.length)h+='<div class="item"><span class="muted" style="font-size:14px">Nothing here yet</span></div>';
     h+='</div><button class="addbtn" data-add="'+c.id+'">+ Add to '+c.label.toLowerCase()+'</button>'+(c.id==='expenses'?'<button class="addbtn mic-btn" type="button" data-voice="1" data-test="voice-add">Add an expense by voice</button>':'')+'</div>';
   });
   $('groups').innerHTML=h;
@@ -2015,7 +2015,7 @@ function renderGoals(){
     return '<div class="card goal" data-layout="goal-'+g.id+'" data-gid="'+g.id+'" data-test="goal-card" style="cursor:pointer"><div class="top"><div class="emoji">'+esc(g.emoji||'🎯')+'</div><div class="gt"><b>'+esc(g.name)+'</b><small>'+money(cvP(g.perF))+' / '+cy.per+' · '+esc(whoShort(g))+'</small></div><div class="pct">'+Math.round(p.pct)+'%</div></div>'+
       '<div class="prog '+cls+'"><i style="width:'+p.pct+'%"></i></div><div class="meta"><span>'+money(g.saved,{whole:true})+' of '+money(g.target,{whole:true})+'</span><span data-test="goal-left">'+(p.left>0?money(p.left,{whole:true})+' to go':'Done')+'</span></div>'+
       '<div class="foot">'+pill(p)+'<span class="r">'+goalFoot(p)+'</span></div></div>';
-  }).join('')||'<div class="card muted" data-layout="goal-empty">No goals yet. Add one to start tracking it.</div>';
+  }).join('')||'<div class="card muted" data-layout="goal-empty">No goals yet. Add one you\'re saving for together.</div>';
 }
 function renderHHCard(){
   var h=HH(),el=$('hhCard'),pm=memberBy('partner'),st=invStatus();
@@ -2028,7 +2028,7 @@ function renderHHCard(){
   if(pm)pr='<div class="mrow"><div class="av b">'+esc(pm.name.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(pm.name)+(viewer()==='B'?'<span class="you">You</span>':'')+'</b><small>'+CYCLES[pm.payCycle].adj+' pay</small>'+(sid&&pm.userId===sid?'<small class="started">Started the household</small>':'')+'</div><span class="gstat ok">Joined</span></div>';
   else if(st==='pending')pr='<div class="mrow"><div class="av b pending">?</div><div class="mi"><b>'+esc(h.invite.forName||'Partner')+' (invited)</b><small>Code '+h.invite.code+' · expires '+fmtDay(h.invite.expiresAt)+'</small></div><span class="gstat warn">Pending</span></div>';
   else if(h.lastLeft){var ln=h.lastLeft.name;pr='<div class="mrow"><div class="av b">'+esc(ln.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(ln)+' (left '+fmtDay(h.lastLeft.at)+')</b><small>Goals stay · their planned contributions are $0</small></div></div>';}
-  else pr='<div class="mrow"><div class="av b pending">+</div><div class="mi"><b>No partner yet</b><small>'+(st==='expired'?'Last invite expired':st==='revoked'?'Last invite revoked':'Invite your partner to join')+'</small></div></div>';
+  else pr='<div class="mrow"><div class="av b pending">+</div><div class="mi"><b>Just you for now</b><small>'+(st==='expired'?'Last invite expired':st==='revoked'?'Last invite revoked':'Invite your partner to plan together')+'</small></div></div>';
   var ow=memberBy('owner')||{name:S.names.D,userId:(S.account||{}).userId};
   el.innerHTML='<h3><span>'+esc(h.name)+'</span><span class="tag">PROTOTYPE</span></h3><div class="mlist" data-test="hh-card"><div class="mrow"><div class="av a">'+esc(S.names.D.charAt(0).toUpperCase())+'</div><div class="mi"><b>'+esc(S.names.D)+(viewer()==='A'?'<span class="you">You</span>':'')+'</b><small>'+CYCLES[S.cycle].adj+' pay</small>'+(sid&&(ow.userId===sid||(!pm&&sid))?'<small class="started">Started the household</small>':'')+'</div></div>'+pr+'</div>'+
     '<button class="btn ghost block" style="margin-top:12px" id="hhManage">Manage household</button>'+
@@ -2182,7 +2182,7 @@ function renderSpentCard(){
   });
   overs.sort(function(a,b){return b.by-a.by;});
   var top=overs.slice(0,2),el=$('spentCardOver');
-  el.innerHTML=top.length?top.map(function(o){return '<div class="over-line" data-test="spent-over-line"><span>'+esc(o.name)+'</span><b>Running over by '+money(o.by)+'</b></div>';}).join(''):'<div class="hint">Nothing is running over this '+per+'.</div>';
+  el.innerHTML=top.length?top.map(function(o){return '<div class="over-line" data-test="spent-over-line"><span>'+esc(o.name)+'</span><b>Running over by '+money(o.by)+'</b></div>';}).join(''):'<div class="hint">Nothing\'s over budget this '+per+'.</div>';
 }
 function spendScopes(){
   var s=[['all','All'],['J','Ours'],['D',S.names.D||'Me']];
@@ -2214,8 +2214,8 @@ function renderSpent(){
   var planned=plannedSpend(['expenses','personal'],owner||undefined);
   var left=planned-net,over=left<-0.004;
   $('spentSummary').innerHTML='<div class="spent-sum"><div><div class="k">Spent</div><div class="v" data-test="sum-spent">'+(net<-0.004?'$0 spent':money(Math.max(0,net)))+'</div></div><div><div class="k">Planned</div><div class="v" data-test="sum-planned">'+money(planned)+'</div></div><div><div class="k">'+(over?'Running over':'Left')+'</div><div class="v'+(over?' over':'')+'" data-test="sum-left">'+(over?('Running over by '+money(-left)):money(Math.max(0,left)))+'</div></div></div>'+(net<-0.004?'<div class="hint">$0 spent, '+money(-net)+' refunded.</div>':'');
-  if(!all.length){el.innerHTML='<div class="card tr-empty" data-test="spent-empty"><b>Nothing recorded this '+per+' yet.</b><div class="muted" style="font-size:14px;line-height:1.45">Add what you spend to see it against your plan.</div></div>';return;}
-  if(!list.length){el.innerHTML='<div class="card tr-empty" data-test="spent-empty"><b>Nothing recorded for this view this '+per+'.</b><div class="muted" style="font-size:14px;line-height:1.45">The other scopes still have spending for this '+per+'.</div></div>';return;}
+  if(!all.length){el.innerHTML='<div class="card tr-empty" data-test="spent-empty"><b>No spending this '+per+' yet.</b><div class="muted" style="font-size:14px;line-height:1.45">Add what you spend to see how it tracks against your plan.</div></div>';return;}
+  if(!list.length){el.innerHTML='<div class="card tr-empty" data-test="spent-empty"><b>Nothing here this '+per+'.</b><div class="muted" style="font-size:14px;line-height:1.45">Switch between Ours, Me and Partner to see the rest.</div></div>';return;}
   list.sort(function(a,b){if(a.on!==b.on)return a.on<b.on?1:-1;return (b.at||0)-(a.at||0);});
   var html='',last='';
   list.forEach(function(e){if(e.on!==last){last=e.on;var d=parseISO(e.on);html+='<div class="dayhead">'+esc(d?fmtDate(d):e.on)+'</div>';}html+=spendRowHtml(e);});
@@ -2703,7 +2703,7 @@ function goalForm(orig){
       else if(p.reached)h2='<b>Already reached</b>. Saved covers the target.';
       else if(!p.date)h2='Pick a target date to work out what\'s needed each '+cy.per+'.';
       else if(p.status==='overdue')h2='That date has passed. Pick a future date.';
-      else if(!p.cycles)h2='No paydays before that date. Pick a later date.';
+      else if(!p.cycles)h2='No paydays before then. Try a later date.';
       else{
         h2='To save <b>'+money(p.left)+'</b> by '+fmtLong(p.date)+' you need <b>'+money(p.req)+' / '+cy.per+'</b> over '+cyc(p.cycles)+'. '+pill(p);
         if(p.status==='behind'&&!(w.who==='both'&&w.split==='custom'))h2+='<div class="row"><span>Planned '+money(p.per)+'</span><button class="btn ghost sm" id="g-use" data-v="'+toDisplay(p.req)+'">Use '+money(p.req)+'</button></div>';
@@ -2920,9 +2920,9 @@ var VIEWS={
     acts='<div class="mbtns"><button class="btn danger sm" id="m-remove">Remove '+esc(oth)+'</button><button class="btn danger sm" id="m-leave">Leave household</button></div>';}
   else if(st==='pending'){prt='<div class="mrow" data-test="m-partner"><div class="av b pending">?</div><div class="mi"><b>'+esc(i.forName||'Partner')+' · invited</b><small>Code '+i.code+' · expires '+fmtDay(i.expiresAt)+(i.sends?' · sent '+i.sends+'×':'')+'</small></div><span class="gstat warn" data-test="m-status">Pending</span></div>';
     acts='<div class="mbtns"><button class="btn ghost sm" id="m-resend">Resend</button><button class="btn ghost sm" id="m-show">Show code</button><button class="btn danger sm" id="m-revoke">Revoke</button></div>';}
-  else{var lab={expired:['Invite expired','bad','Expired'],revoked:['Invite revoked','bad','Revoked'],none:['No partner yet','none','Not invited']}[st];
+  else{var lab={expired:['Invite expired','bad','Expired'],revoked:['Invite revoked','bad','Revoked'],none:['Just you for now','none','Not invited']}[st];
     if(h.lastLeft&&st==='none')prt='<div class="mrow" data-test="m-partner"><div class="av b">'+esc(h.lastLeft.name.charAt(0).toUpperCase())+'</div><div class="mi"><b data-test="m-leftname">'+esc(h.lastLeft.name)+' (left '+fmtDay(h.lastLeft.at)+')</b><small>Goals kept, their planned contributions are $0</small></div><span class="gstat none" data-test="m-status">'+(h.lastLeft.how==='removed'?'Removed':'Left')+'</span></div>';
-    else prt='<div class="mrow" data-test="m-partner"><div class="av b pending">+</div><div class="mi"><b>'+lab[0]+'</b><small>'+(st==='expired'?'Code '+i.code+' expired '+fmtDay(i.expiresAt):st==='revoked'?'Code '+i.code+' no longer works':'Invite your partner to share this budget')+'</small></div><span class="gstat '+lab[1]+'" data-test="m-status">'+lab[2]+'</span></div>';
+    else prt='<div class="mrow" data-test="m-partner"><div class="av b pending">+</div><div class="mi"><b>'+lab[0]+'</b><small>'+(st==='expired'?'Code '+i.code+' expired '+fmtDay(i.expiresAt):st==='revoked'?'Code '+i.code+' no longer works':'Invite your partner to plan together')+'</small></div><span class="gstat '+lab[1]+'" data-test="m-status">'+lab[2]+'</span></div>';
     acts='<div class="mbtns"><button class="btn pri sm" id="m-new">'+(st==='none'?'Invite partner':'Send a new invite')+'</button></div>';}
   var sim=!!pm;
   return {h:'<h2 class="page">'+esc(h.name)+'</h2><p class="sub">Household · created '+fmtDay(h.createdAt)+' · 2 members max · same access for both</p>'+

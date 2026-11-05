@@ -215,16 +215,16 @@
   function showWelcome() {
     mode = 'welcome';
     var p = providers();
-    var note = plan && plan.reason === 'inactive' ? '<p class="sub">You were signed out after 30 days away from this browser. Your account budget is unchanged.</p>' : '<p class="sub">Plan around both paydays.</p>';
+    var note = plan && plan.reason === 'inactive' ? '<p class="sub">You\'ve been away from this browser for 30 days, so we signed you out. Your budget is safe.</p>' : '<p class="sub">Plan around both paydays.</p>';
     var buttons = '';
     if (p.apple) buttons += '<button class="btn apple block" type="button" id="gate-apple" data-test="welcome-apple">Continue with Apple</button>';
     if (p.google) buttons += '<button class="btn google block" type="button" id="gate-google" data-test="welcome-google">Continue with Google</button>';
     buttons += '<button class="btn pri block" type="button" id="gate-email" data-test="welcome-email">Continue with email</button>';
-    var iosHint = !p.apple && !p.google && platform() === 'ios' ? '<p class="email-note">Sign in with Apple isn\'t available in this build yet, so Google is hidden on iPhone. Email still works.</p>' : '';
+    var iosHint = !p.apple && !p.google && platform() === 'ios' ? '<p class="email-note">For now, use email.</p>' : '';
     show('<div class="duo-welcome" data-test="welcome">' + logo() + '<h2 class="page">Duo Budget</h2>' + note + iosHint +
       '<div class="duo-actions">' + buttons + '</div>' +
-      '<button class="linkbtn" type="button" id="gate-guest" data-test="welcome-guest">Try without an account</button>' +
-      '<p class="mock">Stays on this phone. You can add an account later.</p>' +
+      '<button class="linkbtn" type="button" id="gate-guest" data-test="welcome-guest">Try it without an account</button>' +
+      '<p class="mock">Your budget stays on this phone. Add an account any time.</p>' +
       '<p class="mock"><a href="privacy.html">Privacy</a> · <a href="delete-account.html">Delete an account</a></p></div>');
     var apple = $('gate-apple'); if (apple) apple.addEventListener('click', function () { startProvider('apple'); });
     var google = $('gate-google'); if (google) google.addEventListener('click', function () { startProvider('google'); });
@@ -235,16 +235,16 @@
     mode = password ? 'password' : 'email';
     var back = '<button class="linkbtn" type="button" id="gate-back">Back</button>';
     if (password) {
-      show('<div data-test="email-password-screen"><h2 class="page">Use a password</h2><p class="sub">Same account as the email code. Set one in Partners after you sign in, or reset it with a code.</p>' +
+      show('<div data-test="email-password-screen"><h2 class="page">Use a password</h2><p class="sub">Same account as your email code. You can set or reset a password in Partners after you sign in.</p>' +
         '<label class="fl" for="gate-email-input">Email</label><input class="field" id="gate-email-input" data-test="gate-email" type="email" autocomplete="username" inputmode="email">' +
         '<label class="fl" for="gate-password">Password</label><input class="field" id="gate-password" data-test="gate-password" type="password" autocomplete="current-password">' +
         '<div class="ferr" id="gate-err" data-test="gate-err"></div>' +
         '<button class="btn pri block" type="button" id="gate-password-go" data-test="gate-password-go">Sign in</button>' +
-        '<button class="linkbtn" type="button" id="gate-forgot" data-test="gate-forgot">Forgot password? Email a code</button>' + back + '</div>');
+        '<button class="linkbtn" type="button" id="gate-forgot" data-test="gate-forgot">Forgot your password? Get a code by email</button>' + back + '</div>');
       $('gate-password-go').addEventListener('click', submitPassword);
       $('gate-forgot').addEventListener('click', function () { showEmail(false); });
     } else {
-      show('<div data-test="email-screen"><h2 class="page">Continue with email</h2><p class="sub">We\'ll email a 6-digit code. No password needed unless you have set one.</p>' +
+      show('<div data-test="email-screen"><h2 class="page">Continue with email</h2><p class="sub">We\'ll email you a 6-digit code. No password needed.</p>' +
         '<label class="fl" for="gate-email-input">Email</label><input class="field" id="gate-email-input" data-test="gate-email" type="email" autocomplete="username" inputmode="email" placeholder="you@example.com">' +
         '<div class="ferr" id="gate-err" data-test="gate-err"></div>' +
         '<button class="btn pri block" type="button" id="gate-send" data-test="email-send">Send code</button>' +
@@ -257,7 +257,7 @@
   function sendCode() {
     var email = $('gate-email-input').value.trim();
     var err = $('gate-err');
-    if (!ctx.validEmail(email)) { err.textContent = 'Enter a valid email address.'; return; }
+    if (!ctx.validEmail(email)) { err.textContent = 'Check the email address and try again.'; return; }
     err.textContent = '';
     $('gate-send').disabled = true;
     ready().then(function (api) {
@@ -266,11 +266,11 @@
         if (r && r.error) { err.textContent = (ctx.otpProblem ? ctx.otpProblem(r.error, 'send') : r.error.message); return; }
         showCode(email, 'email');
       });
-    }).catch(function () { $('gate-send').disabled = false; err.textContent = 'Couldn\'t send a code just now.'; });
+    }).catch(function () { $('gate-send').disabled = false; err.textContent = 'We couldn\'t send the code. Check your connection and try again.'; });
   }
   function showCode(email, type) {
     mode = 'code';
-    show('<div data-test="email-code-screen"><h2 class="page">Enter your code</h2><p class="sub">We sent a 6-digit code to <b>' + esc(email) + '</b>. Type it here. It isn\'t a link.</p>' +
+    show('<div data-test="email-code-screen"><h2 class="page">Enter your code</h2><p class="sub">We\'ve sent a 6-digit code to <b>' + esc(email) + '</b>. Type it in below.</p>' +
       '<div class="otp-wrap"><div class="otp-cells" data-test="gate-cells">' + '<span></span>'.repeat(6) + '</div>' +
       '<input class="otp-catch" id="gate-code" data-test="gate-code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" aria-label="6-digit code"></div>' +
       '<div class="ferr" id="gate-err"></div>' +
@@ -306,13 +306,13 @@
     var email = $('gate-email-input').value.trim();
     var password = $('gate-password').value;
     var err = $('gate-err');
-    if (!ctx.validEmail(email)) { err.textContent = 'Enter a valid email address.'; return; }
+    if (!ctx.validEmail(email)) { err.textContent = 'Check the email address and try again.'; return; }
     var problem = Account.passwordProblem(password);
     if (problem) { err.textContent = problem; return; }
     err.textContent = '';
     ready().then(function (api) {
       return api.signInWithPassword(email, password).then(function (r) {
-        if (r && r.error) err.textContent = 'That email and password didn\'t match. You can email a code instead.';
+        if (r && r.error) err.textContent = 'That email and password don\'t match. Try again, or get a code by email.';
       });
     });
   }
@@ -337,8 +337,8 @@
     var fresh = info.kind !== 'choose-cloud';
     var title = fresh ? 'Keep this budget?' : 'This account already has a budget';
     var body = fresh
-      ? 'You have a budget on this phone. Add it to your new account so it syncs?'
-      : 'Nothing is combined. Use the budget in your account, or replace it with the one on this phone.';
+      ? 'You\'ve got a budget on this phone. Add it to your account so it syncs to both phones?'
+      : 'We won\'t merge them. Choose your account\'s budget, or replace it with the one on this phone.';
     var primary = fresh
       ? '<button class="btn pri block" type="button" id="gate-keep" data-test="keep-budget">Yes, keep it</button>'
       : '<button class="btn pri block" type="button" id="gate-cloud" data-test="use-cloud">Use the account budget</button>';
@@ -397,11 +397,11 @@
       var gate = Lock.canTry(secret || {}, now);
       var bioBtn = prefs.biometrics && bioAvailable && kind === 'unlock' && gate.ok
         ? '<button class="btn pri block" type="button" id="gate-bio" data-test="lock-bio">Unlock with ' + esc(bioName()) + '</button>' : '';
-      var help = platform() === 'web' ? '<p class="mock">On the web this passcode only hides the budget in this browser.</p>' : '';
+      var help = platform() === 'web' ? '<p class="mock">On the web, the passcode only hides your budget in this browser.</p>' : '';
       var err = '';
-      if (kind === 'unlock' && gate.reason === 'reauth') err = '<p class="sub">Too many tries. Sign in to your account to set a new passcode. Your cloud budget is not deleted.</p>';
+      if (kind === 'unlock' && gate.reason === 'reauth') err = '<p class="sub">Too many tries. Sign in again to set a new passcode. Your budget is safe.</p>';
       else if (kind === 'unlock' && gate.reason === 'backoff') err = '<p class="sub">Try again in ' + Math.ceil((gate.until - now) / 1000) + ' seconds.</p>';
-      var title = kind === 'create' ? 'Choose a passcode' : kind === 'confirm' ? 'Enter it again' : 'Duo Budget is locked';
+      var title = kind === 'create' ? 'Choose a 4-digit passcode' : kind === 'confirm' ? 'Enter it once more to confirm' : 'Duo Budget is locked';
       var forgot = kind === 'unlock' ? '<button class="linkbtn" type="button" id="gate-forgot-pass" data-test="forgot-passcode">Forgot passcode?</button>' : '';
       show('<div data-test="lock-screen"><h2 class="page">' + title + '</h2>' + bioBtn + dots(0) +
         (gate.ok || kind !== 'unlock' ? pad('gate-pad') : '') + '<div class="ferr" id="gate-err"></div>' + err + forgot + help + '</div>');
@@ -422,7 +422,7 @@
         if (kind === 'create') { first = entered; entered = ''; showLock('confirm'); showLock.pending = first; return; }
         if (kind === 'confirm') {
           var prev = showLock.pending || '';
-          if (entered !== prev) { $('gate-err').textContent = 'Those didn\'t match. Try again.'; showLock.pending = ''; setTimeout(function () { showLock('create'); }, 400); return; }
+          if (entered !== prev) { $('gate-err').textContent = 'Those passcodes don\'t match. Try again.'; showLock.pending = ''; setTimeout(function () { showLock('create'); }, 400); return; }
           Lock.seal(entered).then(function (rec) {
             rec.attempts = 0;
             return secretSet(rec);
@@ -453,7 +453,7 @@
           }
           Lock.recordFailure(secret, Date.now());
           secretSet(secret);
-          $('gate-err').textContent = secret.forceReauth ? 'Too many tries. Use Forgot passcode.' : 'That passcode isn\'t right.';
+          $('gate-err').textContent = secret.forceReauth ? 'Too many tries. Tap Forgot passcode? to reset it.' : 'That\'s not the passcode. Try again.';
           entered = '';
           setTimeout(function () { showLock('unlock'); }, secret.forceReauth ? 400 : 250);
         });
@@ -462,14 +462,14 @@
   }
   function tryBio() {
     var p = plugin('BiometricAuthNative');
-    if (!p || !p.internalAuthenticate) { $('gate-err').textContent = 'Use the passcode on this device.'; return; }
+    if (!p || !p.internalAuthenticate) { $('gate-err').textContent = 'Use your passcode instead.'; return; }
     p.internalAuthenticate({
       reason: 'Unlock Duo Budget',
       cancelTitle: 'Use passcode',
       allowDeviceCredential: false,
       iosFallbackTitle: 'Use passcode',
       androidTitle: 'Unlock Duo Budget',
-      androidSubtitle: 'Confirm it is you'
+      androidSubtitle: 'Confirm it\'s you'
     }).then(function () {
       unlocked = true;
       cold = false;
@@ -479,14 +479,14 @@
   function offerBio() {
     if (!ctx.openSheet || !bioAvailable || prefs.biometrics) return;
     var name = bioName();
-    ctx.openSheet('<h4>Also use ' + esc(name) + '?</h4><p class="sub">The passcode still works if ' + esc(name) + ' doesn\'t.</p><div class="btns"><button class="btn ghost" id="bio-no" type="button">Passcode only</button><button class="btn pri" id="bio-yes" type="button">Use ' + esc(name) + '</button></div>', function (sh) {
+    ctx.openSheet('<h4>Use ' + esc(name) + ' too?</h4><p class="sub">Your passcode still works if ' + esc(name) + ' doesn\'t.</p><div class="btns"><button class="btn ghost" id="bio-no" type="button">Passcode only</button><button class="btn pri" id="bio-yes" type="button">Use ' + esc(name) + '</button></div>', function (sh) {
       sh.querySelector('#bio-no').addEventListener('click', function () { ctx.closeSheet(); });
       sh.querySelector('#bio-yes').addEventListener('click', function () { prefs.biometrics = true; writePrefs(prefs); ctx.closeSheet(); renderLockCard(); });
     });
   }
   function forgotPasscode() {
     var email = (ctx.currentEmail && ctx.currentEmail()) || '';
-    show('<div data-test="forgot-screen"><h2 class="page">Forgot passcode?</h2><p class="sub">Sign in again as <b>' + esc(email || 'your account') + '</b>. This sets a new passcode. It does not delete the budget in your account.</p>' +
+    show('<div data-test="forgot-screen"><h2 class="page">Forgot passcode?</h2><p class="sub">Sign in again as <b>' + esc(email || 'your account') + '</b> to set a new passcode. Your budget stays as it is.</p>' +
       (email ? '' : '<label class="fl" for="gate-email-input">Email</label><input class="field" id="gate-email-input" type="email">') +
       '<div class="ferr" id="gate-err"></div>' +
       '<button class="btn pri block" type="button" id="gate-reauth" data-test="reauth-send">Email a code</button>' +
@@ -494,8 +494,8 @@
     $('gate-back').addEventListener('click', function () { showLock('unlock'); });
     $('gate-reauth').addEventListener('click', function () {
       var addr = email || ($('gate-email-input') && $('gate-email-input').value.trim());
-      if (!ctx.validEmail(addr)) { $('gate-err').textContent = 'Enter the email on this account.'; return; }
-      if (email && addr.toLowerCase() !== email.toLowerCase()) { $('gate-err').textContent = 'Use the email on this account.'; return; }
+      if (!ctx.validEmail(addr)) { $('gate-err').textContent = 'Enter the email you signed up with.'; return; }
+      if (email && addr.toLowerCase() !== email.toLowerCase()) { $('gate-err').textContent = 'That\'s not the email on this account.'; return; }
       ready().then(function (api) {
         return api.signInWithEmail(addr).then(function (r) {
           if (r && r.error) { $('gate-err').textContent = r.error.message || 'Couldn\'t send a code.'; return; }
