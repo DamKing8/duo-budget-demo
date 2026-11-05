@@ -63,19 +63,22 @@ appTargets.forEach(function (block) {
   need(/CURRENT_PROJECT_VERSION = 1;/.test(block), 'build number must be 1');
   need(/IPHONEOS_DEPLOYMENT_TARGET = 15\.0;/.test(block), 'App target deployment target must be iOS 15.0');
   need(/CODE_SIGN_STYLE = Automatic;/.test(block), 'signing must be automatic');
-  need(/DEVELOPMENT_TEAM = "";/.test(block), 'DEVELOPMENT_TEAM must be empty so a Personal Team can be chosen on the Mac');
+  need(/DEVELOPMENT_TEAM = P2N4988G3H;/.test(block), 'App target DEVELOPMENT_TEAM must be P2N4988G3H');
 });
 blocks.forEach(function (block) {
   need(!/IPHONEOS_DEPLOYMENT_TARGET = (?!15\.0;)/.test(block), 'every deployment target must be iOS 15.0');
-  need(!/DEVELOPMENT_TEAM = (?!"")/.test(block), 'a team id must not be committed');
+  if (!/PRODUCT_BUNDLE_IDENTIFIER = au\.duobudget\.app;/.test(block)) {
+    need(!/DEVELOPMENT_TEAM = (?!"")/.test(block), 'only the app target carries the team id');
+  }
 });
 need(/ProvisioningStyle = Automatic;/.test(project), 'Xcode provisioning style must be automatic');
-need(!/CODE_SIGN_ENTITLEMENTS|PROVISIONING_PROFILE|SystemCapabilities/.test(project), 'the App target must not reference entitlements or manual profiles');
+need(!/CODE_SIGN_ENTITLEMENTS|PROVISIONING_PROFILE|SystemCapabilities/.test(project), 'Sign in with Apple is not attached to the default build');
+need(project.indexOf('com.apple.developer.applesignin') === -1, 'the default build must not request Sign in with Apple');
+need(plistString(plist, 'NSFaceIDUsageDescription') === 'Duo Budget uses Face ID to unlock your budget.', 'Face ID usage string must be present');
 
 var banned = [
   'com.apple.Push',
   'aps-environment',
-  'com.apple.developer.applesignin',
   'com.apple.security.application-groups',
   'com.apple.developer.associated-domains',
   'com.apple.developer.icloud-services',
@@ -86,9 +89,12 @@ var banned = [
   'com.apple.developer.siri'
 ];
 var tree = '';
+var appleEntitlements = read('capacitor-ios/App/App/App.entitlements');
+need(/<key>com\.apple\.developer\.applesignin<\/key>\s*<array>\s*<string>Default<\/string>\s*<\/array>/.test(appleEntitlements), 'App.entitlements must hold Sign in with Apple Default, unattached to the build');
 walk(ios, function (file) {
-  if (file.endsWith('.entitlements')) problems.push('remove entitlements file ' + path.relative(root, file));
+  if (file.endsWith('.entitlements') && path.basename(file) !== 'App.entitlements') problems.push('remove entitlements file ' + path.relative(root, file));
   if (path.basename(file) === 'Podfile' || path.basename(file) === 'Podfile.lock') problems.push('CocoaPods file is not used: ' + path.relative(root, file));
+  if (path.basename(file) === 'App.entitlements') return;
   if (/\.(plist|pbxproj|entitlements|swift|xcconfig)$/.test(file)) tree += fs.readFileSync(file, 'utf8') + '\n';
 });
 banned.forEach(function (needle) {
@@ -137,4 +143,4 @@ if (problems.length) {
   problems.forEach(function (msg) { console.error(' - ' + msg); });
   process.exit(1);
 }
-console.log('iOS project is ready to open: au.duobudget.app, Duo Budget, 0.1.0 (1), iOS 15, automatic signing, no team, URL scheme au.duobudget.app, web assets copied.');
+console.log('iOS project is ready to open: au.duobudget.app, Duo Budget, 0.1.0 (1), iOS 15, automatic signing, team P2N4988G3H, Sign in with Apple not in the default build, URL scheme au.duobudget.app, web assets copied.');
