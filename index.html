@@ -1133,6 +1133,11 @@ html[data-accent="forest"] .btn.pri,html[data-accent="forest"] .seg button.on,ht
   <section class="view on" id="v-dash" data-layout-tab="dash">
     <div class="dash-title"><h2 class="page">Home</h2><p class="sub" id="dashSub"></p><p class="layout-hint">Hold a card, then drag it to another row or column.</p></div>
     <div class="card" id="backupNudge" data-test="backup-nudge-card" hidden></div>
+    <div class="card" id="emptyStart" data-test="empty-start" hidden>
+      <h3><span>Nothing here yet</span></h3>
+      <p class="sub" style="margin:0">This phone starts empty. Add your own lines, or load the sample household to look around. The sample is made up.</p>
+      <button class="btn pri block" type="button" id="loadSampleHome" data-test="load-sample" style="margin-top:12px">Load sample data</button>
+    </div>
     <div class="dcol">
     <div class="card hero" data-layout="hero">
       <div class="lbl" id="heroLbl">Left over this fortnight</div>
@@ -1180,6 +1185,11 @@ html[data-accent="forest"] .btn.pri,html[data-accent="forest"] .seg button.on,ht
     <div class="summary-strip"><div><div class="l" id="stripLbl">Left over this fortnight</div><div class="v" id="stripV">$0</div></div><span class="pill" id="stripPill">Fortnight</span></div>
     <div class="bud-head"><h2 class="page">Budget</h2><span style="display:flex;gap:8px"><button class="tr-link" type="button" data-open-spent data-test="budget-spending">Spending</button><button class="tr-link" data-open-trends data-test="budget-trends">Trends</button></span></div>
     <p class="sub">Tap a name to edit it. Tap the tag to switch between ours, me and partner. Swipe an expense left to delete. Hold an expense to reorder it. Hold a group to rearrange.</p>
+    <div class="card" id="emptyBudget" data-test="empty-budget" hidden>
+      <h3><span>Empty budget</span></h3>
+      <p class="sub" style="margin:0">No lines yet. Add one below, or load the sample household.</p>
+      <button class="btn ghost block" type="button" id="loadSampleBudget" data-test="load-sample-budget" style="margin-top:12px">Load sample data</button>
+    </div>
     <div id="groups"></div>
   </section>
 
@@ -1260,7 +1270,8 @@ html[data-accent="forest"] .btn.pri,html[data-accent="forest"] .seg button.on,ht
       <div class="seg" id="themeSeg" role="radiogroup" aria-labelledby="themeLbl"><button type="button" role="radio" data-t="light">Light</button><button type="button" role="radio" data-t="dark">Dark</button><button type="button" role="radio" data-t="system">System</button></div>
     </div>
     <div class="card" data-layout="set-storage">
-      <div class="setrow"><div class="l">Reset demo data<small>Restores the sample household (Chloe & Jack)</small></div><button class="btn danger sm" id="resetBtn" type="button">Reset</button></div>
+      <div class="setrow"><div class="l">Load sample data<small>Fills this phone with the made-up Chloe & Jack household.</small></div><button class="btn ghost sm" id="loadSampleBtn" type="button" data-test="load-sample-settings">Load sample data</button></div>
+      <div class="setrow"><div class="l">Clear sample data<small>Removes lines, goals, and spending on this phone and leaves an empty household.</small></div><button class="btn danger sm" id="clearSampleBtn" type="button" data-test="clear-sample">Clear sample data</button></div>
       <div class="setrow"><div class="l">Reset layout<small>Puts every tab’s cards back in the original order</small></div><button class="btn ghost sm" id="resetLayout" type="button" data-test="reset-layout">Reset layout</button></div>
       <div class="setrow"><div class="l">Storage<small>Budget and spending on this device. Layout too. Cloud sync covers lines, goals, pay cycles and spending.</small></div><span class="muted" style="font-size:13px">localStorage</span></div>
     </div>
@@ -1873,7 +1884,7 @@ function demo(){
   };
 }
 var S;
-function load(){try{var raw=localStorage.getItem(KEY);S=raw?JSON.parse(raw):demo();}catch(e){S=demo();}if(!S||!S.items)S=demo();
+function load(){try{var raw=localStorage.getItem(KEY);S=raw?JSON.parse(raw):(window.__DUO_PREVIEW_SEED__?demo():blankBudget());}catch(e){S=window.__DUO_PREVIEW_SEED__?demo():blankBudget();}if(!S)S=blankBudget();if(!Array.isArray(S.items))S.items=[];
   // bank sync was removed: keep who is using the app, drop any old simulated bank data
   if(S.bank){if(!S.actingAs)S.actingAs=S.bank.actingAs||'A';delete S.bank;}
   // migrate older saves (v1 goals had no date / contributors)
@@ -1964,6 +1975,8 @@ function donut(segs,center,sub){
   return h;
 }
 function renderDash(){
+  var emptyCard=$('emptyStart');
+  if(emptyCard)emptyCard.hidden=!!((S.items&&S.items.length)||(S.goals&&S.goals.length));
   var V=S.view,t=totalsIn(V),cy=CYCLES[V],over=t.remainder<-0.004;
   $('heroLbl').textContent=(over?'Running over this ':'Left over this ')+cy.per;
   var hb=$('heroBig');hb.textContent=money(over?-t.remainder:t.remainder);hb.classList.toggle('neg',over);hb.classList.remove('long');
@@ -2003,6 +2016,8 @@ function renderDash(){
   renderSpentCard();
 }
 function renderBudget(){
+  var emptyBudget=$('emptyBudget');
+  if(emptyBudget)emptyBudget.hidden=!!(S.items&&S.items.length);
   var V=S.view,t=totalsIn(V),cy=CYCLES[V];
   renderStrip(t);
   $('stripPill').textContent=cy.adj;
@@ -3244,12 +3259,23 @@ $('resetLayout').addEventListener('click',function(){
   document.querySelectorAll('.layout-slotted').forEach(function(el){el.classList.remove('layout-slotted');});
   renderAll();toast('Layout reset');
 });
-$('resetBtn').addEventListener('click',function(){
-  openSheet('<h4>Reset demo data?</h4><div class="muted" style="font-size:14px">This replaces your edits with the sample budget and goals.</div><div class="btns"><button class="btn ghost" id="r-no">Cancel</button><button class="btn danger" id="r-yes">Reset</button></div>',function(sh){
-    sh.querySelector('#r-no').addEventListener('click',closeSheet);
-    sh.querySelector('#r-yes').addEventListener('click',function(){S=demo();save();closeSheet();renderAll();toast('Demo data restored');});
+function budgetHasRows(){return !!((S.items&&S.items.length)||(S.goals&&S.goals.length)||(S.spends&&S.spends.length));}
+function loadSampleData(){
+  function go(){S=demo();S.sample=true;save();closeSheet();renderAll();toast('Sample household loaded');}
+  if(!budgetHasRows()){go();return;}
+  openSheet('<h4>Load sample data?</h4><p class="sub">This replaces the lines, goals, and spending on this phone with the made-up Chloe & Jack household.</p><div class="btns"><button class="btn ghost" id="s-no" type="button">Cancel</button><button class="btn pri" id="s-yes" type="button" data-test="load-sample-yes">Load sample data</button></div>',function(sh){
+    sh.querySelector('#s-no').addEventListener('click',closeSheet);
+    sh.querySelector('#s-yes').addEventListener('click',go);
   });
-});
+}
+function clearSampleData(){
+  openSheet('<h4>Clear sample data?</h4><p class="sub">This removes the lines, goals, and spending on this phone. The household is empty afterwards.</p><div class="btns"><button class="btn ghost" id="c-no" type="button">Cancel</button><button class="btn danger" id="c-yes" type="button" data-test="clear-sample-yes">Clear sample data</button></div>',function(sh){
+    sh.querySelector('#c-no').addEventListener('click',closeSheet);
+    sh.querySelector('#c-yes').addEventListener('click',function(){S=blankBudget();save();closeSheet();renderAll();toast('Household cleared');});
+  });
+}
+['loadSampleHome','loadSampleBudget','loadSampleBtn'].forEach(function(id){var b=$(id);if(b)b.addEventListener('click',loadSampleData);});
+var clearSampleEl=$('clearSampleBtn');if(clearSampleEl)clearSampleEl.addEventListener('click',clearSampleData);
 // refresh countdown at midnight / when returning to app
 document.addEventListener('visibilitychange',function(){if(!document.hidden)renderDash();});
 
@@ -3998,7 +4024,7 @@ if(window.DuoGate)DuoGate.start({
   sampleOnly:function(){return sampleOnly;},setSampleOnly:function(v){sampleOnly=v;},
   getKey:function(){return KEY;},setKey:function(k){KEY=k;},
   getState:function(){return S;},setState:function(next){S=next;},
-  blank:blankBudget,useDemo:function(){S=demo();},
+  blank:blankBudget,useBlank:function(){S=blankBudget();},useDemo:function(){S=demo();S.sample=true;},
   save:save,render:function(){renderAll();},
   sync:function(){return __sync;},restartSync:startSync,ready:function(){return window.__duoReady;},
   validEmail:validEmail,otpProblem:otpProblem,platform:authPlatform,

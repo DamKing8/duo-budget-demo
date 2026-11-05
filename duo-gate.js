@@ -338,7 +338,7 @@
   }
   function continueGuest() {
     if (ctx.setSampleOnly) ctx.setSampleOnly(false);
-    if (ctx.useDemo) ctx.useDemo();
+    if (ctx.useBlank) ctx.useBlank();
     Account.markGuest(storage());
     if (ctx.save) ctx.save();
     if (ctx.render) ctx.render();
