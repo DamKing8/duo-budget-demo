@@ -36,10 +36,11 @@ function create(opts){
   var cfg=opts.config||{},store=opts.storage,app=opts.app,now=opts.now||function(){return Date.now();};
   var MK=opts.storageKey+'.sync';
   var meta=load();var client=null,session=null,ctx=null,channel=null,applying=false,timer=null,flushing=null,status={state:'starting',pending:0};
+  var linkChoiceOnce=null,pendingHouseholdName='';
   function load(){try{var m=JSON.parse(store.getItem(MK)||'null');if(m&&m.v===1)return m;}catch(e){}return {v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:null};}
   function persist(){try{store.setItem(MK,JSON.stringify(meta));}catch(e){}}
-  function memberCount(){if(!ctx||!ctx.members)return 0;var n=0;ctx.members.forEach(function(m){if(m&&m.status==='active'&&!m.deleted_at)n++;});return n;}
-  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,members:memberCount(),user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
+  function activeMembers(){if(!ctx||!ctx.members)return [];return ctx.members.filter(function(m){return m&&m.status==='active'&&!m.deleted_at;});}
+  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,householdName:(ctx&&ctx.householdName)||'',members:activeMembers().length,memberNames:activeMembers().map(function(m){return m.display_name;}).filter(Boolean),user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
   // Diagnostics stay in the console. The sync card does not show them.
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
@@ -287,7 +288,11 @@ function create(opts){
       var first=meta.household!==ctx.household;
       if(first){meta={v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:ctx.household};idToKey={};}
       var S=app.getState();if(S&&ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;if(S&&ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
-      if(first&&isGuestBudget()&&localHasData()&&typeof opts.onLinkChoice==='function'){
+      return attachHouseholdName(mine.household_id).then(function(){
+      if(ctx&&!ctx.householdName&&pendingHouseholdName)ctx.householdName=pendingHouseholdName;
+      if(first&&isGuestBudget()&&localHasData()&&(linkChoiceOnce||typeof opts.onLinkChoice==='function')){
+        var preset=linkChoiceOnce;
+        if(preset){linkChoiceOnce=null;return finishLink(first,preset);}
         return listCloud().then(function(acc){
           if(disposed)return null;
           var cloudHas=cloudHasRows(acc);
@@ -302,7 +307,15 @@ function create(opts){
         });
       }
       return finishLink(first,null);
+      });
     });
+  }
+  function attachHouseholdName(hh){
+    if(!client||!client.from)return Promise.resolve();
+    return client.from('households').select('name').eq('id',hh).then(function(res){
+      var rows=res&&res.data,row=Array.isArray(rows)?rows[0]:rows;
+      if(ctx&&row&&row.name)ctx.householdName=row.name;
+    },function(){});
   }
   function ctx0(){return {me:session&&session.user?session.user.id:null};}
   var authFlight=null,authFor=null;
@@ -419,7 +432,8 @@ function create(opts){
       if(!client||!client.auth||!client.auth.getUserIdentities)return Promise.resolve({data:{identities:[]}});
       return client.auth.getUserIdentities().then(function(r){return r||{data:{identities:[]}};},function(){return {data:{identities:[]}};});
     },
-    createHousehold:function(name,display){return client.rpc('create_household',{p_name:name,p_display_name:display}).then(function(r){if(r.error)throw r.error;return loadHousehold();});},
+    preferLinkChoice:function(choice){linkChoiceOnce=choice||null;},
+    createHousehold:function(name,display){pendingHouseholdName=String(name||'').trim();return client.rpc('create_household',{p_name:pendingHouseholdName,p_display_name:display}).then(function(r){if(r.error)throw r.error;return loadHousehold();});},
     createInvite:function(){return client.rpc('create_invite',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return r.data;});},
     joinHousehold:function(code,display){return client.rpc('join_household',{p_code:code,p_display_name:display}).then(function(r){if(r.error)throw r.error;if(!r.data||!r.data.ok)return r.data;return loadHousehold().then(function(){return r.data;});});},
     leaveHousehold:function(){return client.rpc('leave_household',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return afterAuth(session);});},
