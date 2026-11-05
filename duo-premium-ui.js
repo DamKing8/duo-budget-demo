@@ -68,7 +68,11 @@
       }
       if (!signed) {
         ctx.openSheet('<h4 data-test="paywall">Duo Premium</h4><p class="sub">Sign in to subscribe. Your free plan stays on this phone either way.</p><button class="btn pri block" type="button" id="pw-signin">Continue to sign in</button>', function (sh) {
-          sh.querySelector('#pw-signin').addEventListener('click', function () { ctx.closeSheet(); if (ctx.openPartner) ctx.openPartner(); });
+          sh.querySelector('#pw-signin').addEventListener('click', function () {
+            ctx.closeSheet();
+            if (window.DuoGate && DuoGate.openEmailSignIn) DuoGate.openEmailSignIn({ after: function () { openPaywall(feature); } });
+            else if (ctx.openPartner) ctx.openPartner();
+          });
         });
         return;
       }

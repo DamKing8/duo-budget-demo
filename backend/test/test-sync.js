@@ -198,7 +198,30 @@ async function main() {
   await testPasswordAndIdToken();
   await testGuestChoiceDoesNotMerge();
   await testInviteButtonFlow();
+  testSignInEntryPoints();
   console.log('sync ok');
+}
+
+function testSignInEntryPoints() {
+  var fs = require('fs');
+  var root = path.join(__dirname, '..', '..');
+  var html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  var gate = fs.readFileSync(path.join(root, 'duo-gate.js'), 'utf8');
+  var premium = fs.readFileSync(path.join(root, 'duo-premium-ui.js'), 'utf8');
+  var syncAt = html.indexOf('id="syncCard"');
+  var hhAt = html.indexOf('id="hhCard"');
+  var lockAt = html.indexOf('id="lockCard"');
+  assert(syncAt > 0 && syncAt < hhAt && hhAt < lockAt, 'cloud sync sits above the practice household and app lock');
+  assert(html.indexOf('Sign in to sync with your partner') > 0, 'the guest sync card has a sign-in button');
+  assert(gate.indexOf('data-test="lock-signin"') > 0 && gate.indexOf('openEmailSignIn()') > 0, 'the app lock button opens email sign-in');
+  assert(premium.indexOf('DuoGate.openEmailSignIn') > 0, 'premium sign-in opens the email flow');
+  assert(html.indexOf('Ours · Me · Partner') > 0 && html.indexOf('Ours · Yours · Mine') < 0, 'whose outgoings says Me and Partner');
+  var visible = html.replace(/<script[\s\S]*?<\/script>/gi, '');
+  assert(visible.indexOf('Yours') < 0 && visible.indexOf('Mine') < 0, 'no user-facing Yours or Mine label remains');
+  assert(gate.indexOf('Yours') < 0 && gate.indexOf('Mine') < 0 && premium.indexOf('Yours') < 0 && premium.indexOf('Mine') < 0, 'gate and premium screens do not say Yours or Mine');
+  var debugAt = html.indexOf('Sync status:');
+  assert(debugAt > 0 && /syncDebugRequested\(\)/.test(html.slice(debugAt - 180, debugAt)), 'the sync status line renders only when ?debug=1');
+  assert(html.indexOf('INITIAL_SESSION') < 0 && gate.indexOf('INITIAL_SESSION') < 0, 'INITIAL_SESSION is not written into the screen');
 }
 
 function emptyApp() {

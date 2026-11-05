@@ -22,6 +22,7 @@
   var bioAvailable = false;
   var mode = '';
   var lockKind = '';
+  var emailReturn = null;
   var LOCK_SLOGAN = 'Plan around both paydays.';
 
   function $(id) { return document.getElementById(id); }
@@ -257,7 +258,22 @@
       $('gate-send').addEventListener('click', sendCode);
       $('gate-use-password').addEventListener('click', function () { showEmail(true); });
     }
-    $('gate-back').addEventListener('click', showWelcome);
+    $('gate-back').addEventListener('click', function () {
+      if (emailReturn) { emailReturn = null; hide(); return; }
+      showWelcome();
+    });
+  }
+  function returnToSync() {
+    if (ctx && ctx.openPartner) ctx.openPartner();
+    setTimeout(function () {
+      var card = document.getElementById('syncCard');
+      if (card && card.scrollIntoView) card.scrollIntoView({ block: 'center' });
+    }, 80);
+  }
+  function openEmailSignIn(opts) {
+    opts = opts || {};
+    emailReturn = typeof opts.after === 'function' ? opts.after : returnToSync;
+    showEmail(false);
   }
   function sendCode() {
     var email = $('gate-email-input').value.trim();
@@ -607,7 +623,10 @@
     el.hidden = false;
     var signed = !!(lastStatus && lastStatus.user);
     if (!signed) {
-      el.innerHTML = '<h3><span>App lock</span></h3><p class="sub" data-test="lock-settings">Sign in to lock Duo Budget on this phone. A forgotten passcode is reset by signing in again, so a guest budget can\'t be locked.</p>';
+      el.innerHTML = '<h3><span>App lock</span></h3><p class="sub" data-test="lock-settings">Sign in to lock Duo Budget on this phone.</p>' +
+        '<button class="btn ghost block" type="button" id="lock-signin" data-test="lock-signin">Sign in</button>';
+      var go = $('lock-signin');
+      if (go) go.addEventListener('click', function () { openEmailSignIn(); });
       return;
     }
     var t = prefs.timeout || '1m';
@@ -648,7 +667,7 @@
     el.innerHTML = '<h3><span>Back up this budget</span></h3><p class="sub">Create an account to sync with your partner and keep this budget if you lose this phone.</p>' +
       '<button class="btn pri block" type="button" id="nudge-go" data-test="backup-nudge">Create an account</button>' +
       '<button class="linkbtn" type="button" id="nudge-no">Not now</button>';
-    $('nudge-go').addEventListener('click', function () { if (ctx.openPartner) ctx.openPartner(); });
+    $('nudge-go').addEventListener('click', function () { openEmailSignIn(); });
     $('nudge-no').addEventListener('click', function () {
       var gate = Account.readGate(storage());
       gate.backupNudge = true;
@@ -737,8 +756,11 @@
       });
       return;
     }
-    if (st.user && mode === 'welcome' || (st.user && mode === 'email') || (st.user && mode === 'code' && mode !== 'reauth-code') || (st.user && mode === 'password')) {
-      if (mode !== 'reauth-code') hide();
+    if (st.user && (mode === 'welcome' || mode === 'email' || mode === 'code' || mode === 'password')) {
+      var back = emailReturn;
+      emailReturn = null;
+      hide();
+      if (typeof back === 'function') back();
     }
     if (mode === 'reauth-code' && st.user) {
       var uid = st.uid || '';
@@ -826,6 +848,7 @@
     openSetPassword: openSetPassword,
     isGuestBudget: isGuestBudget,
     showWelcome: showWelcome,
-    startProvider: startProvider
+    startProvider: startProvider,
+    openEmailSignIn: openEmailSignIn
   };
 });
