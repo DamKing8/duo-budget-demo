@@ -15,7 +15,6 @@
   var unlocked = false;
   var cold = true;
   var backgroundAt = 0;
-  var signupAsked = false;
   var lockOffered = false;
   var linkWait = null;
   var bioType = 0;
@@ -345,13 +344,6 @@
     if (ctx.render) ctx.render();
     plan = Account.boot(storage(), { legacyKey: ctx.getKey(), now: Date.now(), skipWelcome: false });
     hide();
-  }
-  function localRows() {
-    var S = ctx.getState();
-    return !!((S.items && S.items.length) || (S.goals && S.goals.length) || (S.spends && S.spends.length));
-  }
-  function savedBudget() {
-    try { return storage().getItem(ctx.getKey()) != null; } catch (e) { return false; }
   }
   function askLink(info, resolve) {
     linkWait = resolve;
@@ -741,19 +733,6 @@
     renderNudge();
     if (st.user && ctx.sampleOnly && ctx.sampleOnly() && st.uid && st.state !== 'starting') {
       if (ctx.leaveSample) ctx.leaveSample(st.uid);
-      return;
-    }
-    if (st.state === 'no-household' && st.uid && isGuestBudget() && localRows() && savedBudget() && !signupAsked) {
-      signupAsked = true;
-      askLink({ kind: 'keep-or-fresh', cloudHas: false, localHas: true }, function (choice) {
-        Account.claimOwner(storage(), st.uid);
-        if (ctx.setSampleOnly) ctx.setSampleOnly(false);
-        if (ctx.save) ctx.save();
-        var S = ctx.getState();
-        var name = (S.names && S.names.D) || 'Me';
-        ready().then(function (api) { return api.createHousehold(name, name); });
-        if (choice) hide();
-      });
       return;
     }
     if (st.user && (mode === 'welcome' || mode === 'email' || mode === 'code' || mode === 'password')) {

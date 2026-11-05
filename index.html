@@ -1340,10 +1340,11 @@ function create(opts){
   var cfg=opts.config||{},store=opts.storage,app=opts.app,now=opts.now||function(){return Date.now();};
   var MK=opts.storageKey+'.sync';
   var meta=load();var client=null,session=null,ctx=null,channel=null,applying=false,timer=null,flushing=null,status={state:'starting',pending:0};
+  var linkChoiceOnce=null,pendingHouseholdName='';
   function load(){try{var m=JSON.parse(store.getItem(MK)||'null');if(m&&m.v===1)return m;}catch(e){}return {v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:null};}
   function persist(){try{store.setItem(MK,JSON.stringify(meta));}catch(e){}}
-  function memberCount(){if(!ctx||!ctx.members)return 0;var n=0;ctx.members.forEach(function(m){if(m&&m.status==='active'&&!m.deleted_at)n++;});return n;}
-  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,members:memberCount(),user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
+  function activeMembers(){if(!ctx||!ctx.members)return [];return ctx.members.filter(function(m){return m&&m.status==='active'&&!m.deleted_at;});}
+  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,householdName:(ctx&&ctx.householdName)||'',members:activeMembers().length,memberNames:activeMembers().map(function(m){return m.display_name;}).filter(Boolean),user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
   // Diagnostics stay in the console. The sync card does not show them.
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
@@ -1592,7 +1593,11 @@ function create(opts){
       var first=meta.household!==ctx.household;
       if(first){meta={v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:ctx.household};idToKey={};}
       var S=app.getState();if(S&&ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;if(S&&ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
-      if(first&&isGuestBudget()&&localHasData()&&typeof opts.onLinkChoice==='function'){
+      return attachHouseholdName(mine.household_id).then(function(){
+      if(ctx&&!ctx.householdName&&pendingHouseholdName)ctx.householdName=pendingHouseholdName;
+      if(first&&isGuestBudget()&&localHasData()&&(linkChoiceOnce||typeof opts.onLinkChoice==='function')){
+        var preset=linkChoiceOnce;
+        if(preset){linkChoiceOnce=null;return finishLink(first,preset);}
         return listCloud().then(function(acc){
           if(disposed)return null;
           var cloudHas=cloudHasRows(acc);
@@ -1607,7 +1612,15 @@ function create(opts){
         });
       }
       return finishLink(first,null);
+      });
     });
+  }
+  function attachHouseholdName(hh){
+    if(!client||!client.from)return Promise.resolve();
+    return client.from('households').select('name').eq('id',hh).then(function(res){
+      var rows=res&&res.data,row=Array.isArray(rows)?rows[0]:rows;
+      if(ctx&&row&&row.name)ctx.householdName=row.name;
+    },function(){});
   }
   function ctx0(){return {me:session&&session.user?session.user.id:null};}
   var authFlight=null,authFor=null;
@@ -1724,7 +1737,8 @@ function create(opts){
       if(!client||!client.auth||!client.auth.getUserIdentities)return Promise.resolve({data:{identities:[]}});
       return client.auth.getUserIdentities().then(function(r){return r||{data:{identities:[]}};},function(){return {data:{identities:[]}};});
     },
-    createHousehold:function(name,display){return client.rpc('create_household',{p_name:name,p_display_name:display}).then(function(r){if(r.error)throw r.error;return loadHousehold();});},
+    preferLinkChoice:function(choice){linkChoiceOnce=choice||null;},
+    createHousehold:function(name,display){pendingHouseholdName=String(name||'').trim();return client.rpc('create_household',{p_name:pendingHouseholdName,p_display_name:display}).then(function(r){if(r.error)throw r.error;return loadHousehold();});},
     createInvite:function(){return client.rpc('create_invite',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return r.data;});},
     joinHousehold:function(code,display){return client.rpc('join_household',{p_code:code,p_display_name:display}).then(function(r){if(r.error)throw r.error;if(!r.data||!r.data.ok)return r.data;return loadHousehold().then(function(){return r.data;});});},
     leaveHousehold:function(){return client.rpc('leave_household',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return afterAuth(session);});},
@@ -3276,17 +3290,59 @@ function openEmailCode(email){
   });
 }
 function syncDebugRequested(){try{return /(?:^|[?&])debug=1(?:&|$)/.test(location.search||'');}catch(e){return false;}}
+function cloudHouseholdHtml(st){
+  var names=st.memberNames||[];
+  var who=names.length?names.map(function(n){return '<div class="mrow" data-test="cloud-member"><div class="mi"><b>'+esc(n)+'</b></div></div>';}).join(''):'<div class="hint">Just you so far</div>';
+  return '<div data-test="cloud-household" style="margin-top:12px"><div class="muted" style="font-size:12px;font-weight:700">Household</div><b>'+esc(st.householdName||'Household')+'</b><div class="muted" style="font-size:12px;font-weight:700;margin-top:8px">Members</div>'+who+'</div>';
+}
+function phoneHasBudget(){return !!((S.items&&S.items.length)||(S.goals&&S.goals.length)||(S.spends&&S.spends.length));}
+function startCloudHousehold(){
+  function go(choice){
+    if(choice&&__sync.preferLinkChoice)__sync.preferLinkChoice(choice);
+    var title=S.names.D+(S.names.N&&S.names.N!=='Partner'?' & '+S.names.N:'');
+    __sync.createHousehold(title,S.names.D).then(function(){renderAll();toast('Household started');}).catch(function(e){toast(e.message);});
+  }
+  var guest=window.DuoGate&&DuoGate.isGuestBudget&&DuoGate.isGuestBudget();
+  if(guest&&phoneHasBudget()&&window.DuoGate.askLink){
+    DuoGate.askLink({kind:'keep-or-fresh',cloudHas:false,localHas:true},function(choice){go(choice==='keep-local'?'keep-local':'fresh');});
+    return;
+  }
+  go(null);
+}
+function joinCloudCode(code,swap){
+  var display=S.names.D;
+  function run(){
+    if(__sync.preferLinkChoice)__sync.preferLinkChoice('fresh');
+    var step=swap?__sync.leaveHousehold().then(function(){return __sync.joinHousehold(code,display);}):__sync.joinHousehold(code,display);
+    step.then(function(r){
+      if(__sync.preferLinkChoice)__sync.preferLinkChoice(null);
+      if(r&&r.ok===false)toast(r.reason==='too_many_attempts'?'Too many tries. Try again in an hour.':'That code didn\'t work. Check it with your partner.');
+      else{renderAll();toast('You joined the household');}
+    }).catch(function(e){if(__sync.preferLinkChoice)__sync.preferLinkChoice(null);toast(e.message);});
+  }
+  run();
+}
+function confirmSwapHousehold(code){
+  code=String(code||'').trim();
+  if(!code){toast('Enter the code from your partner.');return;}
+  openSheet('<h4>Join their household?</h4><p class="sub">You\'ll leave the household on this phone. The budget on this phone is not uploaded. Both phones then show your partner\'s household.</p><div class="btns"><button class="btn ghost" id="swap-no" type="button">Cancel</button><button class="btn pri" id="swap-yes" type="button" data-test="swap-join">Join their household</button></div>',function(sh){
+    sh.querySelector('#swap-no').addEventListener('click',closeSheet);
+    sh.querySelector('#swap-yes').addEventListener('click',function(){closeSheet();joinCloudCode(code,true);});
+  });
+}
 function renderSync(st){var el=document.getElementById('syncCard');if(!el)return;el.hidden=false;
   var lbl={blocked:'Off on this build',starting:'Starting…','signed-out':'Not signed in','no-household':'Signed in, no household yet','choose-budget':'Choose a budget',pending:'Changes waiting to sync',synced:'Synced',offline:'Offline, saved on this phone',error:'Sync problem'}[st.state]||st.state;
   var h='<div class="row"><b>Cloud sync</b><span class="gstat '+(st.state==='synced'?'ok':st.state==='error'?'bad':st.state==='pending'||st.state==='offline'?'warn':'none')+'" data-test="sync-state">'+esc(lbl)+'</span></div>'+
     '<div class="hint" data-test="sync-msg">'+esc(st.msg||(st.user?'Signed in as '+st.user+(st.pending?' · '+st.pending+' waiting':''):'Beta. Synced data: budget lines, goals, pay cycles and spending.'))+'</div>';
   if(!st.user&&(st.state==='signed-out'||st.state==='error'||st.state==='starting'))h+='<button class="btn pri block" type="button" data-test="sync-signin" style="margin-top:12px">Sign in to sync with your partner</button>';
-  if(st.state==='no-household')h+='<label class="fl" for="syncCode">Enter join code</label><input id="syncCode" class="field sync-code" data-test="join-code" placeholder="8 letters or numbers" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"><div class="btns"><button class="btn pri" id="syncJoin" data-test="sync-join">Join</button><button class="btn ghost" id="syncCreate">Start a household</button></div>';
+  if(st.user&&st.household)h+=cloudHouseholdHtml(st);
+  if(st.state==='no-household')h+='<button class="btn pri block" id="syncCreate" type="button" data-test="sync-create" style="margin-top:12px">Start a household</button><label class="fl" for="syncCode">Enter join code</label><input id="syncCode" class="field sync-code" data-test="join-code" placeholder="8 letters or numbers" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"><p class="hint">This joins your partner\'s household. The budget on this phone is not uploaded.</p><button class="btn pri block" id="syncJoin" type="button" data-test="sync-join">Join</button>';
   if(window.DuoSync&&DuoSync.shouldOfferInvite&&DuoSync.shouldOfferInvite(st)){
     if(cloudInvite&&cloudInvite.code){
       var expTxt=cloudInvite.expires?inviteExpiryText(cloudInvite.expires):'';
       h+='<div data-test="invite-code"><div class="muted" style="font-size:13px;font-weight:600;text-align:center">INVITE CODE</div><div class="invite-code">'+esc(cloudInvite.code)+'</div>'+(expTxt?'<div class="hint" data-test="invite-expiry" style="text-align:center">Expires '+esc(expTxt)+'</div>':'')+'<button class="btn ghost block" id="syncCopy" type="button" data-test="invite-copy">Copy</button></div>';
     }else h+='<button class="btn pri block" id="syncInvite" type="button" data-test="invite-partner" style="margin-top:12px">Invite your partner</button>';
+    h+='<label class="fl" for="syncSwapCode">Have a code from your partner? Join their household</label><input id="syncSwapCode" class="field sync-code" data-test="swap-code" placeholder="8 letters or numbers" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"><button class="btn ghost block" id="syncSwap" type="button" data-test="swap-join-open">Join</button>';
   }
   if(['synced','pending','offline','error','no-household'].indexOf(st.state)>=0&&st.user)h+='<div class="btns"><button class="btn ghost" id="syncOut">Sign out</button></div>';
   if(st.debug&&syncDebugRequested()){var d=st.debug;h+='<div class="hint" data-test="sync-debug" style="font-size:11px;opacity:.75;margin-top:10px;word-break:break-word">Sync status: '+esc([d.state,'app '+d.mode,'storage '+d.storage,'session '+d.session,'household '+d.household,'queue '+d.pending,'online '+d.online,'last event '+d.lastEvent,'return '+d.urlReturn,'error '+d.lastError].join(' · '))+'</div>';}
@@ -3295,8 +3351,9 @@ function renderSync(st){var el=document.getElementById('syncCard');if(!el)return
   var on=function(id,f){var b=document.getElementById(id);if(b)b.addEventListener('click',f);};
   revealSyncAfterReturn(st);on('syncOut',function(){if(window.DuoGate)DuoGate.confirmSignOut();else __sync.signOut();});
   if(window.DuoGate)DuoGate.onSync(st);
-  on('syncCreate',function(){__sync.createHousehold(S.names.D+(S.names.N&&S.names.N!=='Partner'?' & '+S.names.N:''),S.names.D).catch(function(e){toast(e.message);});});
-  on('syncJoin',function(){__sync.joinHousehold(document.getElementById('syncCode').value,S.names.D).then(function(r){if(r&&r.ok===false)toast(r.reason==='too_many_attempts'?'Too many tries. Try again in an hour.':'That code didn\'t work. Check it with your partner.');else{renderAll();toast('You joined the household');}}).catch(function(e){toast(e.message);});});
+  on('syncCreate',startCloudHousehold);
+  on('syncJoin',function(){joinCloudCode(document.getElementById('syncCode').value,false);});
+  on('syncSwap',function(){var field=document.getElementById('syncSwapCode');confirmSwapHousehold(field?field.value:'');});
   on('syncInvite',function(){
     var b=document.getElementById('syncInvite');if(b){b.disabled=true;b.textContent='Creating a code…';}
     __sync.createInvite().then(function(data){

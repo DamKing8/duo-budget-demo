@@ -200,7 +200,107 @@ async function main() {
   await testNativeSignInWhenBrowserCloseRejects();
   await testInviteButtonFlow();
   testSignInEntryPoints();
+  await testTwoPhonesShareAHousehold();
   console.log('sync ok');
+}
+
+async function testTwoPhonesShareAHousehold() {
+  var HH_A = 'aaaaaaa1-aaaa-4aaa-8aaa-aaaaaaaaaaa1';
+  var HH_B = 'bbbbbbb2-bbbb-4bbb-8bbb-bbbbbbbbbbb2';
+  var MEM_A = 'memaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1';
+  var MEM_B = 'membbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2';
+  var MEM_SOLO = 'memccccc-cccc-4ccc-8ccc-ccccccccccc3';
+  var db = {
+    households: [{ id: HH_A, name: 'Chloe' }, { id: HH_B, name: 'Jack' }],
+    household_members: []
+  };
+  var rpcs = [];
+  function client(userId) {
+    return function () {
+      return {
+        from: function (table) {
+          return {
+            select: function () {
+              var filters = [];
+              var q = {
+                eq: function (c, v) { filters.push([c, v]); return q; },
+                gt: function () { return q; },
+                order: function () { return Promise.resolve(run()); },
+                then: function (ok, bad) { return Promise.resolve(run()).then(ok, bad); }
+              };
+              function run() {
+                var rows = (db[table] || []).filter(function (r) { return filters.every(function (f) { return r[f[0]] === f[1]; }); });
+                return { data: rows.map(function (r) { return Object.assign({}, r); }), error: null };
+              }
+              return q;
+            },
+            upsert: function () { return Promise.resolve({ error: null }); }
+          };
+        },
+        channel: function () { return { on: function () { return this; }, subscribe: function () { return this; } }; },
+        removeChannel: function () {},
+        rpc: function (name, args) {
+          rpcs.push([name, args, userId]);
+          if (name === 'create_household') {
+            db.household_members.push({ id: MEM_A, household_id: HH_A, user_id: userId, status: 'active', deleted_at: null, joined_at: '2026-11-01T00:00:00.000Z', display_name: args.p_display_name });
+            return Promise.resolve({ data: { id: HH_A }, error: null });
+          }
+          if (name === 'create_invite') return Promise.resolve({ data: { code: 'AB12CD34', expires_at: '2026-11-12T00:00:00.000Z' }, error: null });
+          if (name === 'leave_household') {
+            db.household_members.forEach(function (m) { if (m.user_id === userId && m.household_id === args.p_household && m.status === 'active') { m.status = 'left'; m.left_at = '2026-11-05T00:00:00.000Z'; } });
+            return Promise.resolve({ data: { ok: true }, error: null });
+          }
+          if (name === 'join_household') {
+            db.household_members.push({ id: userId === USER_N ? MEM_B : MEM_SOLO, household_id: HH_A, user_id: userId, status: 'active', deleted_at: null, joined_at: '2026-11-05T00:00:00.000Z', display_name: args.p_display_name });
+            return Promise.resolve({ data: { ok: true }, error: null });
+          }
+          return Promise.resolve({ data: null, error: { message: 'missing ' + name } });
+        },
+        auth: {
+          onAuthStateChange: function () {},
+          getSession: function () { return Promise.resolve({ data: { session: { user: { id: userId, email: userId + '@example.com' } } }, error: null }); }
+        }
+      };
+    };
+  }
+  function open(userId, local, guest) {
+    return DuoSync.create({
+      config: { enabled: true, supabaseUrl: 'https://example.supabase.co', supabaseAnonKey: 'test' },
+      storageKey: 'duo-two-' + userId,
+      storage: memory(),
+      app: appFor(local),
+      createClient: client(userId),
+      guestBudget: function () { return !!guest; },
+      now: function () { return Date.parse('2026-11-05T00:00:00.000Z'); },
+      online: function () { return true; },
+      flushDelay: 60000
+    }).start();
+  }
+  var phoneA = { names: { D: 'Me', N: 'Partner' }, cycle: 'fortnight', payDate: '2026-11-12', items: [], goals: [], spends: [] };
+  var phoneB = { names: { D: 'Me', N: 'Partner' }, cycle: 'fortnight', payDate: '2026-11-12', items: [{ id: 'rent', name: 'Rent', amount: 1, freq: 'fortnight', cat: 'expenses', owner: 'J' }], goals: [], spends: [] };
+  var a = await open(USER_D, phoneA, false);
+  assert(a.status().state === 'no-household' && a.status().members === 0, 'phone A signs in with no household and is not given one');
+  await a.createHousehold('Chloe', 'Chloe');
+  assert(a.status().members === 1 && a.status().householdName === 'Chloe' && a.status().memberNames[0] === 'Chloe', 'phone A sees the household name and its only member');
+  var invite = DuoSync.readInvite(await a.createInvite());
+  assert(invite.code === 'AB12CD34', 'phone A gets a code to read out');
+  var b = await open(USER_N, phoneB, true);
+  assert(b.status().state === 'no-household', 'phone B is not auto-placed in its own household');
+  b.preferLinkChoice('fresh');
+  var joined = await b.joinHousehold(invite.code, 'Jack');
+  assert(joined && joined.ok === true, 'phone B joins with the code');
+  assert(b.status().household === HH_A && a.status().household === HH_A, 'both phones are in the same household');
+  assert(phoneB.items.length === 0, 'phone B does not upload its own budget into the shared household');
+  assert(b.status().memberNames.indexOf('Chloe') >= 0 && b.status().memberNames.indexOf('Jack') >= 0, 'phone B lists both people');
+  var solo = { names: { D: 'Me', N: 'Partner' }, cycle: 'fortnight', payDate: '2026-11-12', items: [{ id: 'own', name: 'Own', amount: 2, freq: 'fortnight', cat: 'expenses', owner: 'J' }], goals: [], spends: [] };
+  db.household_members.push({ id: MEM_SOLO, household_id: HH_B, user_id: '33333333-3333-4333-8333-333333333333', status: 'active', deleted_at: null, joined_at: '2026-11-01T00:00:00.000Z', display_name: 'Sam' });
+  var c = await open('33333333-3333-4333-8333-333333333333', solo, true);
+  assert(c.status().household === HH_B && c.status().members === 1, 'a phone that already started a household still has it');
+  c.preferLinkChoice('fresh');
+  await c.leaveHousehold();
+  var swapped = await c.joinHousehold('AB12CD34', 'Sam');
+  assert(swapped && swapped.ok === true && c.status().household === HH_A, 'leaving then joining moves the phone into the partner household');
+  assert(rpcs.some(function (c) { return c[0] === 'leave_household' && c[1].p_household === HH_B; }) && rpcs.some(function (c) { return c[0] === 'join_household' && c[1].p_code === 'AB12CD34'; }), 'the swap uses leave_household and join_household only');
 }
 
 function testSignInEntryPoints() {
@@ -214,6 +314,9 @@ function testSignInEntryPoints() {
   var lockAt = html.indexOf('id="lockCard"');
   assert(syncAt > 0 && syncAt < hhAt && hhAt < lockAt, 'cloud sync sits above the practice household and app lock');
   assert(html.indexOf('Sign in to sync with your partner') > 0, 'the guest sync card has a sign-in button');
+  assert(html.indexOf('>Start a household<') > 0 && html.indexOf('Enter join code') > 0, 'a signed-in phone with no household can start or enter a code');
+  assert(html.indexOf('Have a code from your partner? Join their household') > 0, 'a solo household can still join a partner code');
+  assert(gate.indexOf('createHousehold') < 0, 'signing in does not create a household');
   assert(gate.indexOf('data-test="lock-signin"') > 0 && gate.indexOf('openEmailSignIn()') > 0, 'the app lock button opens email sign-in');
   assert(premium.indexOf('DuoGate.openEmailSignIn') > 0, 'premium sign-in opens the email flow');
   assert(html.indexOf('Ours · Me · Partner') > 0 && html.indexOf('Ours · Yours · Mine') < 0, 'whose outgoings says Me and Partner');
