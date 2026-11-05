@@ -328,6 +328,9 @@ function testSignInEntryPoints() {
   assert(html.indexOf('Edit household name') > 0, 'the owner can rename a household from the card');
   assert(html.indexOf('id="currency"') > 0 && html.indexOf('Currency converter') < 0 && html.indexOf('id="fxCard"') < 0, 'display currency stays and the converter card is gone');
   assert(html.indexOf('data-test="edit-household-top"') > 0 && html.indexOf('data-test="build-stamp"') > 0, 'the partner tab has a top rename button and a build stamp');
+  assert(html.indexOf('Load sample data') > 0 && html.indexOf('Clear sample data') > 0 && html.indexOf('data-test="empty-start"') > 0, 'sample data is a choice, with a way to clear it');
+  assert(/:blankBudget\(\)/.test(html) && /useBlank:function\(\)\{S=blankBudget\(\)/.test(html), 'a new phone starts from an empty budget');
+  assert(gate.indexOf('ctx.useBlank') > 0 && gate.indexOf('ctx.useDemo') < 0, 'guest start does not load the sample household');
   assert(html.indexOf('function nativeAppShell') > 0 && html.indexOf('nativeAppShell()') > 0, 'the native shell does not keep a service worker');
   var fixed = DuoSync.settledNames({ D: 'Chloe', N: 'Jack' }, { myName: 'Chloe', partnerName: '', email: 'd.hosking@outlook.com' });
   assert(fixed.D === 'd.hosking' && fixed.N === '', 'sample names become the email local part and a blank partner');
