@@ -241,6 +241,7 @@ async function testTwoPhonesShareAHousehold() {
         rpc: function (name, args) {
           rpcs.push([name, args, userId]);
           if (name === 'create_household') {
+            db.households.forEach(function (h) { if (h.id === HH_A) h.name = args.p_name; });
             db.household_members.push({ id: MEM_A, household_id: HH_A, user_id: userId, status: 'active', deleted_at: null, joined_at: '2026-11-01T00:00:00.000Z', display_name: args.p_display_name });
             return Promise.resolve({ data: { id: HH_A }, error: null });
           }
@@ -275,22 +276,29 @@ async function testTwoPhonesShareAHousehold() {
       flushDelay: 60000
     }).start();
   }
-  var phoneA = { names: { D: 'Me', N: 'Partner' }, cycle: 'fortnight', payDate: '2026-11-12', items: [], goals: [], spends: [] };
-  var phoneB = { names: { D: 'Me', N: 'Partner' }, cycle: 'fortnight', payDate: '2026-11-12', items: [{ id: 'rent', name: 'Rent', amount: 1, freq: 'fortnight', cat: 'expenses', owner: 'J' }], goals: [], spends: [] };
+  assert(DuoSync.realDisplayName('Chloe', 'd.hosking@outlook.com') === 'd.hosking', 'a sample name is not sent to the cloud');
+  assert(DuoSync.realDisplayName('Me', 'hosking.damon@gmail.com') === 'hosking.damon', 'the Me label falls back to the email');
+  assert(DuoSync.realDisplayName('Damon', 'x@y.com') === 'Damon', 'a typed name is kept');
+  assert(DuoSync.householdTitle('Damon') === "Damon's household" && DuoSync.householdTitle('Me') === 'Our household', 'the household title uses the person or Our household');
+  var phoneA = { names: { D: 'Chloe', N: 'Jack' }, cycle: 'fortnight', payDate: '2026-11-12', items: [], goals: [], spends: [] };
+  var phoneB = { names: { D: 'Me', N: 'Jack' }, cycle: 'fortnight', payDate: '2026-11-12', items: [{ id: 'rent', name: 'Rent', amount: 1, freq: 'fortnight', cat: 'expenses', owner: 'J' }], goals: [], spends: [] };
   var a = await open(USER_D, phoneA, false);
   assert(a.status().state === 'no-household' && a.status().members === 0, 'phone A signs in with no household and is not given one');
-  await a.createHousehold('Chloe', 'Chloe');
-  assert(a.status().members === 1 && a.status().householdName === 'Chloe' && a.status().memberNames[0] === 'Chloe', 'phone A sees the household name and its only member');
+  var youA = DuoSync.realDisplayName(phoneA.names.D, 'd.hosking@outlook.com');
+  await a.createHousehold(DuoSync.householdTitle(youA), youA);
+  assert(a.status().members === 1 && a.status().householdName === "d.hosking's household" && a.status().memberNames.join(',') === 'd.hosking', 'phone A stores the email name, not Chloe');
+  assert(phoneA.names.N === 'Partner', 'the sample partner name is cleared when nobody has joined');
   var invite = DuoSync.readInvite(await a.createInvite());
   assert(invite.code === 'AB12CD34', 'phone A gets a code to read out');
   var b = await open(USER_N, phoneB, true);
   assert(b.status().state === 'no-household', 'phone B is not auto-placed in its own household');
   b.preferLinkChoice('fresh');
-  var joined = await b.joinHousehold(invite.code, 'Jack');
+  var joined = await b.joinHousehold(invite.code, DuoSync.realDisplayName(phoneB.names.D, 'ada@example.com'));
   assert(joined && joined.ok === true, 'phone B joins with the code');
   assert(b.status().household === HH_A && a.status().household === HH_A, 'both phones are in the same household');
   assert(phoneB.items.length === 0, 'phone B does not upload its own budget into the shared household');
-  assert(b.status().memberNames.indexOf('Chloe') >= 0 && b.status().memberNames.indexOf('Jack') >= 0, 'phone B lists both people');
+  assert(b.status().memberNames.indexOf('d.hosking') >= 0 && b.status().memberNames.indexOf('ada') >= 0, 'phone B lists both real names');
+  assert(b.status().memberNames.indexOf('Chloe') < 0 && b.status().memberNames.indexOf('Jack') < 0 && b.status().memberNames.indexOf('Me') < 0, 'sample names are not members');
   var solo = { names: { D: 'Me', N: 'Partner' }, cycle: 'fortnight', payDate: '2026-11-12', items: [{ id: 'own', name: 'Own', amount: 2, freq: 'fortnight', cat: 'expenses', owner: 'J' }], goals: [], spends: [] };
   db.household_members.push({ id: MEM_SOLO, household_id: HH_B, user_id: '33333333-3333-4333-8333-333333333333', status: 'active', deleted_at: null, joined_at: '2026-11-01T00:00:00.000Z', display_name: 'Sam' });
   var c = await open('33333333-3333-4333-8333-333333333333', solo, true);
@@ -315,6 +323,9 @@ function testSignInEntryPoints() {
   assert(html.indexOf('Sign in to sync with your partner') > 0, 'the guest sync card has a sign-in button');
   assert(html.indexOf('>Start a household<') > 0 && html.indexOf('Enter join code') > 0, 'a signed-in phone with no household can start or enter a code');
   assert(html.indexOf('Have a code from your partner? Join their household') > 0, 'a solo household can still join a partner code');
+  assert(html.indexOf('Waiting for your partner, tap Invite your partner') > 0, 'a solo household says the partner has not joined');
+  assert(html.indexOf('Edit household name') > 0, 'the owner can rename a household from the card');
+  assert(html.indexOf('id="currency"') > 0 && html.indexOf('Currency converter') < 0 && html.indexOf('id="fxCard"') < 0, 'display currency stays and the converter card is gone');
   assert(gate.indexOf('createHousehold') < 0, 'signing in does not create a household');
   assert(gate.indexOf('data-test="lock-signin"') > 0 && gate.indexOf('openEmailSignIn()') > 0, 'the app lock button opens email sign-in');
   assert(premium.indexOf('DuoGate.openEmailSignIn') > 0, 'premium sign-in opens the email flow');

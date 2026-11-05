@@ -1032,8 +1032,6 @@ html[data-theme=light] #sp-save.btn.pri{
 .otp-catch{position:absolute;inset:0;width:100%;height:100%;margin:0;border:0;padding:0;opacity:0;font-size:16px;background:transparent}
 .email-note{color:var(--muted);font-size:14px;line-height:1.45}
 button.otp-resend:disabled{opacity:.55}
-.fx-result{margin-top:12px;font-size:22px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
-.fx-result small{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-top:4px}
 @media (max-width:767px){
   #v-dash.on{display:flex;flex-direction:column}
   #v-dash .dcol{display:contents}
@@ -1254,16 +1252,6 @@ html[data-accent="forest"] .btn.pri,html[data-accent="forest"] .seg button.on,ht
       <select class="field" id="currency" data-test="currency"><option value="AUD">AUD — Australian dollar</option></select>
       <div class="hint" id="fxAsOf" data-test="fx-asof">Amounts are stored in AUD. Display currency converts them.</div>
     </div>
-    <div class="card" id="fxCard" data-layout="set-fx" data-test="fx-card">
-      <h3><span>Currency converter</span></h3>
-      <div class="two">
-        <div><label class="fl" for="fxAmt" style="margin-top:0">Amount</label><input class="field" id="fxAmt" inputmode="decimal" value="100" autocomplete="off" data-test="fx-amt"></div>
-        <div><label class="fl" for="fxFrom" style="margin-top:0">From</label><select class="field" id="fxFrom" data-test="fx-from"></select></div>
-      </div>
-      <label class="fl" for="fxTo">To</label>
-      <select class="field" id="fxTo" data-test="fx-to"></select>
-      <div class="fx-result" id="fxResult" data-test="fx-result"></div>
-    </div>
     <div class="card" data-test="theme-card" data-layout="set-theme">
       <label class="fl" id="themeLbl" style="margin-top:0">Theme</label>
       <div class="seg" id="themeSeg" role="radiogroup" aria-labelledby="themeLbl"><button type="button" role="radio" data-t="light">Light</button><button type="button" role="radio" data-t="dark">Dark</button><button type="button" role="radio" data-t="system">System</button></div>
@@ -1332,6 +1320,20 @@ function readInvite(data){
 }
 function shouldOfferInvite(st){
   return !!(st&&['synced','pending','offline'].indexOf(st.state)>=0&&st.members===1);
+}
+// Sample and bucket labels are not a person's name. The email's local part is the fallback.
+function realDisplayName(typed, email){
+  var t=String(typed||'').trim();
+  var low=t.toLowerCase();
+  if(t&&low!=='me'&&low!=='partner'&&low!=='chloe'&&low!=='jack')return t.slice(0,60);
+  var local=String(email||'').split('@')[0]||'';
+  local=local.replace(/[^\w.+-]/g,'').slice(0,60);
+  return local||'Me';
+}
+function householdTitle(name){
+  name=String(name||'').trim();
+  if(!name||name.toLowerCase()==='me')return 'Our household';
+  return name.slice(0,60)+"'s household";
 }
 
 /* opts: {config, storageKey, app:{getState, commit(reason), localId(), setPay(slot,{cycle,next}), getPay(slot)},
@@ -1591,7 +1593,10 @@ function create(opts){
       ctx=buildCtx(mine.household_id,(res.data||[]).filter(function(m){return m.household_id===mine.household_id;}));
       var first=meta.household!==ctx.household;
       if(first){meta={v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:ctx.household};idToKey={};}
-      var S=app.getState();if(S&&ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;if(S&&ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
+      var S=app.getState();
+      if(S&&ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;
+      if(S&&ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
+      else if(S&&S.names){var slotN=String(S.names.N||'').trim().toLowerCase();if(!slotN||slotN==='chloe'||slotN==='jack'||slotN==='me')S.names.N='Partner';}
       return attachHouseholdName(mine.household_id).then(function(){
       if(ctx&&!ctx.householdName&&pendingHouseholdName)ctx.householdName=pendingHouseholdName;
       if(first&&isGuestBudget()&&localHasData()&&(linkChoiceOnce||typeof opts.onLinkChoice==='function')){
@@ -1740,12 +1745,33 @@ function create(opts){
     createHousehold:function(name,display){pendingHouseholdName=String(name||'').trim();return client.rpc('create_household',{p_name:pendingHouseholdName,p_display_name:display}).then(function(r){if(r.error)throw r.error;return loadHousehold();});},
     createInvite:function(){return client.rpc('create_invite',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return r.data;});},
     joinHousehold:function(code,display){return client.rpc('join_household',{p_code:code,p_display_name:display}).then(function(r){if(r.error)throw r.error;if(!r.data||!r.data.ok)return r.data;return loadHousehold().then(function(){return r.data;});});},
+    renameHousehold:function(name,display){
+      var hh=ctx&&ctx.household,me=null;
+      activeMembers().forEach(function(m){if(m.user_id===(session&&session.user&&session.user.id))me=m;});
+      if(!hh||!me)return Promise.reject(new Error('Join or start a household first.'));
+      var cleanName=String(name||'').trim(),cleanDisplay=String(display||'').trim();
+      function done(r){if(r&&r.error)throw r.error;return loadHousehold().then(function(){return {ok:true};});}
+      function direct(){
+        var stamp=new Date(now()).toISOString();
+        return client.from('households').update({name:cleanName,updated_at:stamp}).eq('id',hh).then(function(r){
+          if(r&&r.error)throw r.error;
+          return client.from('household_members').update({display_name:cleanDisplay,updated_at:stamp}).eq('id',me.id);
+        }).then(done);
+      }
+      if(!client.rpc)return direct();
+      return client.rpc('rename_my_household',{p_name:cleanName,p_display_name:cleanDisplay}).then(function(r){
+        var msg=r&&r.error&&(r.error.message||'');
+        var code=r&&r.error&&r.error.code;
+        if(r&&r.error&&(code==='PGRST202'||/rename_my_household|schema cache|Could not find the function/i.test(msg)))return direct();
+        return done(r);
+      },direct);
+    },
     leaveHousehold:function(){return client.rpc('leave_household',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return afterAuth(session);});},
     online:function(){pull().then(flush);}
   };
   return api;
 }
-return {create:create,TABLES:TABLES,_stable:stable,readInvite:readInvite,shouldOfferInvite:shouldOfferInvite};
+return {create:create,TABLES:TABLES,_stable:stable,readInvite:readInvite,shouldOfferInvite:shouldOfferInvite,realDisplayName:realDisplayName,householdTitle:householdTitle};
 });
 /*@@SYNC_END@@*/</script>
 <script src="duo-account.js"></script>
@@ -3291,15 +3317,35 @@ function openEmailCode(email){
 function syncDebugRequested(){try{return /(?:^|[?&])debug=1(?:&|$)/.test(location.search||'');}catch(e){return false;}}
 function cloudHouseholdHtml(st){
   var names=st.memberNames||[];
-  var who=names.length?names.map(function(n){return '<div class="mrow" data-test="cloud-member"><div class="mi"><b>'+esc(n)+'</b></div></div>';}).join(''):'<div class="hint">Just you so far</div>';
-  return '<div data-test="cloud-household" style="margin-top:12px"><div class="muted" style="font-size:12px;font-weight:700">Household</div><b>'+esc(st.householdName||'Household')+'</b><div class="muted" style="font-size:12px;font-weight:700;margin-top:8px">Members</div>'+who+'</div>';
+  var who=names.map(function(n){return '<div class="mrow" data-test="cloud-member"><div class="mi"><b>'+esc(n)+'</b></div></div>';}).join('');
+  if((st.members||names.length)<2)who+='<div class="hint" data-test="waiting-partner">Waiting for your partner, tap Invite your partner</div>';
+  return '<div data-test="cloud-household" style="margin-top:12px"><div class="muted" style="font-size:12px;font-weight:700">Household</div><b data-test="cloud-household-name">'+esc(st.householdName||'Household')+'</b><div class="muted" style="font-size:12px;font-weight:700;margin-top:8px">Members</div>'+who+'<button class="btn ghost block" type="button" id="syncRename" data-test="edit-household" style="margin-top:8px">Edit household name</button></div>';
 }
 function phoneHasBudget(){return !!((S.items&&S.items.length)||(S.goals&&S.goals.length)||(S.spends&&S.spends.length));}
+function signedInEmail(){var st=__sync&&__sync.status?__sync.status():null;return st&&st.user||'';}
 function startCloudHousehold(){
+  var mine=DuoSync.realDisplayName(S.names.D,signedInEmail());
+  var title=DuoSync.householdTitle(mine);
+  openSheet('<h4>Start a household</h4><label class="fl" for="hh-you">Your name</label><input class="field" id="hh-you" data-test="start-your-name" maxlength="60" value="'+esc(mine)+'"><label class="fl" for="hh-title">Household name</label><input class="field" id="hh-title" data-test="start-household-name" maxlength="80" value="'+esc(title)+'"><div class="btns"><button class="btn ghost" id="hh-no" type="button">Cancel</button><button class="btn pri" id="hh-yes" type="button" data-test="start-household-yes">Start a household</button></div>',function(sh){
+    sh.querySelector('#hh-no').addEventListener('click',closeSheet);
+    sh.querySelector('#hh-yes').addEventListener('click',function(){
+      var you=sh.querySelector('#hh-you').value.trim();
+      var name=sh.querySelector('#hh-title').value.trim();
+      var low=you.toLowerCase();
+      if(!you||low==='me'||low==='partner'||low==='chloe'||low==='jack'){toast('Enter your own name.');return;}
+      closeSheet();
+      beginHousehold(you,name||DuoSync.householdTitle(you));
+    });
+  });
+}
+function beginHousehold(you,title){
+  S.names.D=you;
+  var partner=String(S.names.N||'').trim().toLowerCase();
+  if(!partner||partner==='chloe'||partner==='jack'||partner==='me')S.names.N='Partner';
+  save();
   function go(choice){
     if(choice&&__sync.preferLinkChoice)__sync.preferLinkChoice(choice);
-    var title=S.names.D+(S.names.N&&S.names.N!=='Partner'?' & '+S.names.N:'');
-    __sync.createHousehold(title,S.names.D).then(function(){renderAll();toast('Household started');}).catch(function(e){toast(e.message);});
+    __sync.createHousehold(title,you).then(function(){renderAll();toast('Household started');}).catch(function(e){toast(e.message);});
   }
   var guest=window.DuoGate&&DuoGate.isGuestBudget&&DuoGate.isGuestBudget();
   if(guest&&phoneHasBudget()&&window.DuoGate.askLink){
@@ -3308,8 +3354,24 @@ function startCloudHousehold(){
   }
   go(null);
 }
+function editCloudHousehold(){
+  var st=__sync.status();
+  var mine=DuoSync.realDisplayName(S.names.D,st.user);
+  openSheet('<h4>Edit household name</h4><label class="fl" for="rn-you">Your name</label><input class="field" id="rn-you" data-test="rename-your-name" maxlength="60" value="'+esc(mine)+'"><label class="fl" for="rn-title">Household name</label><input class="field" id="rn-title" data-test="rename-household-name" maxlength="80" value="'+esc(st.householdName||DuoSync.householdTitle(mine))+'"><div class="btns"><button class="btn ghost" id="rn-no" type="button">Cancel</button><button class="btn pri" id="rn-yes" type="button" data-test="rename-save">Save</button></div>',function(sh){
+    sh.querySelector('#rn-no').addEventListener('click',closeSheet);
+    sh.querySelector('#rn-yes').addEventListener('click',function(){
+      var you=sh.querySelector('#rn-you').value.trim();
+      var name=sh.querySelector('#rn-title').value.trim();
+      var low=you.toLowerCase();
+      if(!you||low==='me'||low==='partner'||low==='chloe'||low==='jack'){toast('Enter your own name.');return;}
+      if(!name){toast('Enter a household name.');return;}
+      closeSheet();
+      __sync.renameHousehold(name,you).then(function(){S.names.D=you;save();renderAll();toast('Household name saved');}).catch(function(e){toast((e&&e.message)||'Couldn\'t rename yet. The name on the server is unchanged.');});
+    });
+  });
+}
 function joinCloudCode(code,swap){
-  var display=S.names.D;
+  var display=DuoSync.realDisplayName(S.names.D,signedInEmail());
   function run(){
     if(__sync.preferLinkChoice)__sync.preferLinkChoice('fresh');
     var step=swap?__sync.leaveHousehold().then(function(){return __sync.joinHousehold(code,display);}):__sync.joinHousehold(code,display);
@@ -3351,6 +3413,7 @@ function renderSync(st){var el=document.getElementById('syncCard');if(!el)return
   revealSyncAfterReturn(st);on('syncOut',function(){if(window.DuoGate)DuoGate.confirmSignOut();else __sync.signOut();});
   if(window.DuoGate)DuoGate.onSync(st);
   on('syncCreate',startCloudHousehold);
+  on('syncRename',editCloudHousehold);
   on('syncJoin',function(){joinCloudCode(document.getElementById('syncCode').value,false);});
   on('syncSwap',function(){var field=document.getElementById('syncSwapCode');confirmSwapHousehold(field?field.value:'');});
   on('syncInvite',function(){
@@ -3468,7 +3531,7 @@ function fetchFX(){
     renderAll();finish();
   }
   function attempt(i){
-    if(i>=urls.length){FX.error=FX.asOf?'':'offline';FX.offline=!!FX.asOf;var el=$('fxAsOf');if(el)el.textContent=fxStatusText();updateConverter();finish();return;}
+    if(i>=urls.length){FX.error=FX.asOf?'':'offline';FX.offline=!!FX.asOf;var el=$('fxAsOf');if(el)el.textContent=fxStatusText();finish();return;}
     var ctrl=typeof AbortController==='function'?new AbortController():null;
     var timer=setTimeout(function(){if(ctrl)ctrl.abort();},8000);
     fetch(urls[i],ctrl?{signal:ctrl.signal}:undefined).then(function(r){if(!r.ok)throw new Error('http');return r.json();}).then(function(data){
@@ -3477,26 +3540,9 @@ function fetchFX(){
   }
   attempt(0);
 }
-function convertFX(amount,from,to){
-  var rf=from==='AUD'?1:(FX.rates[from]||0),rt=to==='AUD'?1:(FX.rates[to]||0);
-  if(!(rf>0)||!(rt>0)||!isFinite(amount))return null;return amount/rf*rt;
-}
 function buildCurrencySelects(){
   var html=FX_CODES.map(function(c){return '<option value="'+c[0]+'">'+c[0]+' — '+esc(c[1])+'</option>';}).join('');
   var cur=$('currency');if(cur){cur.innerHTML=html;cur.value='AUD';}
-  var from=$('fxFrom'),to=$('fxTo');if(from){from.innerHTML=html;from.value='AUD';}if(to){to.innerHTML=html;to.value='USD';}
-}
-function updateConverter(){
-  var out=$('fxResult');if(!out||!$('fxAmt'))return;
-  var amt=parseFloat($('fxAmt').value),from=$('fxFrom').value,to=$('fxTo').value;
-  if(!isFinite(amt)){out.textContent='';return;}
-  var v=convertFX(amt,from,to);
-  if(v==null){out.innerHTML='Rates aren’t on this device yet.<small>'+esc(fxStatusText())+'</small>';return;}
-  var rf=from==='AUD'?1:FX.rates[from],rt=to==='AUD'?1:FX.rates[to];
-  out.innerHTML=fmtCurrency(v,to)+'<small>1 '+from+' = '+(rt/rf).toLocaleString('en-AU',{maximumFractionDigits:4})+' '+to+' · '+esc(fxStatusText())+'</small>';
-}
-function bindConverter(){
-  ['fxAmt','fxFrom','fxTo'].forEach(function(id){var el=$(id);if(!el)return;el.addEventListener('input',updateConverter);el.addEventListener('change',updateConverter);});
 }
 
 function publishWidget(){
@@ -3902,7 +3948,7 @@ else if(bootPlan.holdDemo&&bootPlan.signedIn){S=blankBudget();}
 else{load();save();}
 if(!PERSONAL_BUILD)fetchFX();
 var renderAllCore=renderAll;
-renderAll=function(){renderAllCore();layoutApply();publishWidget();var fx=$('fxAsOf');if(fx)fx.textContent=fxStatusText();updateConverter();};
+renderAll=function(){renderAllCore();layoutApply();publishWidget();var fx=$('fxAsOf');if(fx)fx.textContent=fxStatusText();};
 renderAll();
 if(window.DuoGate)DuoGate.start({
   storage:localStorage,plan:bootPlan,
@@ -3952,7 +3998,6 @@ if(window.DuoPremiumUI){
 }
 initLayout();
 initSwipe();
-bindConverter();
 applyDeepLink();
 window.addEventListener('hashchange',applyDeepLink);
 window.addEventListener('online',function(){if(PERSONAL_BUILD)return;FX.offline=false;fetchFX();});
@@ -3961,7 +4006,7 @@ if(!PERSONAL_BUILD&&'serviceWorker' in navigator&&location.protocol!=='file:'){n
 
 window.__duoRerender=function(){CATS.forEach(function(c){c.color=TC(c.color)});for(var i=0;i<TR_COL.length;i++)TR_COL[i]=TC(TR_COL[i]);renderAll();if(window.__duoThemeSeg)window.__duoThemeSeg();};
 window.__duo={state:function(){return S;},trends:function(sc){return trModel(sc);},trInsights:function(sc){return trInsights(trModel(sc));},trBreak:function(sc,off){var M=trModel(sc);return trBreak(M,M.rows[M.rows.length-1-(off||0)]);},trWins:trWins,trRows:trRows,invStatus:invStatus,totals:totals,totalsIn:totalsIn,projection:projection,shares:shares,paydaysFor:function(c,d,n){return paydaysFor(c,d,n).map(isoLocal);},payWindow:payWindow,lrPct:lrPct,payAt:function(iso,c,k){return isoLocal(payAt(parseISO(iso),c,k));},migrateV4:migrateV4,spentIn:spentIn,spentByLine:spentByLine,spentByOwner:spentByOwner,parseSpendAmount:parseSpendAmount,entryInWindow:entryInWindow,openSpend:openSpendSheet};
-window.__duo.convert=convertFX;window.__duo.fx=function(){return {rates:Object.assign({},FX.rates),asOf:FX.asOf,offline:!!FX.offline,error:FX.error,source:FX.source,currency:S.currency};};window.__duo.layout=function(){return S.layout||null;};window.__duo.widget=function(){try{return JSON.parse(localStorage.getItem('duoBudget.widget')||'null');}catch(e){return null;}};
+window.__duo.fx=function(){return {rates:Object.assign({},FX.rates),asOf:FX.asOf,offline:!!FX.offline,error:FX.error,source:FX.source,currency:S.currency};};window.__duo.layout=function(){return S.layout||null;};window.__duo.widget=function(){try{return JSON.parse(localStorage.getItem('duoBudget.widget')||'null');}catch(e){return null;}};
 })();
 </script>
 

@@ -29,6 +29,20 @@ function readInvite(data){
 function shouldOfferInvite(st){
   return !!(st&&['synced','pending','offline'].indexOf(st.state)>=0&&st.members===1);
 }
+// Sample and bucket labels are not a person's name. The email's local part is the fallback.
+function realDisplayName(typed, email){
+  var t=String(typed||'').trim();
+  var low=t.toLowerCase();
+  if(t&&low!=='me'&&low!=='partner'&&low!=='chloe'&&low!=='jack')return t.slice(0,60);
+  var local=String(email||'').split('@')[0]||'';
+  local=local.replace(/[^\w.+-]/g,'').slice(0,60);
+  return local||'Me';
+}
+function householdTitle(name){
+  name=String(name||'').trim();
+  if(!name||name.toLowerCase()==='me')return 'Our household';
+  return name.slice(0,60)+"'s household";
+}
 
 /* opts: {config, storageKey, app:{getState, commit(reason), localId(), setPay(slot,{cycle,next}), getPay(slot)},
           createClient (supabase-js createClient), storage (localStorage-like), now(), onStatus(status), online() } */
@@ -287,7 +301,10 @@ function create(opts){
       ctx=buildCtx(mine.household_id,(res.data||[]).filter(function(m){return m.household_id===mine.household_id;}));
       var first=meta.household!==ctx.household;
       if(first){meta={v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:ctx.household};idToKey={};}
-      var S=app.getState();if(S&&ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;if(S&&ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
+      var S=app.getState();
+      if(S&&ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;
+      if(S&&ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
+      else if(S&&S.names){var slotN=String(S.names.N||'').trim().toLowerCase();if(!slotN||slotN==='chloe'||slotN==='jack'||slotN==='me')S.names.N='Partner';}
       return attachHouseholdName(mine.household_id).then(function(){
       if(ctx&&!ctx.householdName&&pendingHouseholdName)ctx.householdName=pendingHouseholdName;
       if(first&&isGuestBudget()&&localHasData()&&(linkChoiceOnce||typeof opts.onLinkChoice==='function')){
@@ -436,10 +453,31 @@ function create(opts){
     createHousehold:function(name,display){pendingHouseholdName=String(name||'').trim();return client.rpc('create_household',{p_name:pendingHouseholdName,p_display_name:display}).then(function(r){if(r.error)throw r.error;return loadHousehold();});},
     createInvite:function(){return client.rpc('create_invite',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return r.data;});},
     joinHousehold:function(code,display){return client.rpc('join_household',{p_code:code,p_display_name:display}).then(function(r){if(r.error)throw r.error;if(!r.data||!r.data.ok)return r.data;return loadHousehold().then(function(){return r.data;});});},
+    renameHousehold:function(name,display){
+      var hh=ctx&&ctx.household,me=null;
+      activeMembers().forEach(function(m){if(m.user_id===(session&&session.user&&session.user.id))me=m;});
+      if(!hh||!me)return Promise.reject(new Error('Join or start a household first.'));
+      var cleanName=String(name||'').trim(),cleanDisplay=String(display||'').trim();
+      function done(r){if(r&&r.error)throw r.error;return loadHousehold().then(function(){return {ok:true};});}
+      function direct(){
+        var stamp=new Date(now()).toISOString();
+        return client.from('households').update({name:cleanName,updated_at:stamp}).eq('id',hh).then(function(r){
+          if(r&&r.error)throw r.error;
+          return client.from('household_members').update({display_name:cleanDisplay,updated_at:stamp}).eq('id',me.id);
+        }).then(done);
+      }
+      if(!client.rpc)return direct();
+      return client.rpc('rename_my_household',{p_name:cleanName,p_display_name:cleanDisplay}).then(function(r){
+        var msg=r&&r.error&&(r.error.message||'');
+        var code=r&&r.error&&r.error.code;
+        if(r&&r.error&&(code==='PGRST202'||/rename_my_household|schema cache|Could not find the function/i.test(msg)))return direct();
+        return done(r);
+      },direct);
+    },
     leaveHousehold:function(){return client.rpc('leave_household',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return afterAuth(session);});},
     online:function(){pull().then(flush);}
   };
   return api;
 }
-return {create:create,TABLES:TABLES,_stable:stable,readInvite:readInvite,shouldOfferInvite:shouldOfferInvite};
+return {create:create,TABLES:TABLES,_stable:stable,readInvite:readInvite,shouldOfferInvite:shouldOfferInvite,realDisplayName:realDisplayName,householdTitle:householdTitle};
 });
