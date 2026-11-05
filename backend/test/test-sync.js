@@ -198,6 +198,7 @@ async function main() {
   await testPasswordAndIdToken();
   await testGuestChoiceDoesNotMerge();
   await testNativeSignInWhenBrowserCloseRejects();
+  await testInviteButtonFlow();
   console.log('sync ok');
 }
 
@@ -427,6 +428,90 @@ async function testGuestChoiceDoesNotMerge() {
   assert(local.items.length === 1 && local.items[0].name === 'Cloud rent', 'the account budget is the one that stays');
   assert(!local.items.some(function (it) { return it.name === 'Phone only'; }), 'the phone-only line is not merged in');
   assert(!db.budget_items.some(function (r) { return r.name === 'Phone only'; }), 'the phone-only line is not uploaded');
+}
+
+async function testInviteButtonFlow() {
+  var row = { code: 'AB12CD34', expires_at: '2026-11-12T00:00:00.000Z' };
+  assert(DuoSync.shouldOfferInvite({ state: 'synced', members: 1 }), 'a synced household of one offers an invite');
+  assert(DuoSync.shouldOfferInvite({ state: 'pending', members: 1 }) && DuoSync.shouldOfferInvite({ state: 'offline', members: 1 }), 'pending and offline still offer an invite');
+  assert(!DuoSync.shouldOfferInvite({ state: 'synced', members: 2 }), 'two members do not get another invite');
+  assert(!DuoSync.shouldOfferInvite({ state: 'no-household', members: 0 }), 'join and start stay the path when there is no household');
+  assert(DuoSync.readInvite(row).code === 'AB12CD34' && DuoSync.readInvite(row).expires === row.expires_at, 'public.invites returns code and expires_at');
+  assert(DuoSync.readInvite([row]).code === 'AB12CD34', 'a one-row result is accepted');
+  assert(DuoSync.readInvite('HELLO123').code === 'HELLO123' && DuoSync.readInvite('HELLO123').expires === '', 'a bare code is accepted');
+  assert(DuoSync.readInvite({}) === null && DuoSync.readInvite(null) === null, 'a result without a code is ignored');
+
+  var store = memory();
+  var local = { names: { D: 'Me', N: 'Partner' }, cycle: 'fortnight', payDate: '2026-11-12', items: [], goals: [], spends: [] };
+  var db = {
+    household_members: [{ id: MEM_D, household_id: HH, user_id: USER_D, status: 'active', deleted_at: null, joined_at: '2020-01-01T00:00:00.000Z', display_name: 'Chloe' }],
+    budget_items: [], goals: [], pay_cycles: [], spend_entries: []
+  };
+  var rpcCalls = [];
+  function client() {
+    return {
+      from: function (table) {
+        return {
+          select: function () {
+            var filters = [];
+            var q = {
+              eq: function (c, v) { filters.push([c, v]); return q; },
+              gt: function () { return q; },
+              order: function () { return Promise.resolve(run()); },
+              then: function (ok, bad) { return Promise.resolve(run()).then(ok, bad); }
+            };
+            function run() {
+              var rows = (db[table] || []).filter(function (r) { return filters.every(function (f) { return r[f[0]] === f[1]; }); });
+              return { data: rows.map(function (r) { return Object.assign({}, r); }), error: null };
+            }
+            return q;
+          },
+          upsert: function (rows) {
+            (rows || []).forEach(function (row) {
+              var list = db[table] || (db[table] = []);
+              var i = list.findIndex(function (r) { return r.id === row.id; });
+              if (i >= 0) list[i] = Object.assign({}, list[i], row);
+              else list.push(Object.assign({}, row));
+            });
+            return Promise.resolve({ error: null });
+          }
+        };
+      },
+      channel: function () { return { on: function () { return this; }, subscribe: function () { return this; } }; },
+      removeChannel: function () {},
+      rpc: function (name, args) {
+        rpcCalls.push([name, args]);
+        if (name === 'create_invite') return Promise.resolve({ data: { code: 'AB12CD34', expires_at: '2026-11-12T00:00:00.000Z' }, error: null });
+        if (name === 'join_household') {
+          db.household_members.push({ id: MEM_N, household_id: HH, user_id: USER_N, status: 'active', deleted_at: null, joined_at: '2026-11-01T00:00:00.000Z', display_name: args.p_display_name || 'Jack' });
+          return Promise.resolve({ data: { ok: true }, error: null });
+        }
+        return Promise.resolve({ data: null, error: { message: 'missing ' + name } });
+      },
+      auth: {
+        onAuthStateChange: function () {},
+        getSession: function () { return Promise.resolve({ data: { session: { user: { id: USER_D, email: 'chloe@example.com' } } }, error: null }); }
+      }
+    };
+  }
+  var api = DuoSync.create({
+    config: { enabled: true, supabaseUrl: 'https://example.supabase.co', supabaseAnonKey: 'test' },
+    storageKey: 'duo-invite',
+    storage: store,
+    app: appFor(local),
+    createClient: client,
+    now: function () { return Date.parse('2026-11-04T00:00:00.000Z'); },
+    online: function () { return true; },
+    flushDelay: 60000
+  });
+  await api.start();
+  assert(api.status().members === 1 && DuoSync.shouldOfferInvite(api.status()), 'the first phone, alone in the household, is offered an invite');
+  var made = DuoSync.readInvite(await api.createInvite());
+  assert(rpcCalls.some(function (c) { return c[0] === 'create_invite' && c[1].p_household === HH && !c[1].p_valid_for; }), 'create_invite uses the household id and the 7-day default');
+  assert(made && made.code === 'AB12CD34' && made.expires === '2026-11-12T00:00:00.000Z', 'the button can show the code and the expiry');
+  var joined = await api.joinHousehold('AB12CD34', 'Jack');
+  assert(joined && joined.ok === true, 'a matching code joins the household');
+  assert(local.names.D === 'Chloe' && local.names.N === 'Jack', 'after joining, both names are on the phone');
 }
 
 async function testNativeSignInWhenBrowserCloseRejects() {
