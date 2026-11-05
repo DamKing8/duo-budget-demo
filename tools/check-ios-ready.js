@@ -63,13 +63,11 @@ appTargets.forEach(function (block) {
   need(/CURRENT_PROJECT_VERSION = 1;/.test(block), 'build number must be 1');
   need(/IPHONEOS_DEPLOYMENT_TARGET = 15\.0;/.test(block), 'App target deployment target must be iOS 15.0');
   need(/CODE_SIGN_STYLE = Automatic;/.test(block), 'signing must be automatic');
-  need(/DEVELOPMENT_TEAM = P2N4988G3H;/.test(block), 'App target DEVELOPMENT_TEAM must be P2N4988G3H');
+  need(/DEVELOPMENT_TEAM = "";/.test(block), 'DEVELOPMENT_TEAM must be empty so a Personal Team can be chosen on the Mac');
 });
 blocks.forEach(function (block) {
   need(!/IPHONEOS_DEPLOYMENT_TARGET = (?!15\.0;)/.test(block), 'every deployment target must be iOS 15.0');
-  if (!/PRODUCT_BUNDLE_IDENTIFIER = au\.duobudget\.app;/.test(block)) {
-    need(!/DEVELOPMENT_TEAM = (?!"")/.test(block), 'only the app target carries the team id');
-  }
+  need(!/DEVELOPMENT_TEAM = (?!"")/.test(block), 'a team id must not be committed');
 });
 need(/ProvisioningStyle = Automatic;/.test(project), 'Xcode provisioning style must be automatic');
 need(!/CODE_SIGN_ENTITLEMENTS|PROVISIONING_PROFILE|SystemCapabilities/.test(project), 'Sign in with Apple is not attached to the default build');
@@ -143,4 +141,4 @@ if (problems.length) {
   problems.forEach(function (msg) { console.error(' - ' + msg); });
   process.exit(1);
 }
-console.log('iOS project is ready to open: au.duobudget.app, Duo Budget, 0.1.0 (1), iOS 15, automatic signing, team P2N4988G3H, Sign in with Apple not in the default build, URL scheme au.duobudget.app, web assets copied.');
+console.log('iOS project is ready to open: au.duobudget.app, Duo Budget, 0.1.0 (1), iOS 15, automatic signing, no team, URL scheme au.duobudget.app, web assets copied.');
