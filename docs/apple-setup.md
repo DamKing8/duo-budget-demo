@@ -2,7 +2,7 @@
 
 Team ID: `P2N4988G3H`. Bundle ID: `au.duobudget.app`.
 
-The Xcode app target already has `DEVELOPMENT_TEAM = P2N4988G3H`. Sign in with Apple is written in `capacitor-ios/App/App/App.entitlements` and is **not** attached to the Debug or Release build. A free or still-pending Apple ID cannot sign that capability, so the default build leaves it off. The in-app Apple button stays hidden.
+Debug and Release keep `DEVELOPMENT_TEAM` empty so a free Personal Team can sideload. Sign in with Apple is written in `capacitor-ios/App/App/App.entitlements` and is **not** attached to the Debug or Release build. A free or still-pending Apple ID cannot sign that capability, so the default build leaves it off. The in-app Apple button stays hidden.
 
 Do these steps yourself after Apple approves the paid Developer Program membership. This file does not call Apple.
 
@@ -10,9 +10,10 @@ Do these steps yourself after Apple approves the paid Developer Program membersh
 
 1. Open `capacitor-ios/App/App.xcodeproj`.
 2. Select the **App** target.
-3. Open **Build Settings**, search for **Code Signing Entitlements**.
-4. For Debug and Release, set the value to `App/App.entitlements`.
-5. Open **Signing & Capabilities**. Confirm the team is `P2N4988G3H` and **Sign in with Apple** is listed. Do not add Push, iCloud, or App Groups.
+3. Open **Build Settings** and search for **Development Team**.
+4. For Debug and Release, set **Development Team** to `P2N4988G3H`. Leave it empty until this approval. A free Personal Team cannot use that id.
+5. Search for **Code Signing Entitlements**. For Debug and Release, set the value to `App/App.entitlements`.
+6. Open **Signing & Capabilities**. Confirm the team is `P2N4988G3H` and **Sign in with Apple** is listed. Do not add Push, iCloud, or App Groups.
 
 ## 2. Register the App ID
 
