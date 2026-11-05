@@ -36,6 +36,14 @@
       var c = cfg();
       return c.mock !== false && !c.revenueCatKey && !c.revenueCatAppleKey && !c.revenueCatGoogleKey;
     }
+    function previewControls() {
+      var c = cfg();
+      if (c.previewControls === true) return true;
+      try {
+        if (typeof location !== 'undefined' && /(?:^|[?&])premiumPreview=1(?:&|$)/.test(location.search || '')) return true;
+      } catch (e) {}
+      return false;
+    }
     function view() {
       if (usingMock()) return P.resolve(P.mockRow(readMock(store).state, Date.now()), { now: Date.now() });
       var cache = null;
@@ -81,8 +89,7 @@
       ctx.openSheet('<h4 data-test="paywall">Duo Premium</h4><p class="sub">' + esc(why) + '</p>' +
         (trial ? '<p class="sub">Try it free for 14 days. One trial per household.</p>' : '<p class="sub">Your household has already had its free trial.</p>') +
         '<button class="btn pri block" type="button" id="pw-annual" data-test="plan-annual"><span class="pw-best">Best value</span><span>' + esc(P.PRODUCTS.annual.price) + ' a year</span></button>' +
-        '<button class="btn ghost block" type="button" id="pw-month" data-test="plan-monthly" style="margin-top:8px">' + esc(P.PRODUCTS.monthly.price) + ' a month</button>' +
-        '<p class="mock">Paid through the App Store or Google Play.</p>', function (sh) {
+        '<button class="btn ghost block" type="button" id="pw-month" data-test="plan-monthly" style="margin-top:8px">' + esc(P.PRODUCTS.monthly.price) + ' a month</button>', function (sh) {
         function buy(id) {
           if (!usingMock()) { ctx.toast('Store billing is not configured on this build yet.'); return; }
           var state = trial ? 'trial' : 'active';
@@ -145,7 +152,7 @@
         (v.row && v.row.covered ? '<p data-test="partner-covered">' + esc(v.row.payer_name || 'Your partner') + ' covers this household.</p>' : '') +
         '<button class="btn ghost block" type="button" id="premium-restore" data-test="restore-purchases">Restore purchases</button>' +
         '<button class="btn pri block" type="button" id="premium-see" data-test="see-premium" style="margin-top:8px">See Premium</button>' +
-        (mock ? '<div class="hint" style="margin-top:10px">Preview only. No store is contacted.</div><div class="chips" id="premium-mock" data-test="premium-preview">' + states.map(function (s) {
+        (mock && previewControls() ? '<div class="hint" style="margin-top:10px">Preview only. No store is contacted.</div><div class="chips" id="premium-mock" data-test="premium-preview">' + states.map(function (s) {
           return '<button type="button" class="chip' + (readMock(store).state === s ? ' on' : '') + '" data-mock="' + s + '">' + s + '</button>';
         }).join('') + '</div><label class="duo-radio"><input type="checkbox" id="premium-store"' + (readMock(store).storePurchase ? ' checked' : '') + '> This store account has a purchase</label>' : '');
       var restoreBtn = document.getElementById('premium-restore');
