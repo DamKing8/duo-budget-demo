@@ -413,7 +413,7 @@ input.code-in{text-align:center;font-size:26px;font-weight:800;letter-spacing:10
   @keyframes slidein{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
 }
 
-.logo:not(.mark){background:linear-gradient(135deg,#22d3ee,#14b8a6);box-shadow:0 6px 20px rgba(34,211,238,.35)}
+.logo:not(.mark){background:linear-gradient(135deg,var(--cyan),var(--teal));box-shadow:0 6px 20px rgba(34,211,238,.35)}
 /* ===== Light (paper) theme layer ===== */
 body{background:radial-gradient(110% 55% at 100% 0%,rgba(14,116,144,.07),transparent 60%),radial-gradient(90% 50% at 0% 0%,rgba(109,74,216,.05),transparent 60%),#FBF7EF;background-attachment:fixed}
 .card{background:#FFFFFF;border:1px solid #ECE4D6;box-shadow:0 1px 2px rgba(60,45,20,.04),0 8px 24px rgba(60,45,20,.06)}
@@ -424,15 +424,15 @@ body{background:radial-gradient(110% 55% at 100% 0%,rgba(14,116,144,.07),transpa
 .stat{background:#FFFDF9;border-color:#ECE4D6}
 .pill{background:rgba(14,116,144,.08);border-color:rgba(14,116,144,.25)}
 nav.tabs{background:rgba(255,253,249,.92)!important;border-color:#E6DDCC!important}
-nav.tabs button.on{color:#0E7490}
-.btn.pri,.seg button.on{background:linear-gradient(135deg,#0E7490,#0F766E);color:#FFFFFF;box-shadow:0 6px 16px rgba(14,116,144,.25)}
-.cd-num{background:linear-gradient(135deg,#0F766E,#0E7490);color:#FFFFFF}
+nav.tabs button.on{color:var(--cyan)}
+.btn.pri,.seg button.on{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#FFFFFF;box-shadow:0 6px 16px rgba(14,116,144,.25)}
+.cd-num{background:linear-gradient(135deg,var(--teal),var(--cyan));color:#FFFFFF}
 .toast{background:#1F2430;color:#FFFFFF}
 .owner.D{color:#0B5E75}.owner.N{color:#5536B8}.owner.J{color:#04664A}.gstat.warn,.tag{color:#92400E}.gstat.ok{color:#04664A}.gstat.bad{color:#9F1239}.gstat.done{color:#0B5E75}
 .tr-tog button.on{background:#FFFFFF;color:#1F2430;box-shadow:0 1px 3px rgba(60,45,20,.12)}
 .av{border-color:#FBF7EF}
 input.field,select.field,.amt,.chip{background:#FFFFFF}
-input.field:focus,select.field:focus,.amt:focus{border-color:#0E7490;box-shadow:0 0 0 3px rgba(14,116,144,.15)}
+input.field:focus,select.field:focus,.amt:focus{border-color:var(--cyan);box-shadow:0 0 0 3px color-mix(in srgb,var(--cyan) 15%,transparent)}
 @media (hover:hover) and (prefers-reduced-motion:no-preference){.card:hover{box-shadow:0 2px 4px rgba(60,45,20,.05),0 14px 32px rgba(60,45,20,.09)}}
 </style>
 <style id="th-dark">
@@ -836,7 +836,7 @@ input.code-in{text-align:center;font-size:26px;font-weight:800;letter-spacing:10
 :root{--dim:#8496BB}
 .owner.N{color:#C4B5FD}.btn.danger{color:#FDA4AF}.owner.D{color:#67E8F9}.owner.J{color:#99F6E4}
 .hero .lbl{color:#9fd8e6}
-input.field:focus,select.field:focus,.amt:focus{border-color:#22d3ee;box-shadow:0 0 0 3px rgba(34,211,238,.18)}
+input.field:focus,select.field:focus,.amt:focus{border-color:var(--cyan);box-shadow:0 0 0 3px color-mix(in srgb,var(--cyan) 18%,transparent)}
 nav.tabs{background:rgba(12,22,44,.88)!important}
 @media (hover:hover) and (prefers-reduced-motion:no-preference){.card:hover{box-shadow:0 14px 36px rgba(0,0,0,.35)}}
 </style>
@@ -1110,6 +1110,12 @@ button.otp-resend:disabled{opacity:.55}
 }
 html.duo-gated .app,html.duo-gated nav.tabs{visibility:hidden}
 html.duo-privacy .app,html.duo-privacy nav.tabs{filter:blur(16px)}
+html[data-accent="plum"]{--cyan:#7c3aed;--teal:#5b21b6}
+html[data-accent="sand"]{--cyan:#b45309;--teal:#9a3412}
+html[data-accent="forest"]{--cyan:#047857;--teal:#065f46}
+html[data-accent="plum"] .btn.pri,html[data-accent="plum"] .seg button.on,html[data-accent="plum"] .cd-num,
+html[data-accent="sand"] .btn.pri,html[data-accent="sand"] .seg button.on,html[data-accent="sand"] .cd-num,
+html[data-accent="forest"] .btn.pri,html[data-accent="forest"] .seg button.on,html[data-accent="forest"] .cd-num{color:#fff}
 </style>
 </head>
 <body>
@@ -1231,6 +1237,8 @@ html.duo-privacy .app,html.duo-privacy nav.tabs{filter:blur(16px)}
     <div class="card" id="syncCard" data-layout="set-sync" data-test="sync-card" hidden></div>
     <div class="card" id="accountCard" data-test="account-card" hidden></div>
     <div class="card" id="lockCard" data-test="lock-card" hidden></div>
+    <div class="card" id="premiumCard" data-test="premium-card" hidden></div>
+    <div class="card" id="premiumExtras" data-test="premium-extras" hidden></div>
     <div class="card" data-layout="set-names">
       <label class="fl" for="nameA" style="margin-top:0">Your name</label>
       <input class="field" id="nameA" maxlength="16">
@@ -1286,6 +1294,7 @@ html.duo-privacy .app,html.duo-privacy nav.tabs{filter:blur(16px)}
 <script src="supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R"></script>
 <script>window.DUO_SYNC_CONFIG={"enabled":true,"supabaseUrl":"https://ksrffninlyioqobvdvhu.supabase.co","supabaseAnonKey":"sb_publishable_kYFCNsoHhW537_RtxtOxKg_4agyXKDI"};</script>
 <script>window.DUO_AUTH_CONFIG=Object.assign({apple:false,google:true,allowGoogleWithoutApple:false,appleClientId:"",googleWebClientId:"",googleIosClientId:"",googleAndroidClientId:""},window.DUO_AUTH_CONFIG||{});</script>
+<script>window.DUO_PREMIUM_CONFIG=Object.assign({revenueCatKey:"",revenueCatAppleKey:"",revenueCatGoogleKey:"",mock:true},window.DUO_PREMIUM_CONFIG||{});</script>
 <!-- @@DEPLOY_END@@ -->
 <script id="duo-sync-lib">/*@@SYNC_START@@*/
 /* Duo Budget cloud sync (phase 1: built and tested offline; OFF by default).
@@ -1707,6 +1716,8 @@ return {create:create,TABLES:TABLES,_stable:stable};
 <script src="duo-account.js"></script>
 <script src="duo-lock.js"></script>
 <script src="duo-gate.js"></script>
+<script src="duo-premium.js"></script>
+<script src="duo-premium-ui.js"></script>
 <script>
 (function(){
 'use strict';
@@ -3820,6 +3831,33 @@ if(window.DuoGate)DuoGate.start({
   leaveSample:leaveSample
 });
 window.__duoReady=startSync();
+if(window.DuoPremiumUI){
+  var premiumUi=DuoPremiumUI.install({
+    storage:localStorage,
+    config:function(){return window.DUO_PREMIUM_CONFIG||{};},
+    getS:function(){return S;},
+    save:save,
+    render:function(){renderAll();},
+    openSheet:openSheet,
+    closeSheet:closeSheet,
+    toast:toast,
+    uid:uid,
+    signedIn:function(){var st=__sync&&__sync.status?__sync.status():null;return !!(st&&st.user);},
+    userId:function(){var st=__sync&&__sync.status?__sync.status():null;return st&&st.uid||'';},
+    openPartner:function(){var b=document.querySelector('nav.tabs button[data-v="settings"]');if(b)b.click();},
+    offline:function(){return typeof navigator!=='undefined'&&navigator.onLine===false;},
+    currentSpendWindow:currentSpendWindow,
+    spendOff:function(){return SP.off;},
+    forecast:function(n){var t=totals();return nextPaydays(n).map(function(d,i){return {label:i===0?'This payday':fmtDate(d),left:money(t.remainder)};});}
+  });
+  goalForm=premiumUi.goalForm(goalForm);
+  goalDetail=premiumUi.goalDetail(goalDetail);
+  renderGoals=premiumUi.renderGoals(renderGoals);
+  renderSpent=premiumUi.renderSpent(renderSpent);
+  renderTrends=premiumUi.renderTrends(renderTrends);
+  renderCycle=premiumUi.renderCycle(renderCycle);
+  renderAll();
+}
 initLayout();
 initSwipe();
 bindConverter();

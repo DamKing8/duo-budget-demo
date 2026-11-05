@@ -17,7 +17,7 @@ if (a < 0 || b < 0) throw new Error('TRENDS_SYNTH markers missing');
 html = html.slice(0, a + '/*@@TRENDS_SYNTH_START@@*/'.length) + '\nvar TRENDS_SYNTH=null;\n' + html.slice(b);
 fs.writeFileSync(path.join(dest, 'index.html'), html);
 fs.cpSync(path.join(root, 'icons'), path.join(dest, 'icons'), { recursive: true });
-['supabase.js', 'sw.js', 'manifest.webmanifest', 'duo-account.js', 'duo-lock.js', 'duo-gate.js'].forEach(function (f) {
+['supabase.js', 'sw.js', 'manifest.webmanifest', 'duo-account.js', 'duo-lock.js', 'duo-gate.js', 'duo-premium.js', 'duo-premium-ui.js'].forEach(function (f) {
   fs.copyFileSync(path.join(root, f), path.join(dest, f));
 });
 console.log('built ' + dest);

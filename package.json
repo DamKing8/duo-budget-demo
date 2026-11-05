@@ -10,8 +10,8 @@
     "test:bucket": "TZ=Australia/Sydney node test-spend-bucket.js",
     "test:copy": "node tools/copy-lint.js && node tools/shot-guard.js",
     "test:sync": "node tools/inline-sync.js --check && node backend/test/test-sync.js",
-    "test:auth": "node backend/test/test-account.js && node backend/test/test-lock.js",
-    "test:sql": "node backend/test/test-rls.js && DUO_STUB_EXPOSED=1 node backend/test/test-rls.js && node backend/test/test-delete-account.js",
+    "test:auth": "node backend/test/test-account.js && node backend/test/test-lock.js && node backend/test/test-premium.js",
+    "test:sql": "node backend/test/test-rls.js && DUO_STUB_EXPOSED=1 node backend/test/test-rls.js && node backend/test/test-delete-account.js && node backend/test/test-premium-sql.js",
     "test:spend": "node tools/build-personal.js && node tools/build-demo-data.js && node tools/privacy-check.js && node test-spending.js",
     "test": "npm run test:bucket && npm run test:copy && npm run test:sync && npm run test:auth && npm run test:sql && npm run test:spend"
   },
@@ -25,7 +25,8 @@
     "@capacitor/ios": "^8.6.0",
     "@capacitor/privacy-screen": "2.0.1",
     "@capacitor/splash-screen": "^8.0.2",
-    "@capgo/capacitor-social-login": "8.7.6"
+    "@capgo/capacitor-social-login": "8.7.6",
+    "@revenuecat/purchases-capacitor": "14.0.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.6.0",
