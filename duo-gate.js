@@ -151,7 +151,7 @@
     mode = '';
   }
   function logo() {
-    return '<div class="logo mark duo-mark"><img src="icons/logo-mark.webp" width="64" height="64" alt=""></div>';
+    return '<div class="logo mark duo-mark"><img src="icons/logo-mark.webp" width="168" height="168" alt=""></div>';
   }
   function providers() {
     return Account.visibleProviders(authCfg(), platform());
