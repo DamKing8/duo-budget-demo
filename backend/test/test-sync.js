@@ -338,6 +338,8 @@ function testSignInEntryPoints() {
   assert(html.indexOf('.duo-welcome .btn.apple{background:#000') > 0 && html.indexOf('border:1px solid #747775') > 0, 'Apple is the black sign-in button and Google uses the identity stroke');
   assert(gate.indexOf("startProvider('apple')") > 0 && gate.indexOf("startProvider('google')") > 0 && gate.indexOf('api.signIn(provider)') > 0, 'Apple and Google keep the browser sign-in fallback');
   assert(html.indexOf('apple:true') > 0 && html.indexOf('appleClientId:""') > 0, 'iOS attempts native Apple from the bundle id and does not invent a Services ID');
+  assert(html.indexOf('function appleAuthEnabled()') > 0 && html.indexOf('function startRealApple()') > 0 && html.indexOf('if(appleAuthEnabled()){startRealApple();return;}') > 0, 'Apple buttons use real sign-in when Apple is on');
+  assert(gate.indexOf('cap.registerPlugin') > 0, 'native Sign in with Apple registers the Capacitor plugin');
   assert(gate.indexOf('width="168"') > 0 && html.indexOf('.duo-welcome .duo-mark{width:168px;height:168px') > 0, 'the landing logo matches the lock screen');
   assert(gate.indexOf('data-test="welcome-art"') > 0 && gate.indexOf('$1,172.78') > 0 && gate.indexOf('>INCOME<') > 0, 'the landing shows a phone and income donut under the buttons');
   assert(html.indexOf('.duo-gate.welcome-open .duo-gate-in{min-height:100%') > 0, 'the landing art uses the space under the buttons');

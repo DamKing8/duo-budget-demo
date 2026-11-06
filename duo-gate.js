@@ -44,7 +44,9 @@
   function plugin(name) {
     try {
       var cap = window.Capacitor;
-      if (cap && cap.Plugins && cap.Plugins[name]) return cap.Plugins[name];
+      if (!cap) return null;
+      if (cap.Plugins && cap.Plugins[name]) return cap.Plugins[name];
+      if (typeof cap.registerPlugin === 'function') return cap.registerPlugin(name);
     } catch (e) {}
     return null;
   }

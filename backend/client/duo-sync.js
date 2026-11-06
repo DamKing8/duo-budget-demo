@@ -79,7 +79,7 @@ function create(opts){
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
   function nativeShell(){var cap=nativeCap();try{return !!(cap&&typeof cap.isNativePlatform==='function'&&cap.isNativePlatform());}catch(e){return false;}}
-  function nativePlugin(name){var cap=nativeCap();return cap&&cap.Plugins?cap.Plugins[name]:null;}
+  function nativePlugin(name){var cap=nativeCap();if(!cap)return null;if(cap.Plugins&&cap.Plugins[name])return cap.Plugins[name];try{if(typeof cap.registerPlugin==='function')return cap.registerPlugin(name);}catch(e){}return null;}
   // Custom scheme the Android manifest and the iOS Info.plist both register. Supabase must allow this exact redirect.
   var NATIVE_AUTH_REDIRECT='au.duobudget.app://auth-callback';
   function displayMode(){try{if(nativeShell())return 'native';if(typeof navigator!=='undefined'&&navigator.standalone)return 'home-screen';if(typeof matchMedia!=='undefined'&&matchMedia('(display-mode: standalone)').matches)return 'home-screen';}catch(e){}return 'browser';}

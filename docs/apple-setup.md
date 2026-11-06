@@ -32,6 +32,8 @@ npm run ios:prepare
 
 Open `capacitor-ios/App/App.xcodeproj` (not the widget project in `ios/`). In Xcode: Product → Clean Build Folder, then Run on your iPhone. Team `P2N4988G3H` is already in the project. Do not clear Development Team. Signing & Capabilities should list Sign in with Apple. The Partner footer should show `Build` plus the short commit from `git rev-parse --short HEAD`.
 
+Delete the app from the iPhone once before this Run if it still shows `Mock Sign in with Apple (nothing contacted)`. The old page can stay in WKWebView until the app is removed. A new Run after that delete loads this tip.
+
 ## Still yours to click
 
 None of these values are in the repo. Do not paste the `.p8` or a client secret into git.

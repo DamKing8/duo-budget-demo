@@ -1401,7 +1401,7 @@ function create(opts){
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
   function nativeShell(){var cap=nativeCap();try{return !!(cap&&typeof cap.isNativePlatform==='function'&&cap.isNativePlatform());}catch(e){return false;}}
-  function nativePlugin(name){var cap=nativeCap();return cap&&cap.Plugins?cap.Plugins[name]:null;}
+  function nativePlugin(name){var cap=nativeCap();if(!cap)return null;if(cap.Plugins&&cap.Plugins[name])return cap.Plugins[name];try{if(typeof cap.registerPlugin==='function')return cap.registerPlugin(name);}catch(e){}return null;}
   // Custom scheme the Android manifest and the iOS Info.plist both register. Supabase must allow this exact redirect.
   var NATIVE_AUTH_REDIRECT='au.duobudget.app://auth-callback';
   function displayMode(){try{if(nativeShell())return 'native';if(typeof navigator!=='undefined'&&navigator.standalone)return 'home-screen';if(typeof matchMedia!=='undefined'&&matchMedia('(display-mode: standalone)').matches)return 'home-screen';}catch(e){}return 'browser';}
@@ -2980,6 +2980,12 @@ var FSTEPS={welcome:[1,3],create:[2,3],invite:[3,3],join:[1,4],joinConfirm:[2,4]
 var PSTEPS={join:1,joinConfirm:1,joinAccount:1,joinCycle:1,joined:1,left:1,removed:1};
 function openFlow(step){F.hist=[];F.tmp={};$('flow').classList.add('on');document.body.classList.add('noscroll');F.step=null;go(step);}
 function openHousehold(){openFlow(!S.account?'welcome':!HH()?'create':'members');}
+function appleAuthEnabled(){var c=window.DUO_AUTH_CONFIG;return !!(c&&c.apple);}
+function startRealApple(){
+  if(window.DuoGate&&typeof DuoGate.startProvider==='function'){DuoGate.startProvider('apple');return;}
+  if(window.__sync&&typeof __sync.signIn==='function'){__sync.signIn('apple');return;}
+  toast('Couldn\'t start Apple sign-in.');
+}
 function closeFlow(){$('flow').classList.remove('on');document.body.classList.remove('noscroll');F.step=null;renderAll();}
 function go(step,noHist){if(F.step&&!noHist)F.hist.push(F.step);F.step=step;renderFlow();$('flow').scrollTop=0;}
 function flowBack(){if(!F.hist.length){closeFlow();return;}F.step=F.hist.pop();renderFlow();$('flow').scrollTop=0;}
@@ -3024,7 +3030,7 @@ var VIEWS={
   bind:function(q){
    function done(a){S.account={userId:'u_'+uid(),name:a.name,email:a.email,provider:a.provider,createdAt:Date.now()};S.names.D=a.name;save();renderAll();go('create');}
    q('ob-create').addEventListener('click',function(){var a=readAcct(q,'ob');if(a)done(a);});
-   q('ob-apple').addEventListener('click',function(){toast('Mock Sign in with Apple (nothing contacted)');done({name:q('ob-name').value.trim()||S.names.D,email:'(Apple private relay, mocked)',provider:'apple'});});
+   q('ob-apple').addEventListener('click',function(){if(appleAuthEnabled()){startRealApple();return;}toast('Mock Sign in with Apple (nothing contacted)');done({name:q('ob-name').value.trim()||S.names.D,email:'(Apple private relay, mocked)',provider:'apple'});});
    q('ob-google').addEventListener('click',function(){toast('Mock Continue with Google (nothing contacted)');done({name:q('ob-name').value.trim()||S.names.D,email:'(Google account, mocked)',provider:'google'});});
    q('ob-join').addEventListener('click',function(){go('join');});
   }};},
@@ -3131,7 +3137,7 @@ var VIEWS={
    mock('Prototype: no account is created and no Apple or Google sign-in happens. The password is never stored.'),
   bind:function(q){
    q('ja-next').addEventListener('click',function(){var a=readAcct(q,'ja');if(!a)return;F.tmp.acct=a;go('joinCycle');});
-   q('ja-apple').addEventListener('click',function(){var n=q('ja-name').value.trim();if(!n){q('ja-err').textContent='Enter your name (Apple would normally share it).';return;}
+   q('ja-apple').addEventListener('click',function(){if(appleAuthEnabled()){startRealApple();return;}var n=q('ja-name').value.trim();if(!n){q('ja-err').textContent='Enter your name (Apple would normally share it).';return;}
      toast('Mock Sign in with Apple (nothing contacted)');F.tmp.acct={name:n,email:'(Apple private relay, mocked)',provider:'apple'};go('joinCycle');});
    q('ja-google').addEventListener('click',function(){var n=q('ja-name').value.trim();if(!n){q('ja-err').textContent='Enter your name (Google would normally share it).';return;}
      toast('Mock Continue with Google (nothing contacted)');F.tmp.acct={name:n,email:'(Google account, mocked)',provider:'google'};go('joinCycle');});
@@ -3542,13 +3548,13 @@ function startSync(){
   var inj=window.DUO_SYNC_CONFIG||{},test=window.__DUO_SYNC_TEST__||null;
   var cfg=Object.assign({},SYNC_CONFIG,{enabled:!!inj.enabled,supabaseAnonKey:inj.supabaseAnonKey||'',supabaseUrl:inj.supabaseUrl||SYNC_CONFIG.supabaseUrl,supabaseJsUrl:inj.supabaseJsUrl||SYNC_CONFIG.supabaseJsUrl});
   cfg.allowPersonalData=SYNC_CONFIG.allowPersonalData;          // cannot be switched on from outside the file
-  if(!cfg.enabled)return;
+  if(!cfg.enabled)return Promise.resolve(null);
   // The personal build uses duoBudget.v1 and must never sync. Signed-in keys are duoBudget.u.<id>.v1.
   var syncKey=KEY.indexOf('.demo.')>=0||KEY.indexOf('duoBudget.u.')===0;
   var blocked=!syncKey&&!cfg.allowPersonalData?'Cloud sync is off in your personal build. Your real budget stays on this phone.':'';
   if(!blocked&&!cfg.supabaseAnonKey)blocked='No project key configured on this device.';
   var getCC=blocked?Promise.resolve(null):test&&test.createClient?Promise.resolve(test.createClient):window.supabase&&window.supabase.createClient?Promise.resolve(window.supabase.createClient):import(cfg.supabaseJsUrl).then(function(m){return m.createClient;});
-  getCC.then(function(cc){__sync=DuoSync.create({config:cfg,storageKey:KEY,storage:localStorage,app:syncApp(),createClient:cc,blocked:blocked,
+  return getCC.then(function(cc){__sync=DuoSync.create({config:cfg,storageKey:KEY,storage:localStorage,app:syncApp(),createClient:cc,blocked:blocked,
       online:function(){return navigator.onLine;},onStatus:renderSync,
       guestBudget:function(){return window.DuoGate?DuoGate.isGuestBudget():false;},
       onLinkChoice:function(info){return new Promise(function(resolve){if(window.DuoGate)DuoGate.askLink(info,function(choice){var uid=window.DuoAccount&&DuoAccount.readSessionUserId(localStorage);if(uid)DuoAccount.claimOwner(localStorage,uid);resolve(choice);});else resolve(info&&info.cloudHas?'use-cloud':'fresh');});}});
