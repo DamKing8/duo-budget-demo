@@ -332,7 +332,10 @@ function testSignInEntryPoints() {
   assert(/:blankBudget\(\)/.test(html) && /useBlank:function\(\)\{S=blankBudget\(\)/.test(html), 'a new phone starts from an empty budget');
   assert(gate.indexOf('ctx.useBlank') > 0 && gate.indexOf('ctx.useDemo') < 0, 'guest start does not load the sample household');
   assert(gate.indexOf('class="btn ghost block" type="button" id="gate-guest" data-test="welcome-guest">Try demo<') > 0 && gate.indexOf('Plan around both paydays.') > 0, 'Try demo is a secondary button under the slogan');
-  assert(gate.indexOf('data-test="welcome-apple"') > 0 && gate.indexOf('data-test="welcome-google"') > 0 && gate.indexOf('data-test="welcome-email"') > 0, 'the landing shows Apple, Google, and email');
+  assert(gate.indexOf('data-test="welcome-apple"') > 0 && gate.indexOf('welcome-apple">') > 0 && gate.indexOf('>Sign in with Apple<') > 0, 'the landing uses the Sign in with Apple label');
+  assert(gate.indexOf('data-test="welcome-google"') > 0 && gate.indexOf('>Sign in with Google<') > 0 && gate.indexOf('#4285F4') > 0 && gate.indexOf('#34A853') > 0 && gate.indexOf('#FBBC05') > 0 && gate.indexOf('#EA4335') > 0, 'the landing uses the four-color Google G and Sign in with Google');
+  assert(gate.indexOf('data-test="welcome-email"') > 0, 'the landing still offers email');
+  assert(html.indexOf('.duo-welcome .btn.apple{background:#000') > 0 && html.indexOf('border:1px solid #747775') > 0, 'Apple is the black sign-in button and Google uses the identity stroke');
   assert(gate.indexOf("startProvider('apple')") > 0 && gate.indexOf("startProvider('google')") > 0 && gate.indexOf('api.signIn(provider)') > 0, 'Apple and Google use the existing browser sign-in');
   assert(gate.indexOf('width="168"') > 0 && html.indexOf('.duo-welcome .duo-mark{width:168px;height:168px') > 0, 'the landing logo matches the lock screen');
   assert(html.indexOf('function nativeAppShell') > 0 && html.indexOf('nativeAppShell()') > 0, 'the native shell does not keep a service worker');
