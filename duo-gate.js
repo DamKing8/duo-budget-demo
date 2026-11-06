@@ -219,16 +219,14 @@
   }
   function showWelcome() {
     mode = 'welcome';
-    var p = providers();
     var note = plan && plan.reason === 'inactive' ? '<p class="sub">You\'ve been away from this browser for 30 days, so we signed you out. Your budget is safe.</p>' : '<p class="sub">Plan around both paydays.</p>';
     var buttons = '';
-    if (p.apple) buttons += '<button class="btn apple block" type="button" id="gate-apple" data-test="welcome-apple">Continue with Apple</button>';
-    if (p.google) buttons += '<button class="btn google block" type="button" id="gate-google" data-test="welcome-google">Continue with Google</button>';
+    buttons += '<button class="btn apple block" type="button" id="gate-apple" data-test="welcome-apple">Continue with Apple</button>';
+    buttons += '<button class="btn google block" type="button" id="gate-google" data-test="welcome-google">Continue with Google</button>';
     buttons += '<button class="btn pri block" type="button" id="gate-email" data-test="welcome-email">Continue with email</button>';
-    var iosHint = !p.apple && !p.google && platform() === 'ios' ? '<p class="email-note">For now, use email.</p>' : '';
-    show('<div class="duo-welcome" data-test="welcome">' + logo() + '<h2 class="page">Duo Budget</h2>' + note + iosHint +
+    show('<div class="duo-welcome" data-test="welcome">' + logo() + '<h2 class="page">Duo Budget</h2>' + note +
       '<div class="duo-actions">' + buttons + '</div>' +
-      '<button class="linkbtn" type="button" id="gate-guest" data-test="welcome-guest">Try it without an account</button>' +
+      '<button class="linkbtn" type="button" id="gate-guest" data-test="welcome-guest">Try demo</button>' +
       '<p class="mock">Your budget stays on this phone. Add an account any time.</p>' +
       '<p class="mock"><a href="privacy.html">Privacy</a> · <a href="delete-account.html">Delete an account</a></p></div>');
     var apple = $('gate-apple'); if (apple) apple.addEventListener('click', function () { startProvider('apple'); });

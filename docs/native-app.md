@@ -124,7 +124,7 @@ If you ever have to recreate the Capacitor iOS project: delete `capacitor-ios` a
 
 Milestone 1 adds Face ID / fingerprint, a passcode, and native Apple and Google sheets behind config flags. `NSFaceIDUsageDescription` is in `capacitor-ios/App/App/Info.plist`: "Duo Budget uses Face ID to unlock your budget." Android asks for `USE_BIOMETRIC` and `USE_FINGERPRINT`.
 
-The Sign in with Apple capability is **not** on the Xcode target. A free Personal Team cannot sign it, and the unmerged PR #47 check rejects that entitlement. Add the capability only after the paid Apple Developer Program and the credentials in `docs/auth-setup.md`. Until `window.DUO_AUTH_CONFIG.apple` is true, the Apple button is hidden, and on iPhone the Google button is hidden with it.
+The Sign in with Apple capability is **not** on the Xcode target. A free Personal Team cannot sign it, and the unmerged PR #47 check rejects that entitlement. Add the capability only after the paid Apple Developer Program and the credentials in `docs/auth-setup.md`. The cold-start landing still shows Continue with Apple and Continue with Google. Those taps use browser sign-in until `window.DUO_AUTH_CONFIG.apple` is true and the client ids are set. Native sheets stay off.
 
 `npm run cap:sync` adds `@capgo/capacitor-social-login`, `@aparajita/capacitor-biometric-auth`, `@aparajita/capacitor-secure-storage` and `@capacitor/privacy-screen` to `capacitor-ios/App/CapApp-SPM/Package.swift` and to the Android Gradle projects. PR #47's Package.swift still lists only App, Browser and Splash Screen, so the two branches will both touch that generated file. The widget project in `ios/` is not part of this.
 
