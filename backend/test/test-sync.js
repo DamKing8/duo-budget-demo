@@ -338,6 +338,8 @@ function testSignInEntryPoints() {
   assert(html.indexOf('.duo-welcome .btn.apple{background:#000') > 0 && html.indexOf('border:1px solid #747775') > 0, 'Apple is the black sign-in button and Google uses the identity stroke');
   assert(gate.indexOf("startProvider('apple')") > 0 && gate.indexOf("startProvider('google')") > 0 && gate.indexOf('api.signIn(provider)') > 0, 'Apple and Google use the existing browser sign-in');
   assert(gate.indexOf('width="168"') > 0 && html.indexOf('.duo-welcome .duo-mark{width:168px;height:168px') > 0, 'the landing logo matches the lock screen');
+  assert(gate.indexOf('data-test="welcome-art"') > 0 && gate.indexOf('$1,172.78') > 0 && gate.indexOf('>INCOME<') > 0, 'the landing shows a phone and income donut under the buttons');
+  assert(html.indexOf('.duo-gate.welcome-open .duo-gate-in{min-height:100%') > 0, 'the landing art uses the space under the buttons');
   assert(html.indexOf('function nativeAppShell') > 0 && html.indexOf('nativeAppShell()') > 0, 'the native shell does not keep a service worker');
   var fixed = DuoSync.settledNames({ D: 'Chloe', N: 'Jack' }, { myName: 'Chloe', partnerName: '', email: 'd.hosking@outlook.com' });
   assert(fixed.D === 'd.hosking' && fixed.N === '', 'sample names become the email local part and a blank partner');
