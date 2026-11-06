@@ -37,6 +37,12 @@ var fresh = memory();
 var first = Account.boot(fresh, { now: now });
 assert(first.screen === 'welcome' && first.holdDemo, 'a phone with no budget and no session sees the welcome screen');
 
+var blankFile = memory();
+blankFile.setItem(Account.LEGACY_KEY, '{"items":[],"goals":[],"spends":[],"names":{"D":"Me","N":"Partner"}}');
+var blankBoot = Account.boot(blankFile, { now: now });
+assert(blankBoot.screen === 'welcome', 'an empty saved file with no guest choice still opens the landing');
+assert(!Account.readGate(blankFile).guest, 'that empty file is not marked as a demo choice');
+
 var guest = memory();
 guest.setItem(Account.LEGACY_KEY, '{"items":[{"id":"a"}]}');
 var existing = Account.boot(guest, { now: now });
