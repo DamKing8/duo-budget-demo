@@ -15,13 +15,13 @@
   var unlocked = false;
   var cold = true;
   var backgroundAt = 0;
-  var signupAsked = false;
   var lockOffered = false;
   var linkWait = null;
   var bioType = 0;
   var bioAvailable = false;
   var mode = '';
   var lockKind = '';
+  var emailReturn = null;
   var LOCK_SLOGAN = 'Plan around both paydays.';
 
   function $(id) { return document.getElementById(id); }
@@ -137,6 +137,7 @@
     g.innerHTML = '<div class="duo-gate-in">' + html + '</div>';
     g.classList.add('on');
     g.classList.toggle('lock-open', !!(opts && opts.lock));
+    g.classList.toggle('welcome-open', mode === 'welcome');
     g.removeAttribute('hidden');
     document.documentElement.classList.add('duo-gated');
   }
@@ -145,13 +146,14 @@
     if (!g) return;
     g.classList.remove('on');
     g.classList.remove('lock-open');
+    g.classList.remove('welcome-open');
     g.setAttribute('hidden', '');
     g.innerHTML = '';
     document.documentElement.classList.remove('duo-gated');
     mode = '';
   }
   function logo() {
-    return '<div class="logo mark duo-mark"><img src="icons/logo-mark.webp" width="64" height="64" alt=""></div>';
+    return '<div class="logo mark duo-mark"><img src="icons/logo-mark.webp" width="168" height="168" alt=""></div>';
   }
   function providers() {
     return Account.visibleProviders(authCfg(), platform());
@@ -217,20 +219,54 @@
       });
     });
   }
+  function welcomeArt() {
+    return '<div class="welcome-art" data-test="welcome-art" aria-hidden="true">' +
+      '<svg viewBox="0 0 360 210" xmlns="http://www.w3.org/2000/svg">' +
+      '<defs><filter id="wa-sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#04242c" flood-opacity="0.28"/></filter></defs>' +
+      '<g filter="url(#wa-sh)">' +
+      '<rect x="46" y="8" width="168" height="250" rx="28" fill="#0c1a24"/>' +
+      '<rect x="54" y="16" width="152" height="234" rx="22" fill="#F7F4EE"/>' +
+      '<rect x="112" y="24" width="36" height="6" rx="3" fill="#0c1a24"/>' +
+      '<circle cx="66" cy="46" r="6" fill="#22d3ee"/><circle cx="76" cy="46" r="6" fill="#a78bfa"/>' +
+      '<text x="86" y="50" fill="#1F2430" font-size="11" font-weight="700">Duo Budget</text>' +
+      '<rect x="64" y="62" width="132" height="72" rx="14" fill="#fff"/>' +
+      '<text x="74" y="78" fill="#0F5F57" font-size="7" font-weight="700" letter-spacing="0.4">LEFT OVER THIS FORTNIGHT</text>' +
+      '<text x="74" y="102" fill="#1F2430" font-size="18" font-weight="800">$1,172.78</text>' +
+      '<text x="74" y="120" fill="#5B6170" font-size="7">$5,820 in · 20% left over</text>' +
+      '</g>' +
+      '<g filter="url(#wa-sh)">' +
+      '<rect x="168" y="78" width="156" height="124" rx="20" fill="#fff"/>' +
+      '<text x="246" y="98" text-anchor="middle" fill="#5B6170" font-size="8" font-weight="700">Where the money goes</text>' +
+      '<circle cx="226" cy="148" r="38" fill="none" stroke="#E7F3F1" stroke-width="12"/>' +
+      '<g transform="rotate(-90 226 148)" fill="none" stroke-width="12">' +
+      '<circle cx="226" cy="148" r="38" stroke="#0F766E" stroke-dasharray="23.9 214.9"/>' +
+      '<circle cx="226" cy="148" r="38" stroke="#6D4AD8" stroke-dasharray="23.9 214.9" stroke-dashoffset="-23.9"/>' +
+      '<circle cx="226" cy="148" r="38" stroke="#2F5FD0" stroke-dasharray="143.3 95.5" stroke-dashoffset="-47.8"/>' +
+      '<circle cx="226" cy="148" r="38" stroke="#5eead4" stroke-dasharray="47.8 191" stroke-dashoffset="-191.1"/>' +
+      '</g>' +
+      '<text x="226" y="146" text-anchor="middle" fill="#5B6170" font-size="7" font-weight="700">INCOME</text>' +
+      '<text x="226" y="160" text-anchor="middle" fill="#1F2430" font-size="11" font-weight="800">$5,820</text>' +
+      '<circle cx="278" cy="128" r="4" fill="#0F766E"/><text x="286" y="131" fill="#1F2430" font-size="8">10%</text>' +
+      '<circle cx="278" cy="144" r="4" fill="#6D4AD8"/><text x="286" y="147" fill="#1F2430" font-size="8">10%</text>' +
+      '<circle cx="278" cy="160" r="4" fill="#2F5FD0"/><text x="286" y="163" fill="#1F2430" font-size="8">60%</text>' +
+      '<circle cx="278" cy="176" r="4" fill="#5eead4"/><text x="286" y="179" fill="#1F2430" font-size="8">20%</text>' +
+      '</g></svg></div>';
+  }
   function showWelcome() {
     mode = 'welcome';
-    var p = providers();
     var note = plan && plan.reason === 'inactive' ? '<p class="sub">You\'ve been away from this browser for 30 days, so we signed you out. Your budget is safe.</p>' : '<p class="sub">Plan around both paydays.</p>';
+    var appleMark = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.87-.76-1.47.02-2.83.86-3.59 2.18-1.53 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.24 2.73 2.2 1.1-.04 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.41 1.2-2.47-.03-.01-2.3-.88-2.32-3.5zM14.2 6.13c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.64-1.05 1.68-.92 2.67.97.08 1.96-.49 2.56-1.22z"/></svg>';
+    var googleMark = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
     var buttons = '';
-    if (p.apple) buttons += '<button class="btn apple block" type="button" id="gate-apple" data-test="welcome-apple">Continue with Apple</button>';
-    if (p.google) buttons += '<button class="btn google block" type="button" id="gate-google" data-test="welcome-google">Continue with Google</button>';
+    buttons += '<button class="btn apple block" type="button" id="gate-apple" data-test="welcome-apple">' + appleMark + '<span>Sign in with Apple</span></button>';
+    buttons += '<button class="btn google block" type="button" id="gate-google" data-test="welcome-google">' + googleMark + '<span>Sign in with Google</span></button>';
     buttons += '<button class="btn pri block" type="button" id="gate-email" data-test="welcome-email">Continue with email</button>';
-    var iosHint = !p.apple && !p.google && platform() === 'ios' ? '<p class="email-note">For now, use email.</p>' : '';
-    show('<div class="duo-welcome" data-test="welcome">' + logo() + '<h2 class="page">Duo Budget</h2>' + note + iosHint +
+    show('<div class="duo-welcome" data-test="welcome">' + logo() + '<h2 class="page">Duo Budget</h2>' + note +
       '<div class="duo-actions">' + buttons + '</div>' +
-      '<button class="linkbtn" type="button" id="gate-guest" data-test="welcome-guest">Try it without an account</button>' +
+      '<button class="btn ghost block" type="button" id="gate-guest" data-test="welcome-guest">Try demo</button>' +
       '<p class="mock">Your budget stays on this phone. Add an account any time.</p>' +
-      '<p class="mock"><a href="privacy.html">Privacy</a> · <a href="delete-account.html">Delete an account</a></p></div>');
+      '<p class="mock"><a href="privacy.html">Privacy</a> · <a href="delete-account.html">Delete an account</a></p>' +
+      welcomeArt() + '</div>');
     var apple = $('gate-apple'); if (apple) apple.addEventListener('click', function () { startProvider('apple'); });
     var google = $('gate-google'); if (google) google.addEventListener('click', function () { startProvider('google'); });
     $('gate-email').addEventListener('click', function () { showEmail(false); });
@@ -257,7 +293,22 @@
       $('gate-send').addEventListener('click', sendCode);
       $('gate-use-password').addEventListener('click', function () { showEmail(true); });
     }
-    $('gate-back').addEventListener('click', showWelcome);
+    $('gate-back').addEventListener('click', function () {
+      if (emailReturn) { emailReturn = null; hide(); return; }
+      showWelcome();
+    });
+  }
+  function returnToSync() {
+    if (ctx && ctx.openPartner) ctx.openPartner();
+    setTimeout(function () {
+      var card = document.getElementById('syncCard');
+      if (card && card.scrollIntoView) card.scrollIntoView({ block: 'center' });
+    }, 80);
+  }
+  function openEmailSignIn(opts) {
+    opts = opts || {};
+    emailReturn = typeof opts.after === 'function' ? opts.after : returnToSync;
+    showEmail(false);
   }
   function sendCode() {
     var email = $('gate-email-input').value.trim();
@@ -323,19 +374,12 @@
   }
   function continueGuest() {
     if (ctx.setSampleOnly) ctx.setSampleOnly(false);
-    if (ctx.useDemo) ctx.useDemo();
+    if (ctx.useBlank) ctx.useBlank();
     Account.markGuest(storage());
     if (ctx.save) ctx.save();
     if (ctx.render) ctx.render();
     plan = Account.boot(storage(), { legacyKey: ctx.getKey(), now: Date.now(), skipWelcome: false });
     hide();
-  }
-  function localRows() {
-    var S = ctx.getState();
-    return !!((S.items && S.items.length) || (S.goals && S.goals.length) || (S.spends && S.spends.length));
-  }
-  function savedBudget() {
-    try { return storage().getItem(ctx.getKey()) != null; } catch (e) { return false; }
   }
   function askLink(info, resolve) {
     linkWait = resolve;
@@ -411,6 +455,8 @@
       var title = kind === 'create' ? 'Choose a 4-digit passcode' : kind === 'confirm' ? 'Enter it once more to confirm' : 'Duo Budget is locked';
       var forgot = kind === 'unlock' ? '<button class="linkbtn" type="button" id="gate-forgot-pass" data-test="forgot-passcode">Forgot passcode?</button>' : '';
       var padHtml = (gate.ok || kind !== 'unlock') ? pad('gate-pad') : '';
+      var build = window.DUO_BUILD || {};
+      var stamp = '<p class="build-stamp" data-test="lock-build">Build ' + esc(build.sha || 'dev') + (build.time ? ' · ' + esc(build.time) : '') + '</p>';
       if (kind === 'unlock') {
         show('<div class="lock-invite" data-test="lock-screen">' +
           '<div class="lock-mid">' +
@@ -419,7 +465,7 @@
             '<p class="lock-slogan" data-test="lock-slogan">' + esc(LOCK_SLOGAN) + '</p>' +
             dots(0) + padHtml + '<div class="ferr" id="gate-err"></div>' + err + forgot + help +
           '</div>' +
-          (bioBtn ? '<div class="lock-foot">' + bioBtn + '</div>' : '') +
+          '<div class="lock-foot">' + (bioBtn || '') + stamp + '</div>' +
           '</div>', { lock: true });
       } else {
         show('<div data-test="lock-screen"><h2 class="page">' + title + '</h2>' + dots(0) + padHtml + '<div class="ferr" id="gate-err"></div>' + err + help + '</div>');
@@ -607,7 +653,10 @@
     el.hidden = false;
     var signed = !!(lastStatus && lastStatus.user);
     if (!signed) {
-      el.innerHTML = '<h3><span>App lock</span></h3><p class="sub" data-test="lock-settings">Sign in to lock Duo Budget on this phone. A forgotten passcode is reset by signing in again, so a guest budget can\'t be locked.</p>';
+      el.innerHTML = '<h3><span>App lock</span></h3><p class="sub" data-test="lock-settings">Sign in to lock Duo Budget on this phone.</p>' +
+        '<button class="btn ghost block" type="button" id="lock-signin" data-test="lock-signin">Sign in</button>';
+      var go = $('lock-signin');
+      if (go) go.addEventListener('click', function () { openEmailSignIn(); });
       return;
     }
     var t = prefs.timeout || '1m';
@@ -648,7 +697,7 @@
     el.innerHTML = '<h3><span>Back up this budget</span></h3><p class="sub">Create an account to sync with your partner and keep this budget if you lose this phone.</p>' +
       '<button class="btn pri block" type="button" id="nudge-go" data-test="backup-nudge">Create an account</button>' +
       '<button class="linkbtn" type="button" id="nudge-no">Not now</button>';
-    $('nudge-go').addEventListener('click', function () { if (ctx.openPartner) ctx.openPartner(); });
+    $('nudge-go').addEventListener('click', function () { openEmailSignIn(); });
     $('nudge-no').addEventListener('click', function () {
       var gate = Account.readGate(storage());
       gate.backupNudge = true;
@@ -724,21 +773,11 @@
       if (ctx.leaveSample) ctx.leaveSample(st.uid);
       return;
     }
-    if (st.state === 'no-household' && st.uid && isGuestBudget() && localRows() && savedBudget() && !signupAsked) {
-      signupAsked = true;
-      askLink({ kind: 'keep-or-fresh', cloudHas: false, localHas: true }, function (choice) {
-        Account.claimOwner(storage(), st.uid);
-        if (ctx.setSampleOnly) ctx.setSampleOnly(false);
-        if (ctx.save) ctx.save();
-        var S = ctx.getState();
-        var name = (S.names && S.names.D) || 'Me';
-        ready().then(function (api) { return api.createHousehold(name, name); });
-        if (choice) hide();
-      });
-      return;
-    }
-    if (st.user && mode === 'welcome' || (st.user && mode === 'email') || (st.user && mode === 'code' && mode !== 'reauth-code') || (st.user && mode === 'password')) {
-      if (mode !== 'reauth-code') hide();
+    if (st.user && (mode === 'welcome' || mode === 'email' || mode === 'code' || mode === 'password')) {
+      var back = emailReturn;
+      emailReturn = null;
+      hide();
+      if (typeof back === 'function') back();
     }
     if (mode === 'reauth-code' && st.user) {
       var uid = st.uid || '';
@@ -826,6 +865,7 @@
     openSetPassword: openSetPassword,
     isGuestBudget: isGuestBudget,
     showWelcome: showWelcome,
-    startProvider: startProvider
+    startProvider: startProvider,
+    openEmailSignIn: openEmailSignIn
   };
 });

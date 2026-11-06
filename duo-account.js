@@ -57,6 +57,16 @@
   function present(store, key) {
     try { return store.getItem(key) != null; } catch (e) { return false; }
   }
+  function budgetHasRows(raw) {
+    if (raw == null) return false;
+    try {
+      var s = JSON.parse(raw);
+      if (!s || typeof s !== 'object') return true;
+      return !!((s.items && s.items.length) || (s.goals && s.goals.length) || (s.spends && s.spends.length));
+    } catch (e) {
+      return true;
+    }
+  }
   function copyKey(store, from, to) {
     var raw = store.getItem(from);
     if (raw != null) store.setItem(to, raw);
@@ -93,6 +103,8 @@
     add(LEGACY_KEY);
     add(LEGACY_KEY + '.sync');
     add(WIDGET_KEY);
+    add('duoBudget.premium.mock');
+    add('duoBudget.premium.cache');
     if (uid) { add(budgetKey(uid)); add(budgetKey(uid) + '.sync'); }
     eachKey(store, function (k) {
       if (k.indexOf('duoBudget.u.') === 0 || k.indexOf(BACKUP_PREFIX) === 0) add(k);
@@ -141,6 +153,12 @@
       };
     }
     if (gate.guest || present(store, legacy)) {
+      var rawLegacy = null;
+      try { rawLegacy = store.getItem(legacy); } catch (e) {}
+      // An empty file is not a choice. Only Try demo, or a budget that already has lines, skips the landing.
+      if (!gate.guest && !budgetHasRows(rawLegacy)) {
+        return { screen: 'welcome', key: legacy, uid: null, holdDemo: true, nudge: false, localIsGuest: false, signedIn: false, gate: gate, reason: gate.inactiveSignOut ? 'inactive' : '' };
+      }
       if (!gate.guest && present(store, legacy)) {
         gate.guest = true;
         gate.owner = 'guest';

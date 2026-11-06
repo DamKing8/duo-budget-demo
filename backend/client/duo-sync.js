@@ -13,6 +13,51 @@ function stable(o){if(o===null||typeof o!=='object')return JSON.stringify(o);if(
 function uuid(){if(typeof crypto!=='undefined'&&crypto.randomUUID)return crypto.randomUUID();var b=new Uint8Array(16);crypto.getRandomValues(b);b[6]=b[6]&15|64;b[8]=b[8]&63|128;var h=Array.prototype.map.call(b,function(x){return (x+256).toString(16).slice(1);}).join('');return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);}
 function ts(x){return x?Date.parse(x):0;}
 function num(v){return v===null||v===undefined?0:Math.round(Number(v)*100)/100;}
+// create_invite is not defined in this repo. public.invites stores code and expires_at
+// (default now() + 7 days). The RPC may return that row, a one-row array, or the code text.
+function readInvite(data){
+  var row=data;
+  if(Array.isArray(row))row=row[0];
+  if(row&&typeof row==='object'&&row.data&&row.code==null&&row.invite_code==null)row=row.data;
+  if(Array.isArray(row))row=row[0];
+  if(typeof row==='string'){var t=row.trim();return t?{code:t,expires:''}:null;}
+  if(!row||typeof row!=='object')return null;
+  var code=row.code||row.invite_code||'';
+  if(!code)return null;
+  return {code:String(code).trim(),expires:row.expires_at||row.expiresAt||row.expires||''};
+}
+function shouldOfferInvite(st){
+  return !!(st&&['synced','pending','offline'].indexOf(st.state)>=0&&st.members===1);
+}
+// Sample and bucket labels are not a person's name. The email's local part is the fallback.
+function realDisplayName(typed, email){
+  var t=String(typed||'').trim();
+  var low=t.toLowerCase();
+  if(t&&low!=='me'&&low!=='partner'&&low!=='chloe'&&low!=='jack')return t.slice(0,60);
+  var local=String(email||'').split('@')[0]||'';
+  local=local.replace(/[^\w.+-]/g,'').slice(0,60);
+  return local||'Me';
+}
+function householdTitle(name){
+  name=String(name||'').trim();
+  if(!name||name.toLowerCase()==='me')return 'Our household';
+  return name.slice(0,60)+"'s household";
+}
+function isSampleName(n){
+  var t=String(n||'').trim().toLowerCase();
+  return !t||t==='chloe'||t==='jack'||t==='me'||t==='partner';
+}
+function settledNames(local, info){
+  local=local||{}; info=info||{};
+  var D=local.D, N=local.N;
+  if(isSampleName(D))D=!isSampleName(info.myName)?info.myName:realDisplayName('', info.email);
+  if(isSampleName(N))N=info.partnerName&&!isSampleName(info.partnerName)?info.partnerName:'';
+  return {D:D,N:N};
+}
+function needsRenamePrompt(info){
+  info=info||{};
+  return isSampleName(info.householdName)||isSampleName(info.myName);
+}
 
 /* opts: {config, storageKey, app:{getState, commit(reason), localId(), setPay(slot,{cycle,next}), getPay(slot)},
           createClient (supabase-js createClient), storage (localStorage-like), now(), onStatus(status), online() } */
@@ -20,9 +65,16 @@ function create(opts){
   var cfg=opts.config||{},store=opts.storage,app=opts.app,now=opts.now||function(){return Date.now();};
   var MK=opts.storageKey+'.sync';
   var meta=load();var client=null,session=null,ctx=null,channel=null,applying=false,timer=null,flushing=null,status={state:'starting',pending:0};
+  var linkChoiceOnce=null,pendingHouseholdName='';
   function load(){try{var m=JSON.parse(store.getItem(MK)||'null');if(m&&m.v===1)return m;}catch(e){}return {v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:null};}
   function persist(){try{store.setItem(MK,JSON.stringify(meta));}catch(e){}}
-  function setStatus(s,msg){status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
+  function activeMembers(){if(!ctx||!ctx.members)return [];return ctx.members.filter(function(m){return m&&m.status==='active'&&!m.deleted_at;});}
+  function meAndPartner(){
+    var id=session&&session.user&&session.user.id,mine='',other='';
+    activeMembers().forEach(function(m){if(m.user_id===id)mine=m.display_name||'';else if(!other)other=m.display_name||'';});
+    return {myName:mine,partnerName:other};
+  }
+  function setStatus(s,msg){var who=meAndPartner();status={state:s,pending:meta.queue.length,msg:msg||'',household:meta.household,householdName:(ctx&&ctx.householdName)||'',members:activeMembers().length,memberNames:activeMembers().map(function(m){return m.display_name;}).filter(Boolean),myName:who.myName,partnerName:who.partnerName,user:session&&session.user?session.user.email:null,uid:session&&session.user?session.user.id:null,debug:debugInfo(s)};if(opts.onStatus)opts.onStatus(status);}
   // Diagnostics stay in the console. The sync card does not show them.
   var dbg={lastEvent:'-',lastError:'-',urlReturn:'-'};
   function nativeCap(){try{if(typeof Capacitor!=='undefined')return Capacitor;if(typeof window!=='undefined'&&window.Capacitor)return window.Capacitor;}catch(e){}return null;}
@@ -269,8 +321,15 @@ function create(opts){
       ctx=buildCtx(mine.household_id,(res.data||[]).filter(function(m){return m.household_id===mine.household_id;}));
       var first=meta.household!==ctx.household;
       if(first){meta={v:1,ids:{},snap:{},ua:{},cursor:{},queue:[],household:ctx.household};idToKey={};}
-      var S=app.getState();if(S&&ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;if(S&&ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
-      if(first&&isGuestBudget()&&localHasData()&&typeof opts.onLinkChoice==='function'){
+      var S=app.getState();
+      if(S&&ctx.bySlotName.D)S.names.D=ctx.bySlotName.D;
+      if(S&&ctx.bySlotName.N)S.names.N=ctx.bySlotName.N;
+      else if(S&&S.names){var slotN=String(S.names.N||'').trim().toLowerCase();if(!slotN||slotN==='chloe'||slotN==='jack'||slotN==='me')S.names.N='Partner';}
+      return attachHouseholdName(mine.household_id).then(function(){
+      if(ctx&&!ctx.householdName&&pendingHouseholdName)ctx.householdName=pendingHouseholdName;
+      if(first&&isGuestBudget()&&localHasData()&&(linkChoiceOnce||typeof opts.onLinkChoice==='function')){
+        var preset=linkChoiceOnce;
+        if(preset){linkChoiceOnce=null;return finishLink(first,preset);}
         return listCloud().then(function(acc){
           if(disposed)return null;
           var cloudHas=cloudHasRows(acc);
@@ -285,7 +344,15 @@ function create(opts){
         });
       }
       return finishLink(first,null);
+      });
     });
+  }
+  function attachHouseholdName(hh){
+    if(!client||!client.from)return Promise.resolve();
+    return client.from('households').select('name').eq('id',hh).then(function(res){
+      var rows=res&&res.data,row=Array.isArray(rows)?rows[0]:rows;
+      if(ctx&&row&&row.name)ctx.householdName=row.name;
+    },function(){});
   }
   function ctx0(){return {me:session&&session.user?session.user.id:null};}
   var authFlight=null,authFor=null;
@@ -402,13 +469,35 @@ function create(opts){
       if(!client||!client.auth||!client.auth.getUserIdentities)return Promise.resolve({data:{identities:[]}});
       return client.auth.getUserIdentities().then(function(r){return r||{data:{identities:[]}};},function(){return {data:{identities:[]}};});
     },
-    createHousehold:function(name,display){return client.rpc('create_household',{p_name:name,p_display_name:display}).then(function(r){if(r.error)throw r.error;return loadHousehold();});},
+    preferLinkChoice:function(choice){linkChoiceOnce=choice||null;},
+    createHousehold:function(name,display){pendingHouseholdName=String(name||'').trim();return client.rpc('create_household',{p_name:pendingHouseholdName,p_display_name:display}).then(function(r){if(r.error)throw r.error;return loadHousehold();});},
     createInvite:function(){return client.rpc('create_invite',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return r.data;});},
     joinHousehold:function(code,display){return client.rpc('join_household',{p_code:code,p_display_name:display}).then(function(r){if(r.error)throw r.error;if(!r.data||!r.data.ok)return r.data;return loadHousehold().then(function(){return r.data;});});},
+    renameHousehold:function(name,display){
+      var hh=ctx&&ctx.household,me=null;
+      activeMembers().forEach(function(m){if(m.user_id===(session&&session.user&&session.user.id))me=m;});
+      if(!hh||!me)return Promise.reject(new Error('Join or start a household first.'));
+      var cleanName=String(name||'').trim(),cleanDisplay=String(display||'').trim();
+      function done(r){if(r&&r.error)throw r.error;return loadHousehold().then(function(){return {ok:true};});}
+      function direct(){
+        var stamp=new Date(now()).toISOString();
+        return client.from('households').update({name:cleanName,updated_at:stamp}).eq('id',hh).then(function(r){
+          if(r&&r.error)throw r.error;
+          return client.from('household_members').update({display_name:cleanDisplay,updated_at:stamp}).eq('id',me.id);
+        }).then(done);
+      }
+      if(!client.rpc)return direct();
+      return client.rpc('rename_my_household',{p_name:cleanName,p_display_name:cleanDisplay}).then(function(r){
+        var msg=r&&r.error&&(r.error.message||'');
+        var code=r&&r.error&&r.error.code;
+        if(r&&r.error&&(code==='PGRST202'||/rename_my_household|schema cache|Could not find the function/i.test(msg)))return direct();
+        return done(r);
+      },direct);
+    },
     leaveHousehold:function(){return client.rpc('leave_household',{p_household:ctx.household}).then(function(r){if(r.error)throw r.error;return afterAuth(session);});},
     online:function(){pull().then(flush);}
   };
   return api;
 }
-return {create:create,TABLES:TABLES,_stable:stable};
+return {create:create,TABLES:TABLES,_stable:stable,readInvite:readInvite,shouldOfferInvite:shouldOfferInvite,realDisplayName:realDisplayName,householdTitle:householdTitle,isSampleName:isSampleName,settledNames:settledNames,needsRenamePrompt:needsRenamePrompt};
 });

@@ -79,6 +79,13 @@ async function personal(browser, url) {
   await watch(page, bag);
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await settle(page);
+  if (await page.locator('[data-test="load-sample"]').isVisible()) {
+    await page.click('[data-test="load-sample"]');
+    await page.waitForFunction(function () {
+      var S = window.__duo.state();
+      return S && S.items && S.items.some(function (i) { return i.name === 'Groceries'; });
+    });
+  }
   await page.waitForSelector('[data-test="spent-card"]');
   assert((await page.locator('#spentCardLbl').innerText()).indexOf('Spent this') === 0, 'home card title');
   var phoneTabs = await page.locator('nav.tabs .in > button').evaluateAll(function (els) {

@@ -197,7 +197,164 @@ async function main() {
   await testNativeSignIn();
   await testPasswordAndIdToken();
   await testGuestChoiceDoesNotMerge();
+  await testInviteButtonFlow();
+  testSignInEntryPoints();
+  await testTwoPhonesShareAHousehold();
   console.log('sync ok');
+}
+
+async function testTwoPhonesShareAHousehold() {
+  var HH_A = 'aaaaaaa1-aaaa-4aaa-8aaa-aaaaaaaaaaa1';
+  var HH_B = 'bbbbbbb2-bbbb-4bbb-8bbb-bbbbbbbbbbb2';
+  var MEM_A = 'memaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1';
+  var MEM_B = 'membbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2';
+  var MEM_SOLO = 'memccccc-cccc-4ccc-8ccc-ccccccccccc3';
+  var db = {
+    households: [{ id: HH_A, name: 'Chloe' }, { id: HH_B, name: 'Jack' }],
+    household_members: []
+  };
+  var rpcs = [];
+  function client(userId) {
+    return function () {
+      return {
+        from: function (table) {
+          return {
+            select: function () {
+              var filters = [];
+              var q = {
+                eq: function (c, v) { filters.push([c, v]); return q; },
+                gt: function () { return q; },
+                order: function () { return Promise.resolve(run()); },
+                then: function (ok, bad) { return Promise.resolve(run()).then(ok, bad); }
+              };
+              function run() {
+                var rows = (db[table] || []).filter(function (r) { return filters.every(function (f) { return r[f[0]] === f[1]; }); });
+                return { data: rows.map(function (r) { return Object.assign({}, r); }), error: null };
+              }
+              return q;
+            },
+            upsert: function () { return Promise.resolve({ error: null }); }
+          };
+        },
+        channel: function () { return { on: function () { return this; }, subscribe: function () { return this; } }; },
+        removeChannel: function () {},
+        rpc: function (name, args) {
+          rpcs.push([name, args, userId]);
+          if (name === 'create_household') {
+            db.households.forEach(function (h) { if (h.id === HH_A) h.name = args.p_name; });
+            db.household_members.push({ id: MEM_A, household_id: HH_A, user_id: userId, status: 'active', deleted_at: null, joined_at: '2026-11-01T00:00:00.000Z', display_name: args.p_display_name });
+            return Promise.resolve({ data: { id: HH_A }, error: null });
+          }
+          if (name === 'create_invite') return Promise.resolve({ data: { code: 'AB12CD34', expires_at: '2026-11-12T00:00:00.000Z' }, error: null });
+          if (name === 'leave_household') {
+            db.household_members.forEach(function (m) { if (m.user_id === userId && m.household_id === args.p_household && m.status === 'active') { m.status = 'left'; m.left_at = '2026-11-05T00:00:00.000Z'; } });
+            return Promise.resolve({ data: { ok: true }, error: null });
+          }
+          if (name === 'join_household') {
+            db.household_members.push({ id: userId === USER_N ? MEM_B : MEM_SOLO, household_id: HH_A, user_id: userId, status: 'active', deleted_at: null, joined_at: '2026-11-05T00:00:00.000Z', display_name: args.p_display_name });
+            return Promise.resolve({ data: { ok: true }, error: null });
+          }
+          return Promise.resolve({ data: null, error: { message: 'missing ' + name } });
+        },
+        auth: {
+          onAuthStateChange: function () {},
+          getSession: function () { return Promise.resolve({ data: { session: { user: { id: userId, email: userId + '@example.com' } } }, error: null }); }
+        }
+      };
+    };
+  }
+  function open(userId, local, guest) {
+    return DuoSync.create({
+      config: { enabled: true, supabaseUrl: 'https://example.supabase.co', supabaseAnonKey: 'test' },
+      storageKey: 'duo-two-' + userId,
+      storage: memory(),
+      app: appFor(local),
+      createClient: client(userId),
+      guestBudget: function () { return !!guest; },
+      now: function () { return Date.parse('2026-11-05T00:00:00.000Z'); },
+      online: function () { return true; },
+      flushDelay: 60000
+    }).start();
+  }
+  assert(DuoSync.realDisplayName('Chloe', 'd.hosking@outlook.com') === 'd.hosking', 'a sample name is not sent to the cloud');
+  assert(DuoSync.realDisplayName('Me', 'hosking.damon@gmail.com') === 'hosking.damon', 'the Me label falls back to the email');
+  assert(DuoSync.realDisplayName('Damon', 'x@y.com') === 'Damon', 'a typed name is kept');
+  assert(DuoSync.householdTitle('Damon') === "Damon's household" && DuoSync.householdTitle('Me') === 'Our household', 'the household title uses the person or Our household');
+  var phoneA = { names: { D: 'Chloe', N: 'Jack' }, cycle: 'fortnight', payDate: '2026-11-12', items: [], goals: [], spends: [] };
+  var phoneB = { names: { D: 'Me', N: 'Jack' }, cycle: 'fortnight', payDate: '2026-11-12', items: [{ id: 'rent', name: 'Rent', amount: 1, freq: 'fortnight', cat: 'expenses', owner: 'J' }], goals: [], spends: [] };
+  var a = await open(USER_D, phoneA, false);
+  assert(a.status().state === 'no-household' && a.status().members === 0, 'phone A signs in with no household and is not given one');
+  var youA = DuoSync.realDisplayName(phoneA.names.D, 'd.hosking@outlook.com');
+  await a.createHousehold(DuoSync.householdTitle(youA), youA);
+  assert(a.status().members === 1 && a.status().householdName === "d.hosking's household" && a.status().memberNames.join(',') === 'd.hosking', 'phone A stores the email name, not Chloe');
+  assert(phoneA.names.N === 'Partner', 'the sample partner name is cleared when nobody has joined');
+  var invite = DuoSync.readInvite(await a.createInvite());
+  assert(invite.code === 'AB12CD34', 'phone A gets a code to read out');
+  var b = await open(USER_N, phoneB, true);
+  assert(b.status().state === 'no-household', 'phone B is not auto-placed in its own household');
+  b.preferLinkChoice('fresh');
+  var joined = await b.joinHousehold(invite.code, DuoSync.realDisplayName(phoneB.names.D, 'ada@example.com'));
+  assert(joined && joined.ok === true, 'phone B joins with the code');
+  assert(b.status().household === HH_A && a.status().household === HH_A, 'both phones are in the same household');
+  assert(phoneB.items.length === 0, 'phone B does not upload its own budget into the shared household');
+  assert(b.status().memberNames.indexOf('d.hosking') >= 0 && b.status().memberNames.indexOf('ada') >= 0, 'phone B lists both real names');
+  assert(b.status().memberNames.indexOf('Chloe') < 0 && b.status().memberNames.indexOf('Jack') < 0 && b.status().memberNames.indexOf('Me') < 0, 'sample names are not members');
+  var solo = { names: { D: 'Me', N: 'Partner' }, cycle: 'fortnight', payDate: '2026-11-12', items: [{ id: 'own', name: 'Own', amount: 2, freq: 'fortnight', cat: 'expenses', owner: 'J' }], goals: [], spends: [] };
+  db.household_members.push({ id: MEM_SOLO, household_id: HH_B, user_id: '33333333-3333-4333-8333-333333333333', status: 'active', deleted_at: null, joined_at: '2026-11-01T00:00:00.000Z', display_name: 'Sam' });
+  var c = await open('33333333-3333-4333-8333-333333333333', solo, true);
+  assert(c.status().household === HH_B && c.status().members === 1, 'a phone that already started a household still has it');
+  c.preferLinkChoice('fresh');
+  await c.leaveHousehold();
+  var swapped = await c.joinHousehold('AB12CD34', 'Sam');
+  assert(swapped && swapped.ok === true && c.status().household === HH_A, 'leaving then joining moves the phone into the partner household');
+  assert(rpcs.some(function (c) { return c[0] === 'leave_household' && c[1].p_household === HH_B; }) && rpcs.some(function (c) { return c[0] === 'join_household' && c[1].p_code === 'AB12CD34'; }), 'the swap uses leave_household and join_household only');
+}
+
+function testSignInEntryPoints() {
+  var fs = require('fs');
+  var root = path.join(__dirname, '..', '..');
+  var html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  var gate = fs.readFileSync(path.join(root, 'duo-gate.js'), 'utf8');
+  var premium = fs.readFileSync(path.join(root, 'duo-premium-ui.js'), 'utf8');
+  var syncAt = html.indexOf('id="syncCard"');
+  var hhAt = html.indexOf('id="hhCard"');
+  var lockAt = html.indexOf('id="lockCard"');
+  assert(syncAt > 0 && syncAt < hhAt && hhAt < lockAt, 'cloud sync sits above the practice household and app lock');
+  assert(html.indexOf('Sign in to sync with your partner') > 0, 'the guest sync card has a sign-in button');
+  assert(html.indexOf('>Start a household<') > 0 && html.indexOf('Enter join code') > 0, 'a signed-in phone with no household can start or enter a code');
+  assert(html.indexOf('Have a code from your partner? Join their household') > 0, 'a solo household can still join a partner code');
+  assert(html.indexOf('Waiting for your partner, tap Invite your partner') > 0, 'a solo household says the partner has not joined');
+  assert(html.indexOf('Edit household name') > 0, 'the owner can rename a household from the card');
+  assert(html.indexOf('id="currency"') > 0 && html.indexOf('Currency converter') < 0 && html.indexOf('id="fxCard"') < 0, 'display currency stays and the converter card is gone');
+  assert(html.indexOf('data-test="edit-household-top"') > 0 && html.indexOf('data-test="build-stamp"') > 0, 'the partner tab has a top rename button and a build stamp');
+  assert(html.indexOf('Load sample data') > 0 && html.indexOf('Clear sample data') > 0 && html.indexOf('data-test="empty-start"') > 0, 'sample data is a choice, with a way to clear it');
+  assert(/:blankBudget\(\)/.test(html) && /useBlank:function\(\)\{S=blankBudget\(\)/.test(html), 'a new phone starts from an empty budget');
+  assert(gate.indexOf('ctx.useBlank') > 0 && gate.indexOf('ctx.useDemo') < 0, 'guest start does not load the sample household');
+  assert(gate.indexOf('class="btn ghost block" type="button" id="gate-guest" data-test="welcome-guest">Try demo<') > 0 && gate.indexOf('Plan around both paydays.') > 0, 'Try demo is a secondary button under the slogan');
+  assert(gate.indexOf('data-test="welcome-apple"') > 0 && gate.indexOf('welcome-apple">') > 0 && gate.indexOf('>Sign in with Apple<') > 0, 'the landing uses the Sign in with Apple label');
+  assert(gate.indexOf('data-test="welcome-google"') > 0 && gate.indexOf('>Sign in with Google<') > 0 && gate.indexOf('#4285F4') > 0 && gate.indexOf('#34A853') > 0 && gate.indexOf('#FBBC05') > 0 && gate.indexOf('#EA4335') > 0, 'the landing uses the four-color Google G and Sign in with Google');
+  assert(gate.indexOf('data-test="welcome-email"') > 0, 'the landing still offers email');
+  assert(html.indexOf('.duo-welcome .btn.apple{background:#000') > 0 && html.indexOf('border:1px solid #747775') > 0, 'Apple is the black sign-in button and Google uses the identity stroke');
+  assert(gate.indexOf("startProvider('apple')") > 0 && gate.indexOf("startProvider('google')") > 0 && gate.indexOf('api.signIn(provider)') > 0, 'Apple and Google use the existing browser sign-in');
+  assert(gate.indexOf('width="168"') > 0 && html.indexOf('.duo-welcome .duo-mark{width:168px;height:168px') > 0, 'the landing logo matches the lock screen');
+  assert(gate.indexOf('data-test="welcome-art"') > 0 && gate.indexOf('$1,172.78') > 0 && gate.indexOf('>INCOME<') > 0, 'the landing shows a phone and income donut under the buttons');
+  assert(html.indexOf('.duo-gate.welcome-open .duo-gate-in{min-height:100%') > 0, 'the landing art uses the space under the buttons');
+  assert(html.indexOf('function nativeAppShell') > 0 && html.indexOf('nativeAppShell()') > 0, 'the native shell does not keep a service worker');
+  var fixed = DuoSync.settledNames({ D: 'Chloe', N: 'Jack' }, { myName: 'Chloe', partnerName: '', email: 'd.hosking@outlook.com' });
+  assert(fixed.D === 'd.hosking' && fixed.N === '', 'sample names become the email local part and a blank partner');
+  var joined = DuoSync.settledNames({ D: 'Me', N: 'Partner' }, { myName: 'Damon', partnerName: 'Alex', email: 'a@b.c' });
+  assert(joined.D === 'Damon' && joined.N === 'Alex', 'cloud display names replace the bucket labels');
+  assert(DuoSync.needsRenamePrompt({ householdName: 'Chloe', myName: 'Damon' }) && !DuoSync.needsRenamePrompt({ householdName: "Damon's household", myName: 'Damon' }), 'a sample household name asks to be edited once');
+  assert(gate.indexOf('createHousehold') < 0, 'signing in does not create a household');
+  assert(gate.indexOf('data-test="lock-signin"') > 0 && gate.indexOf('openEmailSignIn()') > 0, 'the app lock button opens email sign-in');
+  assert(premium.indexOf('DuoGate.openEmailSignIn') > 0, 'premium sign-in opens the email flow');
+  assert(html.indexOf('Ours · Me · Partner') > 0 && html.indexOf('Ours · Yours · Mine') < 0, 'whose outgoings says Me and Partner');
+  var visible = html.replace(/<script[\s\S]*?<\/script>/gi, '');
+  assert(visible.indexOf('Yours') < 0 && visible.indexOf('Mine') < 0, 'no user-facing Yours or Mine label remains');
+  assert(gate.indexOf('Yours') < 0 && gate.indexOf('Mine') < 0 && premium.indexOf('Yours') < 0 && premium.indexOf('Mine') < 0, 'gate and premium screens do not say Yours or Mine');
+  var debugAt = html.indexOf('Sync status:');
+  assert(debugAt > 0 && /syncDebugRequested\(\)/.test(html.slice(debugAt - 180, debugAt)), 'the sync status line renders only when ?debug=1');
+  assert(html.indexOf('INITIAL_SESSION') < 0 && gate.indexOf('INITIAL_SESSION') < 0, 'INITIAL_SESSION is not written into the screen');
 }
 
 function emptyApp() {
@@ -409,6 +566,90 @@ async function testGuestChoiceDoesNotMerge() {
   assert(local.items.length === 1 && local.items[0].name === 'Cloud rent', 'the account budget is the one that stays');
   assert(!local.items.some(function (it) { return it.name === 'Phone only'; }), 'the phone-only line is not merged in');
   assert(!db.budget_items.some(function (r) { return r.name === 'Phone only'; }), 'the phone-only line is not uploaded');
+}
+
+async function testInviteButtonFlow() {
+  var row = { code: 'AB12CD34', expires_at: '2026-11-12T00:00:00.000Z' };
+  assert(DuoSync.shouldOfferInvite({ state: 'synced', members: 1 }), 'a synced household of one offers an invite');
+  assert(DuoSync.shouldOfferInvite({ state: 'pending', members: 1 }) && DuoSync.shouldOfferInvite({ state: 'offline', members: 1 }), 'pending and offline still offer an invite');
+  assert(!DuoSync.shouldOfferInvite({ state: 'synced', members: 2 }), 'two members do not get another invite');
+  assert(!DuoSync.shouldOfferInvite({ state: 'no-household', members: 0 }), 'join and start stay the path when there is no household');
+  assert(DuoSync.readInvite(row).code === 'AB12CD34' && DuoSync.readInvite(row).expires === row.expires_at, 'public.invites returns code and expires_at');
+  assert(DuoSync.readInvite([row]).code === 'AB12CD34', 'a one-row result is accepted');
+  assert(DuoSync.readInvite('HELLO123').code === 'HELLO123' && DuoSync.readInvite('HELLO123').expires === '', 'a bare code is accepted');
+  assert(DuoSync.readInvite({}) === null && DuoSync.readInvite(null) === null, 'a result without a code is ignored');
+
+  var store = memory();
+  var local = { names: { D: 'Me', N: 'Partner' }, cycle: 'fortnight', payDate: '2026-11-12', items: [], goals: [], spends: [] };
+  var db = {
+    household_members: [{ id: MEM_D, household_id: HH, user_id: USER_D, status: 'active', deleted_at: null, joined_at: '2020-01-01T00:00:00.000Z', display_name: 'Chloe' }],
+    budget_items: [], goals: [], pay_cycles: [], spend_entries: []
+  };
+  var rpcCalls = [];
+  function client() {
+    return {
+      from: function (table) {
+        return {
+          select: function () {
+            var filters = [];
+            var q = {
+              eq: function (c, v) { filters.push([c, v]); return q; },
+              gt: function () { return q; },
+              order: function () { return Promise.resolve(run()); },
+              then: function (ok, bad) { return Promise.resolve(run()).then(ok, bad); }
+            };
+            function run() {
+              var rows = (db[table] || []).filter(function (r) { return filters.every(function (f) { return r[f[0]] === f[1]; }); });
+              return { data: rows.map(function (r) { return Object.assign({}, r); }), error: null };
+            }
+            return q;
+          },
+          upsert: function (rows) {
+            (rows || []).forEach(function (row) {
+              var list = db[table] || (db[table] = []);
+              var i = list.findIndex(function (r) { return r.id === row.id; });
+              if (i >= 0) list[i] = Object.assign({}, list[i], row);
+              else list.push(Object.assign({}, row));
+            });
+            return Promise.resolve({ error: null });
+          }
+        };
+      },
+      channel: function () { return { on: function () { return this; }, subscribe: function () { return this; } }; },
+      removeChannel: function () {},
+      rpc: function (name, args) {
+        rpcCalls.push([name, args]);
+        if (name === 'create_invite') return Promise.resolve({ data: { code: 'AB12CD34', expires_at: '2026-11-12T00:00:00.000Z' }, error: null });
+        if (name === 'join_household') {
+          db.household_members.push({ id: MEM_N, household_id: HH, user_id: USER_N, status: 'active', deleted_at: null, joined_at: '2026-11-01T00:00:00.000Z', display_name: args.p_display_name || 'Jack' });
+          return Promise.resolve({ data: { ok: true }, error: null });
+        }
+        return Promise.resolve({ data: null, error: { message: 'missing ' + name } });
+      },
+      auth: {
+        onAuthStateChange: function () {},
+        getSession: function () { return Promise.resolve({ data: { session: { user: { id: USER_D, email: 'chloe@example.com' } } }, error: null }); }
+      }
+    };
+  }
+  var api = DuoSync.create({
+    config: { enabled: true, supabaseUrl: 'https://example.supabase.co', supabaseAnonKey: 'test' },
+    storageKey: 'duo-invite',
+    storage: store,
+    app: appFor(local),
+    createClient: client,
+    now: function () { return Date.parse('2026-11-04T00:00:00.000Z'); },
+    online: function () { return true; },
+    flushDelay: 60000
+  });
+  await api.start();
+  assert(api.status().members === 1 && DuoSync.shouldOfferInvite(api.status()), 'the first phone, alone in the household, is offered an invite');
+  var made = DuoSync.readInvite(await api.createInvite());
+  assert(rpcCalls.some(function (c) { return c[0] === 'create_invite' && c[1].p_household === HH && !c[1].p_valid_for; }), 'create_invite uses the household id and the 7-day default');
+  assert(made && made.code === 'AB12CD34' && made.expires === '2026-11-12T00:00:00.000Z', 'the button can show the code and the expiry');
+  var joined = await api.joinHousehold('AB12CD34', 'Jack');
+  assert(joined && joined.ok === true, 'a matching code joins the household');
+  assert(local.names.D === 'Chloe' && local.names.N === 'Jack', 'after joining, both names are on the phone');
 }
 
 main().catch(function (e) {

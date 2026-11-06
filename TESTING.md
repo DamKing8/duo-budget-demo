@@ -17,10 +17,10 @@ Open the URL in a normal browser window, at a phone width (about 390px). Use a p
 
 | What you should see | How |
 | --- | --- |
-| Welcome, with Google and email, and no Apple button | First visit. Apple stays hidden until `DUO_AUTH_CONFIG.apple` is true and a Services ID is set. |
+| Welcome landing | First visit with no session and no saved lines. Logo, Duo Budget, "Plan around both paydays.", Continue with Apple, Continue with Google, Continue with email, and Try demo. |
 | Email code | Continue with email, then Send code. This sends a real code through the existing Resend setup. Don't do it unless you mean to use that inbox. |
 | Password | Use a password instead. It works only after that account has set one under Partners. |
-| Try without an account | The sample budget stays on this browser. Welcome does not come back. |
+| Try demo | Opens an empty household. Load sample data is on Home and in Partners. Welcome does not come back. |
 | Keep this budget? | Sign in after you have used the app as a guest. A cloud budget is never folded in without a choice. |
 | Set a password | Partners, once signed in. |
 | App lock | Partners. Off until you turn it on. Web has the passcode only. |
@@ -47,7 +47,7 @@ Signing & Capabilities: your Personal Team, bundle id `au.duobudget.app`. Do not
 
 You can test welcome, email code, guest mode, the passcode lock, the auto-lock timers (leave the app and come back), and sign-out. Face ID prompts only after the lock is on and the phone has Face ID. The usage text is "Duo Budget uses Face ID to unlock your budget."
 
-You cannot test Sign in with Apple, or native Google on iPhone, until the credentials below exist. Google is hidden on iPhone while Apple is off (App Store guideline 4.8). For a personal install only, `allowGoogleWithoutApple: true` in `window.DUO_AUTH_CONFIG` shows the existing browser Google sign-in. Turn that back off before any App Store submit.
+The landing always shows Apple, Google, and email. Those buttons use the existing browser sign-in. Native Apple and native Google on iPhone still wait for client ids and the paid Sign in with Apple capability. The in-app provider list still hides Google on iPhone while `apple` is false (App Store guideline 4.8).
 
 `npm run cap:sync` rewrites `capacitor-ios/App/CapApp-SPM/Package.swift` for the new plugins. That file will conflict with PR #47, which still lists only App, Browser and Splash Screen. The plist Face ID line can conflict with PR #47's whitespace-only plist edit. The widget project in `ios/` is untouched.
 
@@ -73,3 +73,34 @@ Native Google and Apple sheets do nothing until the client ids below are filled 
 - The auth settings in `backend/auth/config.toml`. They are notes for the dashboard, not a push.
 
 Full credential list: `docs/auth-setup.md`.
+
+## Premium
+
+Premium is previewed on the device until a RevenueCat key is set. The preview does not call Apple, Google, or Supabase. Partners → Premium has six states: free, trial, active, lapsed, partner, courtesy. "This store account has a purchase" controls Restore purchases.
+
+The free plan includes partner sync, unlimited expenses, CSV export, and light, dark, and system themes. It includes 2 goals, 3 months of spending and trends, 5 custom categories, 1 bill reminder, and the current payday. Premium is unlimited goals, the older history (still saved), the further paydays, unlimited categories and reminders, and the extra colours.
+
+### Web
+
+```bash
+npx serve .
+```
+
+Open a private window so an old budget does not skip the new cards. Sign in, or use the preview without a store.
+
+| Screen | How |
+| --- | --- |
+| Paywall | Goals → Add a goal once two goals exist. Prices are A$4.99 a month and A$39.99 a year. |
+| Third goal | With three goals on the free preview, the third card says it is read-only. |
+| History | Spending → previous payday until the page says older spending stays saved. |
+| Lapsed | Partners → Premium → lapsed, then open that third goal. |
+| Partner covers you | Partners → Premium → partner. |
+| Restore | Tick "This store account has a purchase", then Restore purchases. |
+
+### iPhone and Android
+
+Same preview. Build with the milestone 1 steps (`npm run cap:sync`, then Xcode or `npm run android:debug`). The preview chips are on the Partner tab. Face ID and the store sheet do not appear, because there is no RevenueCat key and no store product.
+
+A free Apple ID can install this. It cannot complete a real subscription. Sandbox testing needs the products in `docs/premium-products.md`, a RevenueCat project, an App Store sandbox tester, and a Play licence tester. Put the public SDK key in `DUO_PREMIUM_CONFIG` and set `mock` to false. Then Restore purchases calls the store.
+
+The entitlement table and the webhook are files only. They are not on the live database, so a real purchase would not light up Premium until those are applied and the webhook secret is set.
