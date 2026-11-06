@@ -203,7 +203,14 @@
         var result = res && res.result || {};
         var token = result.idToken;
         if (!token) throw new Error('no-token');
-        return sync().signInWithIdToken(provider, token, raw);
+        return sync().signInWithIdToken(provider, token, raw).then(function (r) {
+          if (r && r.error) {
+            var err = new Error(r.error.message || 'native-token');
+            err.code = r.error.code || 'native-token';
+            throw err;
+          }
+          return r;
+        });
       });
     });
   }

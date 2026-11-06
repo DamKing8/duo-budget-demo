@@ -336,7 +336,8 @@ function testSignInEntryPoints() {
   assert(gate.indexOf('data-test="welcome-google"') > 0 && gate.indexOf('>Sign in with Google<') > 0 && gate.indexOf('#4285F4') > 0 && gate.indexOf('#34A853') > 0 && gate.indexOf('#FBBC05') > 0 && gate.indexOf('#EA4335') > 0, 'the landing uses the four-color Google G and Sign in with Google');
   assert(gate.indexOf('data-test="welcome-email"') > 0, 'the landing still offers email');
   assert(html.indexOf('.duo-welcome .btn.apple{background:#000') > 0 && html.indexOf('border:1px solid #747775') > 0, 'Apple is the black sign-in button and Google uses the identity stroke');
-  assert(gate.indexOf("startProvider('apple')") > 0 && gate.indexOf("startProvider('google')") > 0 && gate.indexOf('api.signIn(provider)') > 0, 'Apple and Google use the existing browser sign-in');
+  assert(gate.indexOf("startProvider('apple')") > 0 && gate.indexOf("startProvider('google')") > 0 && gate.indexOf('api.signIn(provider)') > 0, 'Apple and Google keep the browser sign-in fallback');
+  assert(html.indexOf('apple:true') > 0 && html.indexOf('appleClientId:""') > 0, 'iOS attempts native Apple from the bundle id and does not invent a Services ID');
   assert(gate.indexOf('width="168"') > 0 && html.indexOf('.duo-welcome .duo-mark{width:168px;height:168px') > 0, 'the landing logo matches the lock screen');
   assert(gate.indexOf('data-test="welcome-art"') > 0 && gate.indexOf('$1,172.78') > 0 && gate.indexOf('>INCOME<') > 0, 'the landing shows a phone and income donut under the buttons');
   assert(html.indexOf('.duo-gate.welcome-open .duo-gate-in{min-height:100%') > 0, 'the landing art uses the space under the buttons');

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-/* Checks the Capacitor iOS project is ready to open in Xcode and sign with a
-   free Apple ID (Personal Team). Does not need a Mac. Run after `cap sync ios`. */
+/* Checks the Capacitor iOS project is ready to open in Xcode and sign with
+   paid team P2N4988G3H, including Sign in with Apple. Does not need a Mac.
+   Run after `cap sync ios`. */
 'use strict';
 var fs = require('fs');
 var path = require('path');
@@ -63,15 +64,17 @@ appTargets.forEach(function (block) {
   need(/CURRENT_PROJECT_VERSION = 1;/.test(block), 'build number must be 1');
   need(/IPHONEOS_DEPLOYMENT_TARGET = 15\.0;/.test(block), 'App target deployment target must be iOS 15.0');
   need(/CODE_SIGN_STYLE = Automatic;/.test(block), 'signing must be automatic');
-  need(/DEVELOPMENT_TEAM = "";/.test(block), 'DEVELOPMENT_TEAM must be empty so a Personal Team can be chosen on the Mac');
+  need(/DEVELOPMENT_TEAM = P2N4988G3H;/.test(block), 'DEVELOPMENT_TEAM must be P2N4988G3H');
+  need(/CODE_SIGN_ENTITLEMENTS = App\/App\.entitlements;/.test(block), 'CODE_SIGN_ENTITLEMENTS must be App/App.entitlements');
 });
 blocks.forEach(function (block) {
   need(!/IPHONEOS_DEPLOYMENT_TARGET = (?!15\.0;)/.test(block), 'every deployment target must be iOS 15.0');
-  need(!/DEVELOPMENT_TEAM = (?!"")/.test(block), 'a team id must not be committed');
+  var team = block.match(/DEVELOPMENT_TEAM = ([^;]+);/);
+  if (team) need(team[1] === 'P2N4988G3H', 'DEVELOPMENT_TEAM must be P2N4988G3H');
 });
 need(/ProvisioningStyle = Automatic;/.test(project), 'Xcode provisioning style must be automatic');
-need(!/CODE_SIGN_ENTITLEMENTS|PROVISIONING_PROFILE|SystemCapabilities/.test(project), 'Sign in with Apple is not attached to the default build');
-need(project.indexOf('com.apple.developer.applesignin') === -1, 'the default build must not request Sign in with Apple');
+need(!/PROVISIONING_PROFILE|SystemCapabilities/.test(project), 'keep automatic signing and do not add extra capabilities in the project');
+need((project.match(/CODE_SIGN_ENTITLEMENTS = App\/App\.entitlements;/g) || []).length === 2, 'Debug and Release must both attach App/App.entitlements');
 need(plistString(plist, 'NSFaceIDUsageDescription') === 'Duo Budget uses Face ID to unlock your budget.', 'Face ID usage string must be present');
 
 var banned = [
@@ -88,7 +91,7 @@ var banned = [
 ];
 var tree = '';
 var appleEntitlements = read('capacitor-ios/App/App/App.entitlements');
-need(/<key>com\.apple\.developer\.applesignin<\/key>\s*<array>\s*<string>Default<\/string>\s*<\/array>/.test(appleEntitlements), 'App.entitlements must hold Sign in with Apple Default, unattached to the build');
+need(/<key>com\.apple\.developer\.applesignin<\/key>\s*<array>\s*<string>Default<\/string>\s*<\/array>/.test(appleEntitlements), 'App.entitlements must hold Sign in with Apple Default');
 walk(ios, function (file) {
   if (file.endsWith('.entitlements') && path.basename(file) !== 'App.entitlements') problems.push('remove entitlements file ' + path.relative(root, file));
   if (path.basename(file) === 'Podfile' || path.basename(file) === 'Podfile.lock') problems.push('CocoaPods file is not used: ' + path.relative(root, file));
@@ -141,4 +144,4 @@ if (problems.length) {
   problems.forEach(function (msg) { console.error(' - ' + msg); });
   process.exit(1);
 }
-console.log('iOS project is ready to open: au.duobudget.app, Duo Budget, 0.1.0 (1), iOS 15, automatic signing, no team, URL scheme au.duobudget.app, web assets copied.');
+console.log('iOS project is ready to open: au.duobudget.app, Duo Budget, 0.1.0 (1), iOS 15, automatic signing, team P2N4988G3H, Sign in with Apple, URL scheme au.duobudget.app, web assets copied.');

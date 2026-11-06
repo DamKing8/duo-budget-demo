@@ -6,7 +6,7 @@ The running app reads `window.DUO_AUTH_CONFIG` in `index.html`:
 
 | Flag | Default | Button |
 | --- | --- | --- |
-| `apple` | `false` | Continue with Apple is hidden. |
+| `apple` | `true` | iPhone tries the native Sign in with Apple sheet, then browser sign-in. Web and Android stay on browser sign-in while `appleClientId` is empty. |
 | `google` | `true` | Continue with Google uses the existing browser sign-in. |
 | `allowGoogleWithoutApple` | `false` | On iPhone, Google is hidden while Apple is off. Set true only on your own phone before Apple exists. |
 | `appleClientId` | empty | Services ID. Required before Apple shows on web or Android. iOS native can try from the bundle id once `apple` is true, and still needs the paid capability. |
@@ -22,19 +22,14 @@ Project `ksrffninlyioqobvdvhu`. Notes for the same choices are in `backend/auth/
 
 1. Authentication → Providers → Email. Leave it on. Minimum password length 8. Confirmation stays on. The confirmation template and the recovery template must include `{{ .Token }}` so reset and sign-in are 6-digit codes, not links.
 2. Authentication → Providers → Google. It is the provider the app already calls. Add the iOS client id, and the Android client id if the token audience is not the web client, under additional client ids. Leave skip nonce check off.
-3. Authentication → Providers → Apple. Leave it **off** until the Apple row below exists. Then enable it, set the Services ID, the secret generated from the `.p8`, and add the bundle id `au.duobudget.app` as a client id.
+3. Authentication → Providers → Apple. Turn it on when you have the Services ID, the Key ID, and the `.p8`. Add the bundle id `au.duobudget.app` as a client id so the iPhone id token is accepted. The exact clicks are in `docs/apple-setup.md`. Until this is saved, the native token is rejected and the button opens browser Apple sign-in, which needs the same provider.
 4. Authentication → URL configuration. Keep the site URL as the website. Redirect URLs must include `au.duobudget.app://auth-callback` (already used by the native browser sign-in). Do not change the site URL to the custom scheme.
 5. Authentication → Providers, manual linking. Turn on so Partners → Link Google / Link Apple can attach a second method to the same account. The app will not unlink the last method.
 6. Do not run `backend/migrations/20261105_delete_my_account.sql` until you have read it. Do not deploy `backend/functions/delete-account/`.
 
-## Apple Developer (paid program, not bought)
+## Apple Developer (paid membership, team P2N4988G3H)
 
-A free Apple ID can install the app from Xcode. It cannot enable Sign in with Apple.
-
-1. Identifiers → App ID `au.duobudget.app` → Sign in with Apple.
-2. Identifiers → Services ID for the website and Android. That Services ID is `appleClientId`. Domain and return URL: `https://ksrffninlyioqobvdvhu.supabase.co/auth/v1/callback`.
-3. Keys → Sign in with Apple key (`.p8`), plus the Key ID and Team ID. Supabase turns those into the client secret. The `.p8` does not go in the app.
-4. Only after that: set `apple: true` and `appleClientId` in `DUO_AUTH_CONFIG`, and add the Sign in with Apple capability in Xcode. Adding it earlier breaks the free Personal Team build.
+The iPhone project already sets the team and attaches Sign in with Apple. Follow `docs/apple-setup.md` for the App ID, Services ID `au.duobudget.web`, the `.p8`, and the Supabase provider. Do not commit the `.p8`, the Key ID, or a Services ID. `appleClientId` stays empty; the iPhone sheet uses the bundle id.
 
 ## Google Cloud
 

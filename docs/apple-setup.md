@@ -1,63 +1,91 @@
-# Apple setup after the paid membership is approved
+# Apple setup
 
-Team ID: `P2N4988G3H`. Bundle ID: `au.duobudget.app`.
+Paid Apple Developer Program membership is approved. Team ID `P2N4988G3H` is already on the App target.
 
-Debug and Release keep `DEVELOPMENT_TEAM` empty so a free Personal Team can sideload. Sign in with Apple is written in `capacitor-ios/App/App/App.entitlements` and is **not** attached to the Debug or Release build. A free or still-pending Apple ID cannot sign that capability, so the default build leaves it off. The in-app Apple button stays hidden.
+The iPhone preview tip is `cursor/ios-test-47-48`. Build from that branch. Do not merge it into `main` or `app-private`, and do not submit a build to the App Store from these steps.
 
-Do these steps yourself after Apple approves the paid Developer Program membership. This file does not call Apple.
+## Already in the Xcode project
 
-## 1. Turn the entitlement on in Xcode
+App target, Debug and Release, in `capacitor-ios/App/App.xcodeproj`:
 
-1. Open `capacitor-ios/App/App.xcodeproj`.
-2. Select the **App** target.
-3. Open **Build Settings** and search for **Development Team**.
-4. For Debug and Release, set **Development Team** to `P2N4988G3H`. Leave it empty until this approval. A free Personal Team cannot use that id.
-5. Search for **Code Signing Entitlements**. For Debug and Release, set the value to `App/App.entitlements`.
-6. Open **Signing & Capabilities**. Confirm the team is `P2N4988G3H` and **Sign in with Apple** is listed. Do not add Push, iCloud, or App Groups.
+| Setting | Value |
+| --- | --- |
+| `DEVELOPMENT_TEAM` | `P2N4988G3H` |
+| `CODE_SIGN_STYLE` | `Automatic` |
+| `ProvisioningStyle` | `Automatic` |
+| `PRODUCT_BUNDLE_IDENTIFIER` | `au.duobudget.app` |
+| `CODE_SIGN_ENTITLEMENTS` | `App/App.entitlements` |
 
-## 2. Register the App ID
+`capacitor-ios/App/App/App.entitlements` contains `com.apple.developer.applesignin` = `Default`. Do not add Push, iCloud, or App Groups.
+
+`window.DUO_AUTH_CONFIG.apple` is `true`. On iPhone, Sign in with Apple tries the native sheet through `@capgo/capacitor-social-login` and `signInWithIdToken`. The sheet uses the bundle id. `appleClientId` stays empty in git. If the native token cannot be finished, the same button opens the existing browser Apple sign-in. Google stays on browser sign-in.
+
+## Rebuild on your Mac
+
+```bash
+git fetch origin cursor/ios-test-47-48
+git checkout cursor/ios-test-47-48
+git pull origin cursor/ios-test-47-48
+npm install
+npm run ios:prepare
+```
+
+Open `capacitor-ios/App/App.xcodeproj` (not the widget project in `ios/`). In Xcode: Product → Clean Build Folder, then Run on your iPhone. Team `P2N4988G3H` is already in the project. Do not clear Development Team. Signing & Capabilities should list Sign in with Apple. The Partner footer should show `Build` plus the short commit from `git rev-parse --short HEAD`.
+
+## Still yours to click
+
+None of these values are in the repo. Do not paste the `.p8` or a client secret into git.
+
+### 1. App ID
 
 1. Open [Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/identifiers/list).
-2. Click **Identifiers**, then the **+** button.
-3. Choose **App IDs**, then **Continue**.
-4. Choose **App**, then **Continue**.
-5. Description: `Duo Budget`.
-6. Bundle ID: **Explicit**, `au.duobudget.app`.
-7. Enable **Sign in with Apple**. Leave every other capability off.
-8. Click **Continue**, then **Register**.
+2. Identifiers → **+** → App IDs → App.
+3. Description: `Duo Budget`. Bundle ID: Explicit, `au.duobudget.app`.
+4. Enable **Sign in with Apple** only. Leave every other capability off.
+5. Register.
 
-## 3. Create the Services ID
+If this App ID already exists, open it and enable Sign in with Apple. Xcode automatic signing needs that capability or the attached entitlement will not provision.
 
-1. On Identifiers, click **+**.
-2. Choose **Services IDs**, then **Continue**.
-3. Description: `Duo Budget web`.
-4. Identifier: `au.duobudget.web`.
-5. Click **Continue**, then **Register**.
-6. Open the new Services ID.
-7. Enable **Sign in with Apple**, then click **Configure**.
-8. Primary App ID: `au.duobudget.app`.
-9. Domains: `ksrffninlyioqobvdvhu.supabase.co`.
-10. Return URL: `https://ksrffninlyioqobvdvhu.supabase.co/auth/v1/callback`.
-11. Click **Next**, then **Done**, then **Continue**, then **Save**.
+### 2. Services ID
 
-## 4. Create the Sign in with Apple key
+1. Identifiers → **+** → Services IDs.
+2. Description: `Duo Budget web`. Identifier: `au.duobudget.web`.
+3. Enable Sign in with Apple → Configure.
+4. Primary App ID: `au.duobudget.app`.
+5. Domains: `ksrffninlyioqobvdvhu.supabase.co`.
+6. Return URL: `https://ksrffninlyioqobvdvhu.supabase.co/auth/v1/callback`.
+7. Save.
 
-1. Open [Keys](https://developer.apple.com/account/resources/authkeys/list).
-2. Click **+**.
-3. Key name: `Duo Budget Sign in with Apple`.
-4. Enable **Sign in with Apple**, then click **Configure** and choose Primary App ID `au.duobudget.app`.
-5. Click **Continue**, then **Register**.
-6. Download the `.p8` file. Apple shows it once.
-7. Note the Key ID on that page.
-8. In the Supabase dashboard, open Authentication, then Apple, and upload the `.p8` yourself. Also enter the Services ID `au.duobudget.web`, the Key ID, and Team ID `P2N4988G3H`.
+This identifier is the web and Android Services ID. It is not stored in the app. The iPhone native sheet does not use it.
 
-## 5. Create the App Store Connect app
+### 3. Sign in with Apple key
 
-1. Open [App Store Connect](https://appstoreconnect.apple.com/apps) and click **+**, then **New App**.
-2. Platforms: iOS.
-3. Name: `Duo Budget`.
-4. Primary language: English (Australia) or your choice.
-5. Bundle ID: `au.duobudget.app`.
-6. SKU: `duobudget`.
-7. User access: Full Access.
-8. Click **Create**. Do not submit a build from this step.
+1. Open [Keys](https://developer.apple.com/account/resources/authkeys/list) → **+**.
+2. Key name: `Duo Budget Sign in with Apple`. Enable Sign in with Apple. Primary App ID: `au.duobudget.app`.
+3. Register and download the `.p8`. Apple shows it once.
+4. Write down the Key ID from that page. There is no Key ID in this repo.
+
+### 4. Supabase Apple provider
+
+Project `https://ksrffninlyioqobvdvhu.supabase.co`. Authentication → Providers → Apple. Turn it on and enter:
+
+- Services ID: `au.duobudget.web`
+- Team ID: `P2N4988G3H`
+- Key ID: the id from the key page (not in this repo)
+- Secret: the `.p8` you downloaded, or the secret Supabase generates from it
+- Client IDs: include the bundle id `au.duobudget.app` so the native id token is accepted
+
+Also keep redirect URL `au.duobudget.app://auth-callback` on the allow list. That is the browser return used when the native token cannot be finished.
+
+### 5. App Store Connect, for TestFlight later
+
+1. [App Store Connect](https://appstoreconnect.apple.com/apps) → **+** → New App.
+2. Platform iOS. Name `Duo Budget`. Bundle ID `au.duobudget.app`. SKU `duobudget`.
+3. Create. Do not submit a build from this step.
+
+## What still blocks a finished Apple sign-in
+
+- The App ID must have Sign in with Apple, or Xcode cannot sign the attached entitlement.
+- Supabase must have the Apple provider on, with the `.p8` secret, Team ID `P2N4988G3H`, the Key ID from the key page, Services ID `au.duobudget.web`, and client id `au.duobudget.app`. Until that is saved, the native sheet can appear but the id token is rejected, and the button then opens browser Apple sign-in.
+- Browser Apple sign-in uses that same Supabase provider. Until the provider is on, neither path can create a session.
+- TestFlight needs the App Store Connect app and a build you upload yourself. This repo does not upload one.

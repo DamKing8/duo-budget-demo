@@ -31,9 +31,9 @@ An existing signed-in browser, or one that already has a saved budget, skips the
 
 On the web the passcode is a curtain for that browser. The help text says so. Biometrics on the web are not in this milestone.
 
-### iPhone (Xcode, free Apple ID)
+### iPhone (Xcode, team P2N4988G3H)
 
-Use the Capacitor project, not the widget project in `ios/`. PR #47 (unmerged) is the free Apple ID prep. This change adds `NSFaceIDUsageDescription` to `capacitor-ios/App/App/Info.plist` and does **not** add the Sign in with Apple capability. A free Personal Team cannot sign that capability, and PR #47's check rejects it. Leave the capability off until the paid Apple Developer Program exists.
+Use the Capacitor project, not the widget project in `ios/`. Debug and Release already set Development Team to `P2N4988G3H` and attach `App/App.entitlements` (Sign in with Apple). Do not clear the team and do not add Push, iCloud, or App Groups.
 
 ```bash
 git clone -b app-private https://github.com/DamKing8/duo-budget-demo.git
@@ -43,11 +43,11 @@ npm run cap:sync
 open capacitor-ios/App/App.xcodeproj
 ```
 
-Signing & Capabilities: your Personal Team, bundle id `au.duobudget.app`. Do not add Sign in with Apple. Run on your iPhone (iOS 15 or later).
+Signing & Capabilities: team `P2N4988G3H` is already selected, bundle id `au.duobudget.app`, Sign in with Apple listed. Run on your iPhone (iOS 15 or later).
 
 You can test welcome, email code, guest mode, the passcode lock, the auto-lock timers (leave the app and come back), and sign-out. Face ID prompts only after the lock is on and the phone has Face ID. The usage text is "Duo Budget uses Face ID to unlock your budget."
 
-The landing always shows Apple, Google, and email. Those buttons use the existing browser sign-in. Native Apple and native Google on iPhone still wait for client ids and the paid Sign in with Apple capability. The in-app provider list still hides Google on iPhone while `apple` is false (App Store guideline 4.8).
+The landing always shows Apple, Google, and email. On iPhone, Apple tries the native sheet and falls back to browser sign-in. Google stays on browser sign-in until an iOS client id exists. The Supabase Apple provider steps are in `docs/apple-setup.md`.
 
 `npm run cap:sync` rewrites `capacitor-ios/App/CapApp-SPM/Package.swift` for the new plugins. That file will conflict with PR #47, which still lists only App, Browser and Splash Screen. The plist Face ID line can conflict with PR #47's whitespace-only plist edit. The widget project in `ios/` is untouched.
 

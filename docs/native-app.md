@@ -42,13 +42,13 @@ python3 tools/make-native-branding.py
 
 The return link for Google sign-in is an intent filter on `MainActivity`: scheme `au.duobudget.app`, host `auth-callback`.
 
-## Run on your iPhone with a free Apple ID
+## Run on your iPhone
 
-This installs Duo Budget on your own iPhone from Xcode. It uses the free Apple ID you already have (a Personal Team). You do not need a paid Apple Developer Program membership, TestFlight, App Store Connect, a push certificate, or an upload to Apple.
+This installs Duo Budget on your own iPhone from Xcode. The App target already uses paid team `P2N4988G3H`, automatic signing, and Sign in with Apple. The portal clicks that are still yours are in `docs/apple-setup.md`. Do not submit a build from this page.
 
 The project Xcode opens is `capacitor-ios/`. It was created with `npx cap add ios` and uses Swift Package Manager (`capacitor-ios/App/CapApp-SPM`). There is no Podfile. CocoaPods is not used, and you should not install it. The home-screen widget project in `ios/` is a different app. Leave that folder as it is, and do not open it for this run.
 
-The app target has no Push Notifications, Sign in with Apple, App Groups, Associated Domains, or iCloud capability. `DEVELOPMENT_TEAM` is empty on purpose. Automatic signing is on. You pick your own Personal Team in Xcode. Do not commit a team id if Xcode writes one into the project.
+Debug and Release set `DEVELOPMENT_TEAM` to `P2N4988G3H` and `CODE_SIGN_ENTITLEMENTS` to `App/App.entitlements`. Do not clear the team. Do not add Push, iCloud, or App Groups.
 
 ### What to install
 
@@ -62,8 +62,9 @@ The app target has no Push Notifications, Sign in with Apple, App Groups, Associ
 In Terminal:
 
 ```bash
-git clone -b app-private https://github.com/DamKing8/duo-budget-demo.git
-cd duo-budget-demo
+git fetch origin cursor/ios-test-47-48
+git checkout cursor/ios-test-47-48
+git pull origin cursor/ios-test-47-48
 npm install
 npm run ios:prepare
 ```
@@ -88,15 +89,11 @@ The first open downloads the Capacitor Swift package. Leave the Mac online until
 
 1. In the left sidebar, click the blue App project, then the **App** target under TARGETS.
 2. Open **Signing & Capabilities**.
-3. Tick **Automatically manage signing**.
-4. Open the **Team** menu and choose **Add an Account…**. Sign in with your Apple ID.
-5. Open **Team** again and choose the row that ends in **(Personal Team)**. That is the free account.
-6. The bundle identifier should stay `au.duobudget.app`. The name under the icon is Duo Budget. The version is 0.1.0, build 1. The iOS deployment target is 15.0, which is the oldest iOS Capacitor 8 supports, so the iPhone needs iOS 15 or later.
-7. The capabilities list should be empty. If Push Notifications, Sign in with Apple, App Groups, Associated Domains, or iCloud is listed, select it and delete it. A free account cannot sign those, and the build will fail until they are gone.
+3. **Automatically manage signing** stays on. Team is already `P2N4988G3H`. If the menu is empty, sign in to Xcode with the Apple ID that belongs to that team, then choose `P2N4988G3H` again. Do not choose a Personal Team.
+4. The bundle identifier stays `au.duobudget.app`. The name under the icon is Duo Budget. The version is 0.1.0, build 1. The iOS deployment target is 15.0.
+5. Sign in with Apple should be listed, from `App/App.entitlements`. Leave it. Do not add Push Notifications, App Groups, Associated Domains, or iCloud.
 
-If Xcode says the bundle identifier is not available, or that `au.duobudget.app` cannot be registered to your team, someone else already owns that id. In Signing & Capabilities, change the bundle identifier to a unique one, for example `au.duobudget.app.damon`. Leave the URL scheme in `capacitor-ios/App/App/Info.plist` as `au.duobudget.app`. Sign-in still returns to `au.duobudget.app://auth-callback`. The scheme and the bundle id are separate. Leave everything under `ios/` as it is.
-
-Do that change in Xcode after `npm run ios:prepare` has succeeded. A later `ios:prepare` or `cap:sync` checks that the project file still says `au.duobudget.app`, and it will stop if the id was edited. To refresh the web files without that check, run `npm run sync:www && npx cap sync ios`. Capacitor does not put the bundle id back.
+`npm run ios:prepare` checks the bundle id, the team, and the entitlement. Do not change the bundle id.
 
 ### Run it on the phone
 
@@ -106,25 +103,17 @@ Do that change in Xcode after `npm run ios:prepare` has succeeded. A later `ios:
 4. Press Run. The first build can take a few minutes.
 5. If the icon does nothing, or the phone says the developer is not trusted: on the iPhone open **Settings → General → VPN & Device Management**, tap the developer under Developer App, and tap Trust.
 
-### Seven days, and the free-account limits
+### What this signing setup does not include
 
-A free provisioning profile lasts 7 days. After that, Duo Budget stops opening. Plug the phone in, open this same project, and press Run again. That refreshes the signature. You do not need a new Apple ID, and you do not need to delete the app first (deleting it removes the budget stored on the phone).
+Push notifications, iCloud, and App Groups stay off. The widget project in `ios/` is separate. See `ios/README.md`. TestFlight waits on the App Store Connect app in `docs/apple-setup.md`. Do not upload a build from this page.
 
-Apple’s free account can have **3 apps installed on one device**, and **10 App IDs registered at a time**. Those App IDs expire after 7 days, so the practical limit is about 10 new App IDs a week. Pressing Run again for Duo Budget reuses the same App ID. Changing the bundle identifier spends a new one.
-
-### What a free account cannot do
-
-Push notifications, Sign in with Apple, TestFlight, the App Store, and iCloud do not work on a Personal Team. There is nothing to upload.
-
-App Groups do not work either, so the home-screen widget in `ios/` cannot share numbers with this app. That widget project stays as it is. It still needs a paid Apple Developer Program membership, which this setup does not use. See `ios/README.md` if that membership exists later.
-
-If you ever have to recreate the Capacitor iOS project: delete `capacitor-ios` and run `npx cap add ios`. Do not delete `ios/`. Then put back the bundle id `au.duobudget.app`, the display name Duo Budget, version 0.1.0 build 1, the URL scheme below, an empty development team, and automatic signing. `npm run ios:prepare` checks those.
+If you ever have to recreate the Capacitor iOS project: delete `capacitor-ios` and run `npx cap add ios`. Do not delete `ios/`. Then put back the bundle id `au.duobudget.app`, the display name Duo Budget, version 0.1.0 build 1, the URL scheme below, team `P2N4988G3H`, automatic signing, and `CODE_SIGN_ENTITLEMENTS = App/App.entitlements`. `npm run ios:prepare` checks those.
 
 ## App lock and Sign in with Apple
 
 Milestone 1 adds Face ID / fingerprint, a passcode, and native Apple and Google sheets behind config flags. `NSFaceIDUsageDescription` is in `capacitor-ios/App/App/Info.plist`: "Duo Budget uses Face ID to unlock your budget." Android asks for `USE_BIOMETRIC` and `USE_FINGERPRINT`.
 
-The Sign in with Apple capability is **not** on the Xcode target. A free Personal Team cannot sign it, and the unmerged PR #47 check rejects that entitlement. Add the capability only after the paid Apple Developer Program and the credentials in `docs/auth-setup.md`. The cold-start landing still shows Continue with Apple and Continue with Google. Those taps use browser sign-in until `window.DUO_AUTH_CONFIG.apple` is true and the client ids are set. Native sheets stay off.
+The App target already signs with team `P2N4988G3H` and `App/App.entitlements` (Sign in with Apple, Default). Do not add Push, iCloud, or App Groups. On iPhone, Sign in with Apple tries the native sheet, then browser sign-in if that token cannot be finished. Google stays on browser sign-in. The portal and Supabase steps that are still missing are in `docs/apple-setup.md`.
 
 `npm run cap:sync` adds `@capgo/capacitor-social-login`, `@aparajita/capacitor-biometric-auth`, `@aparajita/capacitor-secure-storage` and `@capacitor/privacy-screen` to `capacitor-ios/App/CapApp-SPM/Package.swift` and to the Android Gradle projects. PR #47's Package.swift still lists only App, Browser and Splash Screen, so the two branches will both touch that generated file. The widget project in `ios/` is not part of this.
 
