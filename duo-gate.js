@@ -137,6 +137,7 @@
     g.innerHTML = '<div class="duo-gate-in">' + html + '</div>';
     g.classList.add('on');
     g.classList.toggle('lock-open', !!(opts && opts.lock));
+    g.classList.toggle('welcome-open', mode === 'welcome');
     g.removeAttribute('hidden');
     document.documentElement.classList.add('duo-gated');
   }
@@ -145,6 +146,7 @@
     if (!g) return;
     g.classList.remove('on');
     g.classList.remove('lock-open');
+    g.classList.remove('welcome-open');
     g.setAttribute('hidden', '');
     g.innerHTML = '';
     document.documentElement.classList.remove('duo-gated');
@@ -217,6 +219,39 @@
       });
     });
   }
+  function welcomeArt() {
+    return '<div class="welcome-art" data-test="welcome-art" aria-hidden="true">' +
+      '<svg viewBox="0 0 360 210" xmlns="http://www.w3.org/2000/svg">' +
+      '<defs><filter id="wa-sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#04242c" flood-opacity="0.28"/></filter></defs>' +
+      '<g filter="url(#wa-sh)">' +
+      '<rect x="46" y="8" width="168" height="250" rx="28" fill="#0c1a24"/>' +
+      '<rect x="54" y="16" width="152" height="234" rx="22" fill="#F7F4EE"/>' +
+      '<rect x="112" y="24" width="36" height="6" rx="3" fill="#0c1a24"/>' +
+      '<circle cx="66" cy="46" r="6" fill="#22d3ee"/><circle cx="76" cy="46" r="6" fill="#a78bfa"/>' +
+      '<text x="86" y="50" fill="#1F2430" font-size="11" font-weight="700">Duo Budget</text>' +
+      '<rect x="64" y="62" width="132" height="72" rx="14" fill="#fff"/>' +
+      '<text x="74" y="78" fill="#0F5F57" font-size="7" font-weight="700" letter-spacing="0.4">LEFT OVER THIS FORTNIGHT</text>' +
+      '<text x="74" y="102" fill="#1F2430" font-size="18" font-weight="800">$1,172.78</text>' +
+      '<text x="74" y="120" fill="#5B6170" font-size="7">$5,820 in · 20% left over</text>' +
+      '</g>' +
+      '<g filter="url(#wa-sh)">' +
+      '<rect x="168" y="78" width="156" height="124" rx="20" fill="#fff"/>' +
+      '<text x="246" y="98" text-anchor="middle" fill="#5B6170" font-size="8" font-weight="700">Where the money goes</text>' +
+      '<circle cx="226" cy="148" r="38" fill="none" stroke="#E7F3F1" stroke-width="12"/>' +
+      '<g transform="rotate(-90 226 148)" fill="none" stroke-width="12">' +
+      '<circle cx="226" cy="148" r="38" stroke="#0F766E" stroke-dasharray="23.9 214.9"/>' +
+      '<circle cx="226" cy="148" r="38" stroke="#6D4AD8" stroke-dasharray="23.9 214.9" stroke-dashoffset="-23.9"/>' +
+      '<circle cx="226" cy="148" r="38" stroke="#2F5FD0" stroke-dasharray="143.3 95.5" stroke-dashoffset="-47.8"/>' +
+      '<circle cx="226" cy="148" r="38" stroke="#5eead4" stroke-dasharray="47.8 191" stroke-dashoffset="-191.1"/>' +
+      '</g>' +
+      '<text x="226" y="146" text-anchor="middle" fill="#5B6170" font-size="7" font-weight="700">INCOME</text>' +
+      '<text x="226" y="160" text-anchor="middle" fill="#1F2430" font-size="11" font-weight="800">$5,820</text>' +
+      '<circle cx="278" cy="128" r="4" fill="#0F766E"/><text x="286" y="131" fill="#1F2430" font-size="8">10%</text>' +
+      '<circle cx="278" cy="144" r="4" fill="#6D4AD8"/><text x="286" y="147" fill="#1F2430" font-size="8">10%</text>' +
+      '<circle cx="278" cy="160" r="4" fill="#2F5FD0"/><text x="286" y="163" fill="#1F2430" font-size="8">60%</text>' +
+      '<circle cx="278" cy="176" r="4" fill="#5eead4"/><text x="286" y="179" fill="#1F2430" font-size="8">20%</text>' +
+      '</g></svg></div>';
+  }
   function showWelcome() {
     mode = 'welcome';
     var note = plan && plan.reason === 'inactive' ? '<p class="sub">You\'ve been away from this browser for 30 days, so we signed you out. Your budget is safe.</p>' : '<p class="sub">Plan around both paydays.</p>';
@@ -230,7 +265,8 @@
       '<div class="duo-actions">' + buttons + '</div>' +
       '<button class="btn ghost block" type="button" id="gate-guest" data-test="welcome-guest">Try demo</button>' +
       '<p class="mock">Your budget stays on this phone. Add an account any time.</p>' +
-      '<p class="mock"><a href="privacy.html">Privacy</a> · <a href="delete-account.html">Delete an account</a></p></div>');
+      '<p class="mock"><a href="privacy.html">Privacy</a> · <a href="delete-account.html">Delete an account</a></p>' +
+      welcomeArt() + '</div>');
     var apple = $('gate-apple'); if (apple) apple.addEventListener('click', function () { startProvider('apple'); });
     var google = $('gate-google'); if (google) google.addEventListener('click', function () { startProvider('google'); });
     $('gate-email').addEventListener('click', function () { showEmail(false); });

@@ -1086,6 +1086,10 @@ button.otp-resend:disabled{opacity:.55}
 html[data-theme=dark] .duo-welcome .btn.apple{background:#fff;color:#000}
 html[data-theme=dark] .duo-welcome .btn.google{background:#131314;color:#e3e3e3;border-color:#8e918f}
 .duo-welcome .btn.ghost{margin-top:14px}
+.duo-gate.welcome-open .duo-gate-in{min-height:100%;display:flex;flex-direction:column;box-sizing:border-box}
+.duo-welcome{flex:1;display:flex;flex-direction:column}
+.welcome-art{margin-top:22px;flex:1 1 auto;min-height:150px;border-radius:28px;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(145deg,#0E7490 0%,#0F766E 46%,#31457f 100%);box-shadow:0 12px 28px rgba(14,116,144,.16)}
+.welcome-art svg{width:100%;height:auto;max-height:100%;display:block}
 .duo-dots{display:flex;gap:14px;justify-content:center;margin:22px 0}
 .duo-dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);display:block}
 .duo-dots i.on{background:var(--cyan);border-color:var(--cyan)}
@@ -1112,6 +1116,7 @@ html[data-theme=dark] .duo-welcome .btn.google{background:#131314;color:#e3e3e3;
 .lock-foot .btn{width:100%;border-radius:14px}
 @media (max-height:700px){
   .lock-invite .lock-logo,.lock-invite .lock-logo img,.duo-welcome .duo-mark,.duo-welcome .duo-mark img{width:144px;height:144px}
+  .welcome-art{min-height:110px;margin-top:14px}
   .lock-invite h2.page{font-size:24px;margin:2px 0}
   .lock-slogan{font-size:14px}
   .lock-invite .duo-dots{margin:8px 0 4px}
