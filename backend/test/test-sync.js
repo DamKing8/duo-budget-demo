@@ -330,7 +330,7 @@ function testSignInEntryPoints() {
   assert(html.indexOf('Load sample data') > 0 && html.indexOf('Clear sample data') > 0 && html.indexOf('data-test="empty-start"') > 0, 'sample data is a choice, with a way to clear it');
   assert(/:blankBudget\(\)/.test(html) && /useBlank:function\(\)\{S=blankBudget\(\)/.test(html), 'a new phone starts from an empty budget');
   assert(gate.indexOf('ctx.useBlank') > 0 && gate.indexOf('ctx.useDemo') < 0, 'guest start does not load the sample household');
-  assert(gate.indexOf('>Try demo<') > 0 && gate.indexOf('Plan around both paydays.') > 0, 'the landing offers Try demo and the slogan');
+  assert(gate.indexOf('class="btn ghost block" type="button" id="gate-guest" data-test="welcome-guest">Try demo<') > 0 && gate.indexOf('Plan around both paydays.') > 0, 'Try demo is a secondary button under the slogan');
   assert(gate.indexOf('data-test="welcome-apple"') > 0 && gate.indexOf('data-test="welcome-google"') > 0 && gate.indexOf('data-test="welcome-email"') > 0, 'the landing shows Apple, Google, and email');
   assert(gate.indexOf("startProvider('apple')") > 0 && gate.indexOf("startProvider('google')") > 0 && gate.indexOf('api.signIn(provider)') > 0, 'Apple and Google use the existing browser sign-in');
   assert(gate.indexOf('width="168"') > 0 && html.indexOf('.duo-welcome .duo-mark{width:168px;height:168px') > 0, 'the landing logo matches the lock screen');
