@@ -333,6 +333,8 @@ function testSignInEntryPoints() {
   assert(gate.indexOf('ctx.useBlank') > 0 && gate.indexOf('ctx.useDemo') < 0, 'guest start does not load the sample household');
   assert(gate.indexOf('>Try demo<') > 0 && gate.indexOf('Plan around both paydays.') > 0, 'the landing offers Try demo and the slogan');
   assert(gate.indexOf('data-test="welcome-apple"') > 0 && gate.indexOf('data-test="welcome-google"') > 0 && gate.indexOf('data-test="welcome-email"') > 0, 'the landing shows Apple, Google, and email');
+  assert(gate.indexOf("startProvider('apple')") > 0 && gate.indexOf("startProvider('google')") > 0 && gate.indexOf('api.signIn(provider)') > 0, 'Apple and Google use the existing browser sign-in');
+  assert(gate.indexOf('width="168"') > 0 && html.indexOf('.duo-welcome .duo-mark{width:168px;height:168px') > 0, 'the landing logo matches the lock screen');
   assert(html.indexOf('function nativeAppShell') > 0 && html.indexOf('nativeAppShell()') > 0, 'the native shell does not keep a service worker');
   var fixed = DuoSync.settledNames({ D: 'Chloe', N: 'Jack' }, { myName: 'Chloe', partnerName: '', email: 'd.hosking@outlook.com' });
   assert(fixed.D === 'd.hosking' && fixed.N === '', 'sample names become the email local part and a blank partner');
