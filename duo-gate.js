@@ -226,7 +226,7 @@
     buttons += '<button class="btn pri block" type="button" id="gate-email" data-test="welcome-email">Continue with email</button>';
     show('<div class="duo-welcome" data-test="welcome">' + logo() + '<h2 class="page">Duo Budget</h2>' + note +
       '<div class="duo-actions">' + buttons + '</div>' +
-      '<button class="linkbtn" type="button" id="gate-guest" data-test="welcome-guest">Try demo</button>' +
+      '<button class="btn ghost block" type="button" id="gate-guest" data-test="welcome-guest">Try demo</button>' +
       '<p class="mock">Your budget stays on this phone. Add an account any time.</p>' +
       '<p class="mock"><a href="privacy.html">Privacy</a> · <a href="delete-account.html">Delete an account</a></p></div>');
     var apple = $('gate-apple'); if (apple) apple.addEventListener('click', function () { startProvider('apple'); });
